@@ -125,7 +125,7 @@
       <input
         id="example1"
         type="file"
-        class="bg-gray-50 block text-xs rounded-sm border truncate max-h-fit file:mr-3 file:border-0 file:bg-[#F46055] file:py-[0.4rem] file:px-4 file:text-xs file:text-white focus:outline-none"
+        class="bg-gray-50 block text-xs rounded-sm border truncate max-h-fit file:mr-3 file:border-0 file:bg-[#237334] file:py-[0.4rem] file:px-4 file:text-xs file:text-white focus:outline-none"
         accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
         on:change={(e) => {
           loadFile(e)

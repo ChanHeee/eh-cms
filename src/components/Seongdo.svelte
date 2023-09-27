@@ -8,13 +8,6 @@
   } from "$lib"
   import { utils, writeFile } from "xlsx"
 
-  onMount(() => {
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(
-      window.navigator.userAgent
-    )
-    console.log(isMobile)
-  })
-
   //icon
   import ChevronDown from "carbon-icons-svelte/lib/ChevronDown.svelte"
   import ChevronUp from "carbon-icons-svelte/lib/ChevronUp.svelte"

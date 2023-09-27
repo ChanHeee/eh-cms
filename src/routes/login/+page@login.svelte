@@ -1,10 +1,15 @@
 <script>
   import { goto } from "$app/navigation"
   import { currentUser } from "$lib"
-  import { onMount } from "svelte"
+  import { onMount, beforeUpdate } from "svelte"
 
   $: name = ""
   $: password = ""
+
+  let isMobile = false
+  onMount(() => {
+    isMobile = /iPhone|iPad|iPod|Android/i.test(window.navigator.userAgent)
+  })
 
   const loginHandler = async () => {
     const response = await fetch(`/api/users/login`, {
@@ -23,8 +28,7 @@
   }
 </script>
 
-<div class="flex w-full items-center">
-  <img src="/landing.png" alt="" class="h-[calc(110vh)]" />
+<div class="flex w-full items-center" class:hidden={isMobile}>
   <div
     class="bg-gray-100 w-full flex h-[calc(130vh)] items-center justify-center p-4"
   >
@@ -74,5 +78,19 @@
         </form>
       </div>
     </div>
+  </div>
+</div>
+
+<div
+  id="no-mobile"
+  class={isMobile
+    ? "flex fixed top-0 left-0 w-[100vw] h-screen justify-center items-center z-[99] bg-gray-50"
+    : "hidden"}
+>
+  <div class="flex flex-col w-4/5 rounded-lg mb-32 bg-white drop-shadow p-3">
+    <img class="mx-auto h-10 w-auto mb-5" src="/eh-logo.png" alt="" />
+    <p class="text-center mb-3 text-sm">
+      이 페이지는 모바일에서 접근할 수 없습니다.<br />PC로 접근해주세요.
+    </p>
   </div>
 </div>
