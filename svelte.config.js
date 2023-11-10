@@ -14,9 +14,6 @@ const config = {
     adapter: adapter({
       runtime: "nodejs18.x",
     }),
-    alias: {
-      $db: "./src/db",
-    },
   },
 }
 

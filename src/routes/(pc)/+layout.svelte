@@ -1,0 +1,186 @@
+<script lang="ts">
+  import Briefcase from "./../../lib/icon/Briefcase.svelte"
+  import HamburgerMenu from "$lib/icon/HamburgerMenu.svelte"
+  import GraduationCap from "$lib/icon/GraduationCap.svelte"
+  import { enhance } from "$app/forms"
+  import "../../app.postcss"
+
+  import UserMultiple from "carbon-icons-svelte/lib/UserMultiple.svelte"
+  import Logout from "carbon-icons-svelte/lib/Logout.svelte"
+  import { onMount } from "svelte"
+  import { Search } from "carbon-icons-svelte"
+  import { goto } from "$app/navigation"
+
+  export let data: {
+    path: string
+  }
+  $: path = data.path
+  $: name = ""
+  const tab = { seongdos: "seongdos", educations: "educations" }
+  $: getTabArray = () => {
+    if (path == "seongdos") {
+      const { seongdos, ...rest } = tab
+      return ["seongdos", ...Object.keys({ ...rest })]
+    } else if (path == "educations") {
+      const { educations, ...rest } = tab
+      return ["educations", ...Object.keys({ ...rest })]
+    } else {
+      return ["seongdos", "educations"]
+    }
+  }
+  $: hideMenu = true
+
+  onMount(() => {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(
+      window.navigator.userAgent
+    )
+    if (isMobile) {
+      // document.getElementById("html")?.classList.remove("overflow-hidden")
+    }
+  })
+</script>
+
+<div class="flex flex-col h-[100dvh]">
+  <nav
+    class="flex w-full sm:px-16 items-center text-white bg-[#4C5153] border-b-[4px]"
+    class:border-[#F46055]={path == "seongdos" ? true : false}
+    class:border-[#FBA244]={path == "educations" ? true : false}
+    class:border-[#41B8AF]={path == "simbangs" ? true : false}
+  >
+    <div class="flex w-full flex-col">
+      <div class="flex justify-between items-center px-7 sm:px-0 items-center">
+        <div class="nav_left flex">
+          <p class="text-xl cursor-pointer mt-1.5 py-3 mr-20">
+            <a href="/"><button>은혜교회</button></a>
+          </p>
+          <div class="hidden sm:flex text-sm">
+            <a href="/seongdos">
+              <button
+                class="flex flex-col items-center px-4 pt-3 pb-1 gap-1 hover:bg-[#F46055]"
+                class:bg-[#F46055]={path == "seongdos" ? true : false}
+              >
+                <UserMultiple size={20} />
+                <p class="text-sm">성도관리</p>
+              </button>
+            </a>
+
+            <a href="/educations">
+              <button
+                class="flex flex-col items-center px-4 pt-3 pb-1 gap-1 hover:bg-[#FBA244]"
+                class:bg-[#FBA244]={path == "educations" ? true : false}
+              >
+                <GraduationCap color="#ffffff" width="20px" />
+                <p class="text-sm">교육관리</p>
+              </button>
+            </a>
+            <a href="/educations">
+              <button
+                class="flex flex-col items-center px-4 pt-3 pb-1 gap-1 hover:bg-[#41B8AF]"
+                class:bg-[#41B8AF]={path == "/simbangs" ? true : false}
+              >
+                <div class="flex items-center h-[20px]">
+                  <Briefcase color="#ffffff" width="16px" />
+                </div>
+                <p class="text-sm">심방관리</p>
+              </button>
+            </a>
+          </div>
+        </div>
+        <div class="nav_right">
+          <button class="sm:hidden mt-1.5">
+            <label for="hamburger">
+              <HamburgerMenu width="24px" color="#ffffff" />
+            </label>
+            <input
+              id="hamburger"
+              type="checkbox"
+              class="hidden"
+              on:change={(e) => {
+                hideMenu = !hideMenu
+              }}
+            />
+          </button>
+          <form
+            class="hidden sm:block"
+            method="post"
+            action="/login?/logout"
+            use:enhance
+          >
+            <button class="text-md mt-1.5"> 로그아웃 </button>
+          </form>
+        </div>
+      </div>
+
+      <div
+        id="menu"
+        class="flex-col sm:hidden bg-[#5C6163] text-md"
+        class:hidden={hideMenu}
+      >
+        <!-- {#each getTabArray() as item}
+          {#if item == "seongdos"}
+            <button
+              class="flex w-full items-center text-start px-4 py-2"
+              class:bg-[#F46055]={path == "seongdos" ? true : false}
+              on:click={() => {
+                // document.getElementById("menu")?.classList.add("hidden")
+                hideMenu = true
+                goto("/seongdos")
+              }}
+            >
+              <UserMultiple size={16} class="mr-1" />
+              <p>성도관리</p>
+            </button>
+          {:else if item == "educations"}
+            <button
+              class="flex w-full items-center text-start px-4 py-2"
+              class:bg-[#FBA244]={path == "educations" ? true : false}
+              on:click={() => {
+                // document.getElementById("menu")?.classList.add("hidden")
+                hideMenu = true
+                goto("/educations")
+              }}
+            >
+              <GraduationCap color="#ffffff" width="16px" classString="mr-1" />
+              <p>교육관리</p>
+            </button>
+          {/if}
+        {/each} -->
+        <button
+          class="flex w-full items-center text-start px-4 py-2"
+          class:bg-[#F46055]={path == "seongdos" ? true : false}
+          on:click={() => {
+            // document.getElementById("menu")?.classList.add("hidden")
+            hideMenu = true
+            goto("/seongdos")
+          }}
+        >
+          <UserMultiple size={16} class="mr-1" />
+          <p>성도관리</p>
+        </button>
+        <button
+          class="flex w-full items-center text-start px-4 py-2"
+          class:bg-[#FBA244]={path == "educations" ? true : false}
+          on:click={() => {
+            // document.getElementById("menu")?.classList.add("hidden")
+            hideMenu = true
+            goto("/educations")
+          }}
+        >
+          <GraduationCap color="#ffffff" width="16px" classString="mr-1" />
+          <p>교육관리</p>
+        </button>
+
+        <form class="" method="post" action="/login?/logout" use:enhance>
+          <button class="flex w-full items-center text-start px-4 py-2">
+            <Logout class="mr-1" />
+            <p>로그아웃</p>
+          </button>
+        </form>
+      </div>
+    </div>
+  </nav>
+
+  <div class="flex h-screen overflow-scroll">
+    <slot class="bg-white" />
+  </div>
+</div>

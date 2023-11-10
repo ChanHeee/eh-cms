@@ -3,8 +3,34 @@
 @tailwind components;
 @tailwind utilities;
 
-.grid-col-8 {
-  grid-template-columns: repeat(8, minmax(0, 1fr));
+div,
+form {
+  box-sizing: border-box;
+}
+
+.hidden-if-modile {
+  @media (max-width: 1024px) {
+    display: none;
+  }
+}
+
+.flex-col-if-mobile {
+  @media (max-width: 640px) {
+    flex-direction: column;
+  }
+}
+
+.flex-row-if-mobile {
+  @media (max-width: 1024px) {
+    flex-direction: row;
+  }
+}
+
+.w-full-if-mobile {
+  width: 57%;
+  @media (max-width: 1400px) {
+    width: 100%;
+  }
 }
 
 /* Chrome, Safari, Edge, Opera */
