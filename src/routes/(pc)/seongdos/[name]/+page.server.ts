@@ -4,7 +4,7 @@ export const load = async ({ url, fetch }) => {
 
   const name = decodeURIComponent(url.pathname.split("/")[2])
 
-  let seongdo
+  let seongdo, family, simbangs
   let response = await fetch(`/api/seongdos/${name}`, {
     method: "GET",
     headers: {
@@ -16,7 +16,31 @@ export const load = async ({ url, fetch }) => {
     seongdo = (await response.json()).seongdo
   }
 
+  response = await fetch(`/api/families?seongdoId=${seongdo._id}`, {
+    method: "GET",
+    headers: {
+      "content-type": "application/json",
+    },
+  })
+
+  if (response.ok) {
+    family = (await response.json()).family
+  }
+
+  response = await fetch(`/api/simbangs?seongdoId=${seongdo._id}`, {
+    method: "GET",
+    headers: {
+      "content-type": "application/json",
+    },
+  })
+
+  if (response.ok) {
+    simbangs = (await response.json()).simbangs
+  }
+
   return {
     seongdo,
+    family,
+    simbangs,
   }
 }

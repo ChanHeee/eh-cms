@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Briefcase from "./../../lib/icon/Briefcase.svelte"
+  import Briefcase from "$lib/icon/Briefcase.svelte"
   import HamburgerMenu from "$lib/icon/HamburgerMenu.svelte"
   import GraduationCap from "$lib/icon/GraduationCap.svelte"
   import { enhance } from "$app/forms"
@@ -15,19 +15,9 @@
     path: string
   }
   $: path = data.path
-  $: name = ""
+
   const tab = { seongdos: "seongdos", educations: "educations" }
-  $: getTabArray = () => {
-    if (path == "seongdos") {
-      const { seongdos, ...rest } = tab
-      return ["seongdos", ...Object.keys({ ...rest })]
-    } else if (path == "educations") {
-      const { educations, ...rest } = tab
-      return ["educations", ...Object.keys({ ...rest })]
-    } else {
-      return ["seongdos", "educations"]
-    }
-  }
+
   $: hideMenu = true
 
   onMount(() => {
@@ -45,7 +35,6 @@
     class="flex w-full sm:px-16 items-center text-white bg-[#4C5153] border-b-[4px]"
     class:border-[#F46055]={path == "seongdos" ? true : false}
     class:border-[#FBA244]={path == "educations" ? true : false}
-    class:border-[#41B8AF]={path == "simbangs" ? true : false}
   >
     <div class="flex w-full flex-col">
       <div class="flex justify-between items-center px-7 sm:px-0 items-center">
@@ -73,17 +62,17 @@
                 <p class="text-sm">교육관리</p>
               </button>
             </a>
-            <a href="/educations">
+            <!-- <a href="/simbangs">
               <button
                 class="flex flex-col items-center px-4 pt-3 pb-1 gap-1 hover:bg-[#41B8AF]"
-                class:bg-[#41B8AF]={path == "/simbangs" ? true : false}
+                class:bg-[#41B8AF]={path == "simbangs" ? true : false}
               >
                 <div class="flex items-center h-[20px]">
                   <Briefcase color="#ffffff" width="16px" />
                 </div>
                 <p class="text-sm">심방관리</p>
               </button>
-            </a>
+            </a> -->
           </div>
         </div>
         <div class="nav_right">
@@ -116,35 +105,6 @@
         class="flex-col sm:hidden bg-[#5C6163] text-md"
         class:hidden={hideMenu}
       >
-        <!-- {#each getTabArray() as item}
-          {#if item == "seongdos"}
-            <button
-              class="flex w-full items-center text-start px-4 py-2"
-              class:bg-[#F46055]={path == "seongdos" ? true : false}
-              on:click={() => {
-                // document.getElementById("menu")?.classList.add("hidden")
-                hideMenu = true
-                goto("/seongdos")
-              }}
-            >
-              <UserMultiple size={16} class="mr-1" />
-              <p>성도관리</p>
-            </button>
-          {:else if item == "educations"}
-            <button
-              class="flex w-full items-center text-start px-4 py-2"
-              class:bg-[#FBA244]={path == "educations" ? true : false}
-              on:click={() => {
-                // document.getElementById("menu")?.classList.add("hidden")
-                hideMenu = true
-                goto("/educations")
-              }}
-            >
-              <GraduationCap color="#ffffff" width="16px" classString="mr-1" />
-              <p>교육관리</p>
-            </button>
-          {/if}
-        {/each} -->
         <button
           class="flex w-full items-center text-start px-4 py-2"
           class:bg-[#F46055]={path == "seongdos" ? true : false}

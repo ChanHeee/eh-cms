@@ -1,4 +1,5 @@
 import type { ISeongdoSearchBody } from "$lib/interfaces"
+import { Seongdo } from "$lib/models/Seongdo"
 import { seongdoSearchBody } from "$lib/store"
 import { getSeongdosSearchParams } from "$lib/utils"
 import { redirect } from "@sveltejs/kit"
@@ -33,6 +34,7 @@ export const load = async ({ request, fetch, url, locals }) => {
 
       throw redirect(302, url)
     }
+
     return {
       seongdos,
       total,

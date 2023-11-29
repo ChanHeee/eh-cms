@@ -3,6 +3,9 @@
 
   import { Checkmark } from "carbon-icons-svelte"
 
+  export let data
+  $: teacherList = JSON.parse(data.selectList).teacherList
+
   let name = ""
   let teacher = ""
   let semester = ""
@@ -115,7 +118,10 @@
               class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
             >
               <option value="none" class="hidden" />
-              <option value="고재국 담임목사님">고재국 담임목사님</option>
+              {#each teacherList as teacher}
+                <!-- content here -->
+                <option value={teacher}>{teacher}</option>
+              {/each}
             </select>
           </div>
         </div>

@@ -43,6 +43,34 @@ export interface IEducation {
   seongdos: string[]
 }
 
+export interface IFamily {
+  _id?: string
+  memberIds?: string[]
+  members?: IMember[]
+}
+
+export interface IMember {
+  _id?: string
+  seongdo?: string
+  classification?: string
+}
+
+export interface ISimbang {
+  _id?: string
+  seongdoId?: string
+  date?: string
+  hymn?: string
+  bible?: string
+  simbangja?: string
+  detail?: string
+}
+
+export interface ISelectList {
+  _id?: string
+  teacherList: string[]
+  familyClassList: string[]
+}
+
 export interface ISeongdoResponse {
   seongdos: ISeongdo[]
   total: number

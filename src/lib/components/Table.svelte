@@ -107,17 +107,9 @@
   </div>
   <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
     <button
-      class=" flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10 hover:bg-[#B0B1B0]"
-      on:mouseover={(e) => {
-        document.getElementById("jikbunDefalut")?.classList.remove("invisible")
-      }}
-      on:mouseleave={(e) => {
-        document.getElementById("jikbunDefalut")?.classList.add("invisible")
-      }}
-      on:focus={null}
+      class="flex gap-2 px-3 bg-[#D9D9D8] font-bold items-center w-full text-center h-10"
     >
       직분
-      <ArrowsVertical id="jikbunDefalut" class="invisible" />
     </button>
     {#each seongdos as item}
       <div class="flex px-3 items-center h-10">
