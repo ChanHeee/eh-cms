@@ -17,6 +17,7 @@ export interface ISeongdo {
   originalName?: string
   avatar?: string
   birth?: string
+  age?: number
   gender?: string
   phone?: string
   jikbun?: string
@@ -24,7 +25,7 @@ export interface ISeongdo {
   group1?: string
   group2?: string
   address?: string
-  age?: number
+  remarks?: string
   educations?: string[]
 }
 

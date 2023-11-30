@@ -1,11 +1,9 @@
 <script lang="ts">
-  import TableForEdu from "$lib/components/TableForEdu.svelte"
-  import { getAgeFromBirth, getSeongdosSearchParams } from "$lib/utils"
+  import { getAgeFromBirth } from "$lib/utils"
 
   import {
     AddLarge,
     Checkmark,
-    Classification,
     Close,
     Search,
     TrashCan,
@@ -19,8 +17,8 @@
   const nameData = data.seongdo.name
   const phoneData = data.seongdo.phone
   const ageData = data.seongdo.age
-  const group1Data = data.seongdo.group1
-  const group2Data = data.seongdo.group2
+  const remarksData = data.seongdo.remarks
+  console.log(remarksData)
 
   onMount(() => {
     document.getElementById("preview")!.src = seongdo.avatar || "/avatar.png"
@@ -77,6 +75,7 @@
       return address + ", " + detailAddress + " (" + extraAddress + ")"
     }
   }
+  $: remarks = remarksData
 
   // value for family
   $: familyId = data.family?._id
@@ -159,6 +158,7 @@
         group2: group2 || "미분류",
         singeup,
         address: fullAddress,
+        remarks,
       }),
       headers: {
         "content-type": "application/json",
@@ -864,6 +864,19 @@
             class="flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
           />
         </div>
+        <div class="flex h-24 flex-auto border-gray-300 border-x border-y">
+          <div
+            class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0]"
+          >
+            특이사항
+          </div>
+
+          <textarea
+            autocomplete="off"
+            bind:value={remarks}
+            class="resize-none flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
+          />
+        </div>
       </div>
     </div>
     <div class="가족관계 flex flex-col">
@@ -1039,7 +1052,7 @@
         </div>
       </div>
     </div>
-    <div class="심방내역 flex flex-col">
+    <div class="심방내역 flex flex-col mb-8">
       <div
         class="sticky top-0 pt-8 bg-white flex justify-between items-start pb-2"
       >

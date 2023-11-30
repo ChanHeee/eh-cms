@@ -15,6 +15,7 @@ const seongdoSchema = new Schema<ISeongdo>({
   group1: { type: String, required: false },
   group2: { type: String, required: false },
   address: { type: String, required: false },
+  remarks: { type: String, required: false },
   educations: [
     {
       type: Schema.Types.ObjectId,

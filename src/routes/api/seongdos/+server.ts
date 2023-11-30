@@ -90,6 +90,7 @@ export async function POST({ request }) {
     group2,
     singeup,
     address,
+    remarks,
     seongdos,
   } = await request.json()
 
@@ -120,6 +121,7 @@ export async function POST({ request }) {
     group2,
     singeup,
     address,
+    remarks,
   })
 
   return json({ seongdo })
