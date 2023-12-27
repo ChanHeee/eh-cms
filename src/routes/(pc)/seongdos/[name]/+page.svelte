@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { getAgeFromBirth } from "$lib/utils"
-
+  import SearchTable from "./SearchTable.svelte"
+  import { goto } from "$app/navigation"
+  import { getAgeFromBirth, getGroupItem, getGroupString } from "$lib/utils"
   import {
     AddLarge,
     Checkmark,
@@ -8,59 +9,20 @@
     Search,
     TrashCan,
   } from "carbon-icons-svelte"
-  import { onMount } from "svelte"
-
-  $: console.log("(", group1, typeof group1, ")", "(", group2, ")")
-
+  import { SeongdoPageStore, SeongdosStore } from "$lib/store"
+  import type { ISeongdo } from "$lib/interfaces"
+  import toast from "svelte-french-toast"
   export let data
-  const addressData = data.seongdo.address
-  const nameData = data.seongdo.name
-  const phoneData = data.seongdo.phone
-  const ageData = data.seongdo.age
-  const remarksData = data.seongdo.remarks
-  console.log(remarksData)
-
-  onMount(() => {
-    document.getElementById("preview")!.src = seongdo.avatar || "/avatar.png"
-    document.getElementById("previewM")!.src = seongdo.avatar || "/avatar.png"
-
-    document.getElementById("jikbun")!.value = seongdo.jikbun
-    document.getElementById("jikbunM")!.value = seongdo.jikbun
-
-    document.getElementById("gender")!.value = seongdo.gender
-    document.getElementById("genderM")!.value = seongdo.gender
-
-    document.getElementById("singeup")!.value = seongdo.singeup
-    document.getElementById("singeupM")!.value = seongdo.singeup
-
-    document.getElementById("address")!.value = extraAddress
-      ? address + " (" + extraAddress + ")"
-      : address
-
-    document.getElementById("group1")!.value = seongdo.group1
-    document.getElementById("group1M")!.value = seongdo.group1
-    document.getElementById("group2")!.value = seongdo.group2
-    document.getElementById("group2M")!.value = seongdo.group2
-  })
 
   // value for senogdo detail
   $: seongdo = data.seongdo
-  $: id = seongdo._id
-  $: name = nameData
-  $: originalName = name
-  $: avatar = seongdo.avatar
-  $: birth = seongdo.birth
-  $: gender = seongdo.gender
-  $: age = ageData
-  $: ageWithString = age ? age + " 세" : ""
-  $: phone = phoneData
-  $: jikbun = seongdo.jikbun
-  $: group1 = seongdo.group1
-  $: group2 = seongdo.group2
-  $: singeup = seongdo.singeup
+  $: ageWithString = seongdo.age ? seongdo.age + " 세" : ""
+  $: groupItem = getGroupItem(seongdo.group1, seongdo.group2)
+  $: group2Add = groupItem.group2Add
   $: addressWithExtraAddress = extraAddress
     ? address + " (" + extraAddress + ")"
     : address
+  $: addressData = seongdo.address
   $: address = addressData.split(",")[0] || ""
   $: detailAddress =
     addressData.split(",")[1]?.split("(")[0]?.slice(1, -1) || ""
@@ -68,24 +30,28 @@
   $: fullAddress = getFullAddress()
   $: getFullAddress = () => {
     if (extraAddress == "" && detailAddress == "") {
-      return addressData
+      return seongdo.address
     } else if (extraAddress == "") {
       return address + ", " + detailAddress
     } else {
       return address + ", " + detailAddress + " (" + extraAddress + ")"
     }
   }
-  $: remarks = remarksData
 
   // value for family
+
+  const familyAddHandler = (seongdo: ISeongdo) => {
+    selectedSeongdo = seongdo
+  }
+  let selectedSeongdo: ISeongdo | null
+  $: selectedSeongdo = selectedSeongdo
   $: familyId = data.family?._id
   $: members = data.family?.members || []
   $: memberIds = data.family?.memberIds || []
   $: searchName = ""
-  $: seongdoList = []
+  $: classificationValue = ""
   $: classification = ""
   $: familyClassList = JSON.parse(data.selectList).familyClassList
-  $: selectedIndex = undefined
 
   // value for simbang
   $: simbangs = data.simbangs
@@ -142,30 +108,24 @@
   }
 
   const submitHandler = async () => {
+    const { name, age, group2, address, ...rest } = seongdo
+
     const response = await fetch("/api/seongdos", {
       method: "PUT",
       body: JSON.stringify({
-        id,
         name: name.trim(),
-        originalName,
-        avatar,
-        birth,
-        age: age ? age : getAgeFromBirth(birth),
-        gender,
-        phone,
-        jikbun,
-        group1,
-        group2: group2 || "미분류",
-        singeup,
+        originalName: name.trim(),
+        age: age ? age : getAgeFromBirth(seongdo.birth),
+        group2: group2Add ? group2 + "," + group2Add : group2,
         address: fullAddress,
-        remarks,
+        ...rest,
       }),
       headers: {
         "content-type": "application/json",
       },
     })
     if (response.ok) {
-      alert("저장되었습니다.")
+      toast.success("저장되었습니다.")
     }
   }
 
@@ -173,7 +133,7 @@
     const response = await fetch("/api/seongdos", {
       method: "DELETE",
       body: JSON.stringify({
-        id,
+        id: seongdo._id,
       }),
       headers: {
         "content-type": "application/json",
@@ -232,18 +192,23 @@
   }
 
   const searchHandler = async () => {
-    const response = await fetch(`/api/seongdos?name=${searchName}`, {
+    const response = await fetch(`/api/seongdos?name=${searchName}&take=10`, {
       headers: {
         "content-type": "application/json",
       },
     })
     if (response.ok) {
-      seongdoList = (await response.json()).seongdos
+      const result = await response.json()
+      $SeongdosStore = result.seongdos
+      $SeongdoPageStore = result.page
+      $SeongdoPageStore.requestParams.take = 10
     }
   }
 
   const familyHandler = async () => {
     // let response
+    console.log(familyId)
+
     if (familyId) {
       const response = await fetch(`/api/families/${familyId}`, {
         method: "PUT",
@@ -268,26 +233,34 @@
           "content-type": "application/json",
         },
       })
+      if (response.ok) {
+        const { family } = await response.json()
+        familyId = family._id
+      }
       return response.ok
     }
   }
 
   const simbangHandler = async () => {
-    const response = await fetch(`/api/simbangs`, {
-      method: "POST",
-      body: JSON.stringify({
-        seongdoId: id,
-        date,
-        hymn,
-        bible,
-        simbangja,
-        detail,
-      }),
-      headers: {
-        "content-type": "application/json",
-      },
-    })
-    return response.ok
+    if (!date || !simbangja) {
+      toast.error("심방날짜와 심방자를 입력해주세요.")
+    } else {
+      const response = await fetch(`/api/simbangs`, {
+        method: "POST",
+        body: JSON.stringify({
+          seongdoId: seongdo._id,
+          date,
+          hymn,
+          bible,
+          simbangja,
+          detail,
+        }),
+        headers: {
+          "content-type": "application/json",
+        },
+      })
+      return response.ok
+    }
   }
 
   const simbangDeleteHandler = async (simbangId: string) => {
@@ -298,19 +271,6 @@
       },
     })
     return response.ok
-  }
-
-  const getGroupString = (group1: any, group2: any) => {
-    if (group1 == "" && group2 == "") {
-      return "미분류"
-    }
-    if (group1 == "장년부") {
-      return (
-        group1 + " > " + group2.split(",")[0] + " > " + group2.split(",")[1]
-      )
-    } else {
-      return group1 + " > " + group2
-    }
   }
 </script>
 
@@ -323,7 +283,10 @@
       <div
         class="sticky top-0 pt-8 bg-white flex justify-between items-start pb-2"
       >
-        <h1 class="text-lg font-medium">{seongdo.name} {seongdo.jikbun}</h1>
+        <h1 class="text-lg font-medium">
+          {seongdo.name}
+          {seongdo.jikbun || ""}
+        </h1>
         <div class="flex ml-auto gap-2">
           <button
             type="submit"
@@ -352,7 +315,13 @@
             type="button"
             class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
             on:click={async () => {
-              history.back()
+              const urlParams = new URLSearchParams(document.location.search)
+              const isAfterCreate = urlParams.get("create")
+              if (isAfterCreate == "true") {
+                goto("/seongdos")
+              } else {
+                history.back()
+              }
             }}
           >
             <span class="flex items-center">
@@ -369,7 +338,7 @@
               <img
                 alt=""
                 id="preview"
-                src={"/avatar.png"}
+                src={seongdo.avatar || "/avatar.png"}
                 class="border-gray-300 border w-[7.5rem] min-w-[7.5rem] h-[7.5rem] object-cover hover:opacity-75"
               />
             </label>
@@ -394,8 +363,9 @@
                 <input
                   id="name"
                   type="text"
-                  bind:value={name}
+                  bind:value={seongdo.name}
                   required
+                  disabled
                   class="flex w-full bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 p-2"
                 />
               </div>
@@ -410,13 +380,13 @@
                     id="date"
                     type="date"
                     on:change={(e) => {
-                      birth = e.target.value
-                      age = getAgeFromBirth(birth)
+                      seongdo.birth = e.target.value
+                      seongdo.age = getAgeFromBirth(seongdo.birth)
                     }}
                     class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 pl-1 pr-2 border-gray-300 border-r"
                     min="1900-01-01"
                     max="2023-12-31"
-                    value={birth}
+                    value={seongdo.birth}
                   />
                   <input
                     id="age"
@@ -438,8 +408,9 @@
                 <div class="flex w-full bg-gray-50 px-1">
                   <select
                     id="gender"
+                    value={seongdo.gender}
                     on:change={() => {
-                      gender = document.querySelector(
+                      seongdo.gender = document.querySelector(
                         "#gender > option:checked"
                       ).value
                     }}
@@ -461,8 +432,9 @@
                   <div class="flex w-full justify-center gap-1 pr-1">
                     <select
                       id="jikbun"
+                      value={seongdo.jikbun}
                       on:change={() => {
-                        jikbun = document.querySelector(
+                        seongdo.jikbun = document.querySelector(
                           "#jikbun > option:checked"
                         ).value
                       }}
@@ -472,15 +444,22 @@
                       <option value="장로">장로</option>
                       <option value="안수집사">안수집사</option>
                       <option value="권사">권사</option>
-                      <option value="집사">집사</option>
+                      <option value="은퇴권사">은퇴권사</option>
+                      <option value="무임권사">무임권사</option>
+                      <option value="무임은퇴권사">무임은퇴권사</option>
+                      <option value="서리집사">서리집사</option>
+                      <option value="은퇴집사">은퇴집사</option>
+                      <option value="무임집사">무임집사</option>
+                      <option value="무임은퇴집사">무임은퇴집사</option>
                       <option value="권찰">권찰</option>
                       <option value="성도">성도</option>
                     </select>
                     <div class="border-l border-gray-300" />
                     <select
                       id="singeup"
+                      value={seongdo.singeup}
                       on:change={() => {
-                        singeup = document.querySelector(
+                        seongdo.singeup = document.querySelector(
                           "#singeup > option:checked"
                         ).value
                       }}
@@ -507,8 +486,11 @@
                   <input
                     id="phone"
                     type="text"
-                    bind:value={phone}
+                    value={seongdo.phone}
                     class="flex w-full px-2 bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    on:input={(e) => {
+                      seongdo.phone = e.target.value
+                    }}
                   />
                 </div>
               </div>
@@ -521,12 +503,13 @@
                   >
                   <div class="flex w-full justify-center gap-1 pr-1">
                     <select
+                      value={groupItem.group1}
                       id="group1"
                       on:change={() => {
-                        group1 = document.querySelector(
+                        seongdo.group1 = document.querySelector(
                           "#group1 > option:checked"
                         ).value
-                        group2 = ""
+                        seongdo.group2 = ""
                       }}
                       class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
                     >
@@ -536,55 +519,81 @@
                       <option value="교회학교">교회학교</option>
                     </select>
                     <div class="border-l border-gray-300" />
-                    <input
-                      id="temp"
-                      type="text"
-                      class="flex w-[45.5%] text-center bg-gray-50 text-gray-900 text-[12.5px] focus:outline-0"
-                      class:hidden={group1 == "장년부" && group2 != ""
-                        ? false
-                        : true}
-                      value={getGroupString(group1, group2)}
-                      on:focus={() => {
-                        group2 = ""
-                        document.querySelector("#group2").value = ""
-                      }}
-                    />
+
                     <select
                       id="group2"
+                      value={groupItem.group2}
                       required
                       on:change={() => {
-                        group2 = document.querySelector("#group2").value
+                        seongdo.group2 = document.querySelector("#group2").value
                       }}
                       class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                      class:hidden={group1 == "장년부" && group2 != ""
-                        ? true
-                        : false}
                     >
                       <option value="none" class="hidden" />
-                      {#if group1 == "장년부"}
-                        <optgroup label="1구역">
-                          <option value="1구역,1교구">1교구</option>
-                          <option value="1구역,2교구">2교구</option>
-                          <option value="1구역,3교구">3교구</option>
-                          <option value="1구역,4교구">4교구</option>
-                        </optgroup>
-                        <optgroup label="2구역">
-                          <option value="2구역,1교구">1교구</option>
-                          <option value="2구역,2교구">2교구</option>
-                          <option value="2구역,3교구">3교구</option>
-                          <option value="2구역,4교구">4교구</option>
-                        </optgroup>
-                      {:else if group1 == "청년부"}
+                      {#if seongdo.group1 == "장년부"}
+                        <option value="1교구">1교구</option>
+                        <option value="2교구">2교구</option>
+                        <option value="3교구">3교구</option>
+                      {:else if seongdo.group1 == "청년부"}
                         <option value="1청년">1청년</option>
                         <option value="2청년">2청년</option>
-                      {:else if group1 == "교회학교"}
+                      {:else if seongdo.group1 == "교회학교"}
                         <option value="영아부">영아부</option>
                         <option value="유치부">유치부</option>
                         <option value="유년부">유년부</option>
                         <option value="초등부">초등부</option>
                         <option value="중등부">중등부</option>
                         <option value="고등부">고등부</option>
+                        <option value="은혜브릿지">은혜브릿지</option>
+                        <option value="늘푸른부">늘푸른부</option>
                       {/if}
+                    </select>
+                    <div
+                      class="border-l border-gray-300"
+                      class:hidden={seongdo.group1 == "장년부" &&
+                      seongdo.group2 != ""
+                        ? false
+                        : true}
+                    />
+                    <select
+                      id="group2Add"
+                      required
+                      value={group2Add}
+                      on:change={() => {
+                        group2Add = document.querySelector("#group2Add").value
+                      }}
+                      class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      class:hidden={seongdo.group1 == "장년부" &&
+                      seongdo.group2 != ""
+                        ? false
+                        : true}
+                    >
+                      <option value="none" class="hidden" />
+                      <option value="1구역">1구역</option>
+                      <option value="2구역">2구역</option>
+                      <option value="3구역">3구역</option>
+                      <option value="4구역">4구역</option>
+                      <option value="5구역">5구역</option>
+                      <option value="6구역">6구역</option>
+                      <option value="7구역">7구역</option>
+                      <option value="8구역">8구역</option>
+                      <option value="9구역">9구역</option>
+                      <option value="10구역">10구역</option>
+                      <option value="11구역">11구역</option>
+                      <option value="12구역">12구역</option>
+                      <option value="13구역">13구역</option>
+                      <option value="14구역">14구역</option>
+                      <option value="15구역">15구역</option>
+                      <option value="16구역">16구역</option>
+                      <option value="17구역">17구역</option>
+                      <option value="18구역">18구역</option>
+                      <option value="19구역">19구역</option>
+                      <option value="20구역">20구역</option>
+                      <option value="21구역">21구역</option>
+                      <option value="22구역">22구역</option>
+                      <option value="23구역">23구역</option>
+                      <option value="24구역">24구역</option>
+                      <option value="25구역">25구역</option>
                     </select>
                   </div>
                 </div>
@@ -624,8 +633,9 @@
                 <input
                   id="name"
                   type="text"
-                  bind:value={name}
+                  bind:value={seongdo.name}
                   required
+                  disabled
                   class="flex w-full bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 p-2"
                 />
               </div>
@@ -639,7 +649,7 @@
                   <select
                     id="genderM"
                     on:change={() => {
-                      gender = document.querySelector(
+                      seongdo.gender = document.querySelector(
                         "#gender > option:checked"
                       ).value
                     }}
@@ -681,13 +691,13 @@
                   id="birthM"
                   type="date"
                   on:change={(e) => {
-                    birth = e.target.value
-                    age = getAgeFromBirth(birth)
+                    seongdo.birth = e.target.value
+                    seongdo.age = getAgeFromBirth(seongdo.birth)
                   }}
                   class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 px-1 border-gray-300"
                   min="1900-01-01"
                   max="2023-12-31"
-                  value={birth}
+                  value={seongdo.birth}
                 />
               </div>
             </div>
@@ -703,7 +713,10 @@
                 <input
                   id="phoneM"
                   type="text"
-                  bind:value={phone}
+                  value={seongdo.phone}
+                  on:input={(e) => {
+                    seongdo.phone = e.target.value
+                  }}
                   class="flex w-full px-1 bg-gray-50 text-gray-900 text-sm focus:outline-0"
                 />
               </div>
@@ -720,25 +733,33 @@
                   <select
                     id="jikbunM"
                     on:change={() => {
-                      jikbun = document.querySelector(
+                      seongdo.jikbun = document.querySelector(
                         "#jikbunM > option:checked"
                       ).value
                     }}
+                    value={seongdo.jikbun}
                     class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
                   >
                     <option value="none" class="hidden" />
                     <option value="장로">장로</option>
                     <option value="안수집사">안수집사</option>
                     <option value="권사">권사</option>
-                    <option value="집사">집사</option>
+                    <option value="은퇴권사">은퇴권사</option>
+                    <option value="무임권사">무임권사</option>
+                    <option value="무임은퇴권사">무임은퇴권사</option>
+                    <option value="서리집사">서리집사</option>
+                    <option value="은퇴집사">은퇴집사</option>
+                    <option value="무임집사">무임집사</option>
+                    <option value="무임은퇴집사">무임은퇴집사</option>
                     <option value="권찰">권찰</option>
                     <option value="성도">성도</option>
                   </select>
                   <div class="border-l border-gray-300" />
                   <select
                     id="singeupM"
+                    value={seongdo.singeup}
                     on:change={() => {
-                      singeup = document.querySelector(
+                      seongdo.singeup = document.querySelector(
                         "#singeupM > option:checked"
                       ).value
                     }}
@@ -764,11 +785,12 @@
                 <div class="flex w-full justify-center gap-1 pr-1">
                   <select
                     id="group1M"
+                    value={groupItem.group1}
                     on:change={() => {
-                      group1 = document.querySelector(
+                      seongdo.group1 = document.querySelector(
                         "#group1M > option:checked"
                       ).value
-                      group2 = ""
+                      seongdo.group2 = ""
                     }}
                     class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
                   >
@@ -778,55 +800,81 @@
                     <option value="교회학교">교회학교</option>
                   </select>
                   <div class="border-l border-gray-300" />
-                  <input
-                    id="tempM"
-                    type="text"
-                    class="flex w-[45.5%] text-center bg-gray-50 text-gray-900 text-[12.5px] focus:outline-0"
-                    class:hidden={group1 == "장년부" && group2 != ""
-                      ? false
-                      : true}
-                    value={getGroupString(group1, group2)}
-                    on:focus={() => {
-                      group2 = ""
-                      document.querySelector("#group2M").value = ""
-                    }}
-                  />
+
                   <select
                     id="group2M"
+                    value={groupItem.group2}
                     required
                     on:change={() => {
-                      group2 = document.querySelector("#group2M").value
+                      seongdo.group2 = document.querySelector("#group2M").value
                     }}
                     class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                    class:hidden={group1 == "장년부" && group2 != ""
-                      ? true
-                      : false}
                   >
                     <option value="none" class="hidden" />
-                    {#if group1 == "장년부"}
-                      <optgroup label="1구역">
-                        <option value="1구역,1교구">1교구</option>
-                        <option value="1구역,2교구">2교구</option>
-                        <option value="1구역,3교구">3교구</option>
-                        <option value="1구역,4교구">4교구</option>
-                      </optgroup>
-                      <optgroup label="2구역">
-                        <option value="2구역,1교구">1교구</option>
-                        <option value="2구역,2교구">2교구</option>
-                        <option value="2구역,3교구">3교구</option>
-                        <option value="2구역,4교구">4교구</option>
-                      </optgroup>
-                    {:else if group1 == "청년부"}
+                    {#if seongdo.group1 == "장년부"}
+                      <option value="1교구">1교구</option>
+                      <option value="2교구">2교구</option>
+                      <option value="3교구">3교구</option>
+                    {:else if seongdo.group1 == "청년부"}
                       <option value="1청년">1청년</option>
                       <option value="2청년">2청년</option>
-                    {:else if group1 == "교회학교"}
+                    {:else if seongdo.group1 == "교회학교"}
                       <option value="영아부">영아부</option>
                       <option value="유치부">유치부</option>
                       <option value="유년부">유년부</option>
                       <option value="초등부">초등부</option>
                       <option value="중등부">중등부</option>
                       <option value="고등부">고등부</option>
+                      <option value="은혜브릿지">은혜브릿지</option>
+                      <option value="늘푸른부">늘푸른부</option>
                     {/if}
+                  </select>
+                  <div
+                    class="border-l border-gray-300"
+                    class:hidden={seongdo.group1 == "장년부" &&
+                    seongdo.group2 != ""
+                      ? false
+                      : true}
+                  />
+                  <select
+                    id="group2MAdd"
+                    required
+                    value={groupItem.group2Add}
+                    on:change={() => {
+                      group2Add = document.querySelector("#group2MAdd").value
+                    }}
+                    class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    class:hidden={seongdo.group1 == "장년부" &&
+                    seongdo.group2 != ""
+                      ? false
+                      : true}
+                  >
+                    <option value="none" class="hidden" />
+                    <option value="1구역">1구역</option>
+                    <option value="2구역">2구역</option>
+                    <option value="3구역">3구역</option>
+                    <option value="4구역">4구역</option>
+                    <option value="5구역">5구역</option>
+                    <option value="6구역">6구역</option>
+                    <option value="7구역">7구역</option>
+                    <option value="8구역">8구역</option>
+                    <option value="9구역">9구역</option>
+                    <option value="10구역">10구역</option>
+                    <option value="11구역">11구역</option>
+                    <option value="12구역">12구역</option>
+                    <option value="13구역">13구역</option>
+                    <option value="14구역">14구역</option>
+                    <option value="15구역">15구역</option>
+                    <option value="16구역">16구역</option>
+                    <option value="17구역">17구역</option>
+                    <option value="18구역">18구역</option>
+                    <option value="19구역">19구역</option>
+                    <option value="20구역">20구역</option>
+                    <option value="21구역">21구역</option>
+                    <option value="22구역">22구역</option>
+                    <option value="23구역">23구역</option>
+                    <option value="24구역">24구역</option>
+                    <option value="25구역">25구역</option>
                   </select>
                 </div>
               </div>
@@ -844,7 +892,10 @@
           <input
             id="address"
             autocomplete="off"
-            bind:value={addressWithExtraAddress}
+            value={addressWithExtraAddress}
+            on:input={(e) => {
+              addressWithExtraAddress = e.target.value
+            }}
             class="flex w-full justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
             on:click={searchAddress}
           />
@@ -859,7 +910,10 @@
           <input
             id="detailAddress"
             autocomplete="off"
-            bind:value={detailAddress}
+            value={detailAddress}
+            on:input={(e) => {
+              detailAddress = e.target.value
+            }}
             type="text"
             class="flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
           />
@@ -872,8 +926,10 @@
           </div>
 
           <textarea
-            autocomplete="off"
-            bind:value={remarks}
+            value={seongdo.remarks || ""}
+            on:input={(e) => {
+              seongdo.remarks = e.target.value
+            }}
             class="resize-none flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
           />
         </div>
@@ -890,6 +946,7 @@
             class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
             on:click={() => {
               isFamilyModalHidden = !isFamilyModalHidden
+              $SeongdosStore = []
             }}
           >
             <AddLarge scale={16} />
@@ -934,17 +991,21 @@
           {/if}
         </div>
         <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
-          <button
+          <div
             class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
           >
             이름
-          </button>
+          </div>
           {#if members.length > 0}
             <!-- content here -->
             {#each members as member}
-              <div class="flex px-3 items-center h-10">
-                {member.seongdo.name}
-              </div>
+              <button class="flex px-3 items-center h-10">
+                <a href={`/seongdos/${member.seongdo.name}`}>
+                  <div>
+                    {member.seongdo.name}
+                  </div>
+                </a>
+              </button>
             {/each}
           {/if}
         </div>
@@ -976,19 +1037,6 @@
             {/each}
           {/if}
         </div>
-        <div
-          class="flex flex-col flex-auto sm:flex-none whitespace-nowrap border-r divide-y border-b"
-        >
-          <button class=" px-3 font-bold h-10 bg-[#D9D9D8]"> 나이 </button>
-          {#if members.length > 0}
-            <!-- content here -->
-            {#each members as member}
-              <div class="flex justify-center px-3 items-center h-10">
-                {member.seongdo.age}
-              </div>
-            {/each}
-          {/if}
-        </div>
 
         <div
           class="flex flex-col flex-auto sm:flex-none whitespace-nowrap border-r divide-y border-b"
@@ -1016,16 +1064,14 @@
             <!-- content here -->
             {#each members as member}
               <div class="flex justify-center px-3 items-center h-10">
-                {member.seongdo.group1
-                  ? getGroupString(member.seongdo.group1, member.seongdo.group2)
-                  : "미분류"}
+                {getGroupString(member.seongdo.group1, member.seongdo.group2)}
               </div>
             {/each}
           {/if}
         </div>
         <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
           <button
-            class=" flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
+            class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
           />
           {#if members.length > 0}
             {#each members as member}
@@ -1041,7 +1087,6 @@
                       (seongdo) => seongdo._id != member._id
                     )
                     await familyHandler()
-                    seongdoList = []
                   }}
                 >
                   <TrashCan fill="#4a4a4a" size={20} />
@@ -1194,7 +1239,10 @@
         <div
           class="overflow-scroll h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
         >
-          <form class="flex w-full items-center mx-auto">
+          <form
+            class="flex w-full items-center mx-auto"
+            class:hidden={selectedSeongdo}
+          >
             <input
               id="name"
               type="text"
@@ -1207,173 +1255,150 @@
             />
             <button
               class="bg-[#B0B1B0] p-2 border-gray-300 border-y border-r"
-              on:click|preventDefault={searchHandler}
+              on:click|preventDefault={async () => {
+                await searchHandler()
+              }}
               ><Search size={20} class="text-gray-600" />
             </button>
           </form>
 
-          <div class="flex text-sm border-l">
-            <div
-              class="flex flex-col whitespace-nowrap border-r divide-y border-b"
-            >
-              <div
-                class="flex justify-center px-2 bg-[#D9D9D8] font-bold items-center h-10"
-              >
-                사진
+          {#if $SeongdosStore.length > 0}
+            <SearchTable
+              {familyAddHandler}
+              classString={selectedSeongdo ? "hidden" : ""}
+            />
+          {/if}
+
+          <div class="flex flex-col gap-3 text-sm">
+            <div class="flex gap-3">
+              <div class="flex flex-none" class:hidden={!selectedSeongdo}>
+                <img
+                  alt=""
+                  id="previewForFamily"
+                  src={selectedSeongdo?.avatar || "/avatar.png"}
+                  class="border-gray-300 border w-[7.5rem] min-w-[7.5rem] h-[7.5rem] object-cover"
+                />
               </div>
-              {#each seongdoList as item}
-                <div class="flex justify-center px-2 items-center h-10">
-                  <img
-                    class="mx-auto object-cover w-8 h-8"
-                    src={item.avatar || "/avatar.png"}
-                    alt=""
-                  />
+              {#if selectedSeongdo}
+                <div class="flex flex-col gap-3 w-full">
+                  <div class="flex w-full h-8 border-gray-300 border">
+                    <div
+                      class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >
+                      이름
+                    </div>
+                    <p
+                      class="flex w-full bg-gray-50 text-gray-900 p-2 items-center"
+                    >
+                      {selectedSeongdo.name}
+                    </p>
+                  </div>
+                  <div class="flex w-full h-8 border-gray-300 border">
+                    <div
+                      class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >
+                      생년월일
+                    </div>
+                    <p
+                      class="flex w-full bg-gray-50 text-gray-900 p-2 items-center"
+                    >
+                      {selectedSeongdo.birth}
+                    </p>
+                  </div>
+                  <div class="flex w-full h-8 border-gray-300 border">
+                    <div
+                      class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >
+                      구분
+                    </div>
+                    <div class="flex w-full bg-gray-50 px-1">
+                      <select
+                        id="classification"
+                        class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                        class:hidden={classification == "직접입력"}
+                        on:change={() => {
+                          classification = document.querySelector(
+                            "#classification > option:checked"
+                          ).value
+                        }}
+                      >
+                        <option value="none" class="hidden" />
+                        <option value="직접입력">직접입력</option>
+                        {#each familyClassList as familyClass}
+                          <option value={familyClass}>{familyClass}</option>
+                        {/each}
+                      </select>
+                      <input
+                        placeholder="직접입력"
+                        class="flex w-full bg-gray-50 text-gray-900 py-2 px-1 items-center focus:outline-0"
+                        class:hidden={classification != "직접입력"}
+                        bind:value={classificationValue}
+                      />
+                    </div>
+                  </div>
                 </div>
-              {/each}
-            </div>
-            <div
-              class="flex flex-col whitespace-nowrap border-r divide-y border-b"
-            >
-              <button
-                id="nameField"
-                class="flex justify-between bg-[#D9D9D8] px-3 font-bold items-center h-10"
-              >
-                이름
-              </button>
-
-              {#each seongdoList as item, index}
-                <div class="flex px-3 items-center h-10">
-                  <button>
-                    {item.name}
-                  </button>
-                </div>
-              {/each}
-            </div>
-            <div
-              class="flex flex-col whitespace-nowrap border-r divide-y border-b"
-            >
-              <button
-                class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
-              >
-                직분
-              </button>
-              {#each seongdoList as item}
-                <div class="flex px-3 items-center h-10">
-                  {item.jikbun}
-                </div>
-              {/each}
-            </div>
-            <div
-              class="flex flex-col whitespace-nowrap border-r divide-y border-b hidden-if-modile"
-            >
-              <button
-                class="flex justify-between bg-[#D9D9D8] px-3 font-bold items-center h-10"
-              >
-                생년월일
-              </button>
-
-              {#each seongdoList as item, index}
-                <div class="flex px-3 items-center h-10">
-                  <button>
-                    {item.birth}
-                  </button>
-                </div>
-              {/each}
-            </div>
-
-            <div
-              class="flex flex-col flex-auto whitespace-nowrap divide-y border-b"
-            >
-              <button
-                class="flex justify-between gap-2 pl-3 bg-[#D9D9D8] font-bold items-center h-10"
-              >
-                구분
-              </button>
-              {#each seongdoList as item, index}
-                <div class="flex pl-3 py-1 items-center h-10">
-                  <select
-                    on:change={(e) => {
-                      classification = e.target.value
-                      console.log(classification)
-
-                      if (classification == "직접입력") {
-                        classification = ""
-                        selectedIndex = seongdoList.indexOf(item)
-                      }
-                    }}
-                    class="w-full border h-full text-gray-900 text-sm focus:outline-0"
-                    class:hidden={selectedIndex == index ? true : false}
-                  >
-                    <option value="none" class="hidden" />
-                    <option value="직접입력">직접입력</option>
-                    {#each familyClassList as familyClass}
-                      <option value={familyClass}>{familyClass}</option>
-                    {/each}
-                  </select>
-                  <input
-                    id="직접입력"
-                    placeholder="직접입력"
-                    type="text"
-                    bind:value={classification}
-                    class="w-full border h-full text-gray-900 text-sm focus:outline-0 px-2"
-                    class:hidden={selectedIndex == index ? false : true}
-                  />
-                </div>
-              {/each}
-            </div>
-
-            <div
-              class="flex flex-col flex-none whitespace-nowrap border-r divide-y border-b"
-            >
-              <button
-                class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
-              />
-              {#each seongdoList as item, index}
-                <div class="flex items-center px-1 h-10">
-                  <button
-                    type="button"
-                    class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem]"
-                    on:click={async () => {
-                      if (memberIds.includes(item._id)) {
-                        alert("이미 가족 구성원으로 추가되었습니다.")
-                      } else {
-                        memberIds = [...memberIds, item._id]
-                        members = [
-                          ...members,
-                          { seongdo: item, classification },
-                        ]
-                        await familyHandler()
-                        searchName = ""
-                        classification = ""
-                        isFamilyModalHidden = true
-                        seongdoList = []
-                        selectedIndex = undefined
-                      }
-                    }}
-                  >
-                    <AddLarge fill="#4a4a4a" size={20} />
-                  </button>
-                </div>
-              {/each}
+              {/if}
             </div>
           </div>
         </div>
 
-        <div class="bg-gray-50 h-[55px] px-4 py-3 flex flex-row-reverse px-6">
+        <div
+          class="bg-gray-50 h-[55px] px-4 py-3 flex flex-row-reverse px-6 gap-2"
+        >
           <button
-            type="button"
             class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
+            class:hidden={selectedSeongdo}
             on:click={async () => {
               isFamilyModalHidden = !isFamilyModalHidden
-              seongdoList = []
               searchName = ""
-              selectedIndex = undefined
             }}
           >
             <span class="flex items-center">
               <Close class="text-[#F46055]" />
               <p>닫기</p>
             </span>
+          </button>
+          <button
+            class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
+            class:hidden={!selectedSeongdo}
+            on:click={async () => {
+              selectedSeongdo = null
+            }}
+          >
+            <span class="flex items-center">
+              <Close class="text-[#F46055]" />
+              <p>뒤로</p>
+            </span>
+          </button>
+          <button
+            class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+            class:hidden={!selectedSeongdo}
+            on:click={async () => {
+              if (
+                classification == "" ||
+                (classification == "직접입력" && classificationValue == "")
+              ) {
+                return toast.error("구분을 입력해주세요.")
+              }
+
+              members = [
+                ...members,
+                {
+                  seongdo: selectedSeongdo,
+                  classification: classificationValue || classification,
+                },
+              ]
+              memberIds = [...memberIds, selectedSeongdo?._id]
+              const result = await familyHandler()
+              if (result) {
+                selectedSeongdo = null
+                isFamilyModalHidden = !isFamilyModalHidden
+                toast.success("추가되었습니다.")
+              }
+            }}
+          >
+            <AddLarge scale={16} />
+            <span>추가</span>
           </button>
         </div>
       </div>
@@ -1417,7 +1442,29 @@
                   />
                 </div>
               </div>
-
+              <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                <label
+                  for="simbangSimbangja"
+                  class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                  >심방자</label
+                >
+                <div class="flex flex-auto justify-start bg-gray-50">
+                  <select
+                    id="simbangSimbangja"
+                    class="px-2 flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    on:change={() => {
+                      simbangja = document.querySelector(
+                        "#simbangSimbangja > option:checked"
+                      ).value
+                    }}
+                  >
+                    <option value="none" class="hidden" />
+                    {#each teacherList as teacher}
+                      <option value={teacher}>{teacher}</option>
+                    {/each}
+                  </select>
+                </div>
+              </div>
               <div class="flex w-full h-8 border-gray-300 border-x border-y">
                 <label
                   for="simbangHymn"
@@ -1447,30 +1494,6 @@
                     bind:value={bible}
                     class="px-2 flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
                   />
-                </div>
-              </div>
-
-              <div class="flex w-full h-8 border-gray-300 border-x border-y">
-                <label
-                  for="simbangSimbangja"
-                  class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                  >심방자</label
-                >
-                <div class="flex flex-auto justify-start bg-gray-50">
-                  <select
-                    id="simbangSimbangja"
-                    class="px-2 flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                    on:change={() => {
-                      simbangja = document.querySelector(
-                        "#simbangSimbangja > option:checked"
-                      ).value
-                    }}
-                  >
-                    <option value="none" class="hidden" />
-                    {#each teacherList as teacher}
-                      <option value={teacher}>{teacher}</option>
-                    {/each}
-                  </select>
                 </div>
               </div>
 
@@ -1518,17 +1541,14 @@
             on:click={async () => {
               const result = await simbangHandler()
               if (result) {
-                simbangs = [
-                  { date, hymn, bible, simbangja, detail },
-                  ...simbangs,
-                ]
+                simbangs = [result.simbang, ...simbangs]
+                isSimbangModalHidden = !isSimbangModalHidden
+                date = ""
+                hymn = ""
+                bible = ""
+                simbangja = ""
+                detail = ""
               }
-              isSimbangModalHidden = !isSimbangModalHidden
-              date = ""
-              hymn = ""
-              bible = ""
-              simbangja = ""
-              detail = ""
             }}
           >
             <Checkmark scale={16} />

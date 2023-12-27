@@ -1,5 +1,7 @@
+import { JWT_SECRET } from "$lib/env"
 import type { IGroup } from "$lib/interfaces"
 import { redirect } from "@sveltejs/kit"
+import jwt from "jsonwebtoken"
 
 /** @type {import('@sveltejs/kit').Load} */
 export const load = async ({ url, locals, fetch }) => {
@@ -28,13 +30,16 @@ export const load = async ({ url, locals, fetch }) => {
   const name = url.searchParams.get("name")
   const jikbun = JSON.parse(url.searchParams.get("jikbun"))
   const order = url.searchParams.get("order")
-  const eduName = url.searchParams.get("eduName")
   const page =
     url.searchParams.get("page") != null
       ? parseInt(url.searchParams.get("page"))
       : 0
   const group1 = url.searchParams.get("group1")
   const group2 = url.searchParams.get("group2")
+  const birthStart = url.searchParams.get("birthStart")
+  const birthEnd = url.searchParams.get("birthEnd")
+  const { token } = locals
+  const allowedGroup = jwt.verify(token, JWT_SECRET).allowedGroup
 
   if (
     (group1 != null &&
@@ -46,14 +51,16 @@ export const load = async ({ url, locals, fetch }) => {
     throw redirect(303, "/seongdos")
   }
 
+  locals.allowedGroup = allowedGroup
   locals.searchParams = {
     name,
     jikbun,
     order,
-    eduName,
     page,
     group1,
     group2,
+    birthStart,
+    birthEnd,
   }
 
   let groupTree: IGroup | null = null
@@ -61,91 +68,68 @@ export const load = async ({ url, locals, fetch }) => {
   if (group1 == "장년부") {
     groupTree = {
       name: "장년부",
-      total: await getSeongdoCount({ group1: "장년부" }),
+      count: await getSeongdoCount({ group1: "장년부" }),
       child: [
         {
-          name: "1구역",
-          total: await getSeongdoCount({ group2: "1구역" }),
-          child: [
-            {
-              name: "1교구",
-              total: await getSeongdoCount({
-                group2: "1구역,1교구",
-              }),
-              child: [],
-            },
-            {
-              name: "2교구",
-              total: await getSeongdoCount({
-                group2: "1구역,2교구",
-              }),
-              child: [],
-            },
-            {
-              name: "3교구",
-              total: await getSeongdoCount({
-                group2: "1구역,3교구",
-              }),
-              child: [],
-            },
-            {
-              name: "4교구",
-              total: await getSeongdoCount({
-                group2: "1구역,4교구",
-              }),
-              child: [],
-            },
-          ],
+          name: "1교구",
+          count: await getSeongdoCount({ group2: "1교구" }),
+          child: await Promise.all(
+            ("" + Array(19)).split(",").map(async (item, idx) => {
+              return {
+                name: `${idx + 1}구역`,
+                count: await getSeongdoCount({
+                  group2: `1교구,${idx + 1}구역`,
+                }),
+                child: [],
+              }
+            })
+          ),
         },
         {
-          name: "2구역",
-          total: await getSeongdoCount({ group2: "2구역" }),
-          child: [
-            {
-              name: "1교구",
-              total: await getSeongdoCount({
-                group2: "2구역,1교구",
-              }),
-              child: [],
-            },
-            {
-              name: "2교구",
-              total: await getSeongdoCount({
-                group2: "2구역,2교구",
-              }),
-              child: [],
-            },
-            {
-              name: "3교구",
-              total: await getSeongdoCount({
-                group2: "2구역,3교구",
-              }),
-              child: [],
-            },
-            {
-              name: "4교구",
-              total: await getSeongdoCount({
-                group2: "2구역,4교구",
-              }),
-              child: [],
-            },
-          ],
+          name: "2교구",
+          count: await getSeongdoCount({ group2: "2교구" }),
+          child: await Promise.all(
+            ("" + Array(20)).split(",").map(async (item, idx) => {
+              return {
+                name: `${idx + 1}구역`,
+                count: await getSeongdoCount({
+                  group2: `2교구,${idx + 1}구역`,
+                }),
+                child: [],
+              }
+            })
+          ),
+        },
+        {
+          name: "3교구",
+          count: await getSeongdoCount({ group2: "3교구" }),
+          child: await Promise.all(
+            ("" + Array(18)).split(",").map(async (item, idx) => {
+              return {
+                name: `${idx + 1}구역`,
+                count: await getSeongdoCount({
+                  group2: `3교구,${idx + 1}구역`,
+                }),
+                child: [],
+              }
+            })
+          ),
         },
       ],
     }
   } else if (group1 == "청년부") {
     groupTree = {
       name: "청년부",
-      total: await getSeongdoCount({ group1: "청년부" }),
+      count: await getSeongdoCount({ group1: "청년부" }),
       child: [
         {
           name: "1청년",
-          total: await getSeongdoCount({ group2: "1청년" }),
+          count: await getSeongdoCount({ group2: "1청년" }),
           child: [],
         },
         {
           name: "2청년",
-          total: await getSeongdoCount({ group2: "2청년" }),
+          count: await getSeongdoCount({ group2: "2청년" }),
           child: [],
         },
       ],
@@ -153,36 +137,46 @@ export const load = async ({ url, locals, fetch }) => {
   } else if (group1 == "교회학교") {
     groupTree = {
       name: "교회학교",
-      total: await getSeongdoCount({ group1: "교회학교" }),
+      count: await getSeongdoCount({ group1: "교회학교" }),
       child: [
         {
           name: "영아부",
-          total: await getSeongdoCount({ group2: "영아부" }),
+          count: await getSeongdoCount({ group2: "영아부" }),
           child: [],
         },
         {
           name: "유치부",
-          total: await getSeongdoCount({ group2: "유치부" }),
+          count: await getSeongdoCount({ group2: "유치부" }),
           child: [],
         },
         {
           name: "유년부",
-          total: await getSeongdoCount({ group2: "유년부" }),
+          count: await getSeongdoCount({ group2: "유년부" }),
           child: [],
         },
         {
           name: "초등부",
-          total: await getSeongdoCount({ group2: "초등부" }),
+          count: await getSeongdoCount({ group2: "초등부" }),
           child: [],
         },
         {
           name: "중등부",
-          total: await getSeongdoCount({ group2: "중등부" }),
+          count: await getSeongdoCount({ group2: "중등부" }),
           child: [],
         },
         {
           name: "고등부",
-          total: await getSeongdoCount({ group2: "고등부" }),
+          count: await getSeongdoCount({ group2: "고등부" }),
+          child: [],
+        },
+        {
+          name: "은혜브릿지",
+          count: await getSeongdoCount({ group2: "은혜브릿지" }),
+          child: [],
+        },
+        {
+          name: "늘푸른부",
+          count: await getSeongdoCount({ group2: "늘푸른부" }),
           child: [],
         },
       ],
@@ -195,10 +189,11 @@ export const load = async ({ url, locals, fetch }) => {
         name,
         jikbun,
         order,
-        eduName,
         page,
         group1,
         group2,
+        birthStart,
+        birthEnd,
       },
       groupTree,
     }
@@ -208,10 +203,11 @@ export const load = async ({ url, locals, fetch }) => {
         name,
         jikbun,
         order,
-        eduName,
         page,
         group1,
         group2,
+        birthStart,
+        birthEnd,
       },
     }
   }

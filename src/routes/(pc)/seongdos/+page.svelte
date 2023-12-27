@@ -1,39 +1,34 @@
 <script lang="ts">
-  import type { ISeongdo, ISeongdoSearchParams } from "$lib/interfaces"
-  import { seongdoResponse, seongdoSearchParams } from "$lib/store"
-  import Table from "$lib/components/Table.svelte"
-  import Pagination from "$lib/components/Pagination.svelte"
-
+  import { page as appPage } from "$app/stores"
+  import Table from "./Table.svelte"
+  import type { IPage, ISeongdo } from "$lib/interfaces"
   import { utils, writeFile } from "xlsx"
   import {
-    ChevronDown,
-    ChevronUp,
     Document,
     Search,
     UserFollow,
     UserMultiple,
   } from "carbon-icons-svelte"
-  import { goto, invalidateAll } from "$app/navigation"
-  import { getSeongdosSearchParams } from "$lib/utils"
+  import { goto } from "$app/navigation"
+  import { getSearchParams } from "$lib/utils"
+  import { getFlash } from "sveltekit-flash-message/client"
+  import toast from "svelte-french-toast"
 
   export let data: {
     seongdos: ISeongdo[]
-    total: number
-    skip: number
-    take: number
-    searchParams: ISeongdoSearchParams
+    page: IPage
   }
   $: name = ""
   $: seongdos = data.seongdos
-  $: total = data.total
-  $: skip = data.skip
-  $: take = data.take
-  $: searchParams = data.searchParams
-  $: seongdoSearchParams.set(searchParams ? searchParams : {})
-  $: seongdoResponse.set({ seongdos, total, skip, take })
+  $: page = data.page
+
+  $: flash = getFlash(appPage)
+  $: $flash?.type == "error"
+    ? toast.error("접근할 수 없는 페이지입니다.")
+    : undefined
 
   const searchHandler = () => {
-    const params = getSeongdosSearchParams({
+    const params = getSearchParams({
       page: 1,
       name,
     })
@@ -72,7 +67,7 @@
       <div class="flex items-center">
         <p class="text-lg font-medium mr-1">성도 목록</p>
         <p class="text-lg">
-          {`(${$seongdoResponse.total}명)`}
+          {`(${page.totalSize}명)`}
         </p>
       </div>
       <div class="rounded flex ml-auto gap-2">
@@ -144,7 +139,8 @@
         </button>
       </div>
     </div>
-    <Table />
-    <Pagination classString="mb-8" />
+    <Table {seongdos} {page} />
+    <!-- <Table />
+    <Pagination classString="mb-8" /> -->
   </div>
 </div>

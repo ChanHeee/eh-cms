@@ -5,7 +5,7 @@ import type { ISimbang } from "$lib/interfaces"
 const simbangSchema = new Schema<ISimbang>({
   seongdoId: {
     type: Schema.Types.ObjectId,
-    ref: "education",
+    ref: "seongdo",
   },
   date: { type: String, required: false },
   hymn: { type: String, required: false },

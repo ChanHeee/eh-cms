@@ -1,15 +1,33 @@
 <script lang="ts">
   import BookStroke from "./../../../lib/icon/BookStroke.svelte"
 
-  import { AlignBoxMiddleCenter } from "carbon-icons-svelte"
+  import { AlignBoxMiddleCenter, Search } from "carbon-icons-svelte"
   import { goto } from "$app/navigation"
   import EducationSideBarSearch from "$lib/components/EducationSideBarSearch.svelte"
+  import type { ISeongdoEduSearchParams } from "$lib/interfaces"
+  import { getSearchParams } from "$lib/utils"
 
   export let data: {
-    className: string
+    searchParams: ISeongdoEduSearchParams
   }
 
-  $: className = data.className || "전체"
+  const nameData = data.searchParams.name
+
+  $: searchParams = data.searchParams
+  $: name = nameData ?? ""
+  $: className = searchParams.className || "전체"
+  $: jikbunArray = searchParams.jikbun ?? []
+
+  const searchHandler = () => {
+    const params = getSearchParams({
+      name,
+      jikbun: jikbunArray,
+    })
+
+    // const url = params ? `/educations/전체/${params}` : "/educations"
+    const url = `/educations/${className}/${params}`
+    goto(url)
+  }
 </script>
 
 <aside
@@ -26,6 +44,7 @@
         class:text-[#FBA244]={className == "전체" ? true : false}
         class:text-white={className != "전체" ? true : false}
         on:click={() => {
+          name = ""
           goto(`/educations`)
         }}
       >
@@ -42,7 +61,8 @@
         class:text-[#FBA244]={className == "기초반" ? true : false}
         class:text-white={className != "기초반" ? true : false}
         on:click|preventDefault={() => {
-          goto(`/educations?class=기초반`)
+          name = ""
+          goto(`/educations/기초반`)
         }}
       >
         <!-- <Book size={20} class="mb-1" /> -->
@@ -63,7 +83,8 @@
         class:text-[#FBA244]={className == "열매반" ? true : false}
         class:text-white={className != "열매반" ? true : false}
         on:click={() => {
-          goto(`/educations?class=열매반`)
+          name = ""
+          goto(`/educations/열매반`)
         }}
       >
         <!-- <Book size={20} class="mb-1" /> -->
@@ -84,7 +105,8 @@
         class:text-[#FBA244]={className == "청지기반" ? true : false}
         class:text-white={className != "청지기반" ? true : false}
         on:click={() => {
-          goto(`/educations?class=청지기반`)
+          name = ""
+          goto(`/educations/청지기반`)
         }}
       >
         <!-- <Book size={20} class="mb-1" /> -->
@@ -105,7 +127,8 @@
         class:text-[#FBA244]={className == "새신자반" ? true : false}
         class:text-white={className != "새신자반" ? true : false}
         on:click={() => {
-          goto(`/educations?class=새신자반`)
+          name = ""
+          goto(`/educations/새신자반`)
         }}
       >
         <!-- <Book size={20} class="mb-1" /> -->
@@ -119,6 +142,6 @@
     </li>
   </ul>
 </aside>
-<EducationSideBarSearch />
+<EducationSideBarSearch {searchParams} />
 
 <slot><!-- optional fallback --></slot>

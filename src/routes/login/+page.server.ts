@@ -1,8 +1,7 @@
 import { redirect } from "@sveltejs/kit"
-// import jwt from "jsonwebtoken"
-
+import jwt from "jsonwebtoken"
 import type { PageServerLoad } from "./$types"
-import { ENVIRONMENT } from "$lib/env"
+import { ENVIRONMENT, JWT_SECRET } from "$lib/env"
 
 /** @type {import('@sveltejs/kit').Load} */
 export const load: PageServerLoad = async ({ url, locals }) => {
@@ -22,7 +21,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 }
 
 export const actions = {
-  login: async ({ request, cookies, fetch }) => {
+  login: async ({ request, cookies, fetch, locals }) => {
     const data = await request.formData()
 
     const name = data.get("name")

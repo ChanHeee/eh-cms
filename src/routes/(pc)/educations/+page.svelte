@@ -1,45 +1,51 @@
 <script lang="ts">
+  import Table from "./Table.svelte"
   import BookPlusStroke from "./../../../lib/icon/BookPlusStroke.svelte"
   import TableForEdu from "./../../../lib/components/TableForEdu.svelte"
   import { goto } from "$app/navigation"
-  import type { IEducationResponse } from "$lib/interfaces"
+  import ListBoxes from "carbon-icons-svelte/lib/ListBoxes.svelte"
+  import type { IEducation, IPage } from "$lib/interfaces"
 
   export let data: {
-    proceedingEdu: IEducationResponse
-    recentEdu: IEducationResponse
+    educations: IEducation[]
+    page: IPage
   }
 
-  $: proceedingEdu = data.proceedingEdu.educations
-  $: recentEdu = data.recentEdu.educations
+  $: educations = data.educations
+  $: page = data.page
 </script>
 
 <div
   id="content"
-  class="flex flex-col px-6 sm:px-16 pt-8 pb-15 flex w-full bg-white box-border"
+  class="flex flex-col px-6 sm:px-16 pb-15 flex w-full bg-white overflow-scroll"
 >
-  <div class="flex w-full justify-between mb-2">
-    <p class="text-lg font-medium mr-1">진행중인 강의</p>
-    <div class="rounded flex ml-auto gap-2">
-      <button
-        class="flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#FBA244]"
-        on:click={() => {
-          goto("/educations/add")
-        }}
-      >
-        <BookPlusStroke color="#ffffff" width="16px" />
-        <span>강의 생성</span>
-      </button>
+  <div class="flex flex-col mb-3">
+    <div
+      class=" bg-white pt-8 bg-white sticky top-0 flex w-full justify-between pb-2"
+    >
+      <p class="text-lg font-medium mr-1">강의 내역</p>
+      <div class="rounded flex ml-auto gap-2">
+        <button
+          class="flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#FBA244]"
+          on:click={() => {
+            goto("/educations/add")
+          }}
+        >
+          <BookPlusStroke color="#ffffff" width="16px" />
+          <span>강의 생성</span>
+        </button>
+        <button
+          class="flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#FBA244]"
+          on:click={() => {
+            goto("/educations/전체")
+          }}
+        >
+          <ListBoxes size={16} />
+          <span>수강 내역</span>
+        </button>
+      </div>
     </div>
-  </div>
-
-  <div class="flex flex-col overflow-scroll">
-    <TableForEdu educations={proceedingEdu} status="proceeding" />
-  </div>
-
-  <div class="flex w-full justify-between mt-10 mb-2">
-    <p class="text-lg font-medium mr-1">최근 강의</p>
-  </div>
-  <div class="flex flex-col overflow-scroll">
-    <TableForEdu educations={recentEdu} status="terminated" />
+    <!-- <TableForEdu {educations} /> -->
+    <Table {educations} {page} />
   </div>
 </div>

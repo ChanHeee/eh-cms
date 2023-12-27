@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation"
-
   import { Checkmark } from "carbon-icons-svelte"
+  import toast from "svelte-french-toast"
 
   export let data
   $: teacherList = JSON.parse(data.selectList).teacherList
@@ -33,8 +33,8 @@
       },
     })
     if (response.ok) {
-      alert("저장되었습니다.")
-      goto(`/educations/${getSlug(name, semester, startDate)}`)
+      toast.success("저장되었습니다.")
+      goto(`/educations/${getSlug(name, semester, startDate)}?create=true`)
     }
   }
 
@@ -194,6 +194,7 @@
               id="time"
               type="time"
               bind:value={time}
+              required
               class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
             />
           </div>
@@ -210,6 +211,7 @@
             id="place"
             type="text"
             bind:value={place}
+            required
             class="flex w-full bg-gray-50 px-2 text-gray-900 text-sm focus:outline-0"
           />
         </div>
@@ -227,6 +229,7 @@
               id="startDate"
               type="date"
               bind:value={startDate}
+              required
               class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
             />
           </div>
@@ -235,13 +238,14 @@
           <label
             for="endDate"
             class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-            >종료일</label
+            required>종료일</label
           >
           <div class="flex flex-auto justify-start bg-gray-50 pl-1.5 pr-1">
             <input
               id="endDate"
               type="date"
               bind:value={endDate}
+              required
               class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
             />
           </div>

@@ -1,12 +1,24 @@
 <script lang="ts">
   import { goto } from "$app/navigation"
-  import { seongdoResponse, seongdoSearchParams } from "$lib/store"
-  import { getGroupString, getSeongdosSearchParams } from "$lib/utils"
+  import type { IPage, ISeongdoEduPopulate } from "$lib/interfaces"
+
+  import { getEduSlug, getGroupString, getSearchParams } from "$lib/utils"
   import { ArrowDown, ArrowUp, ArrowsVertical } from "carbon-icons-svelte"
 
-  $: seongdos = $seongdoResponse.seongdos
-  $: searchParams = $seongdoSearchParams
-  $: order = searchParams.order
+  export let seongdoEdus: ISeongdoEduPopulate[]
+  export let page: IPage
+
+  // $: seongdoEdus = $seongdoEduStore
+  // $: page = $pageStore
+  $: searchParams = page.requestParams
+  $: order = page.requestParams.order
+  $: now = page.requestPage
+  $: min =
+    now % 5 == 0 ? (parseInt(now / 5) - 1) * 5 + 1 : parseInt(now / 5) * 5 + 1
+  $: last = page.totalPage
+  $: pagination = [0, 1, 2, 3, 4]
+    .filter((i) => min + i <= last)
+    .map((i) => min + i)
 </script>
 
 <div class="overflow-scroll flex text-sm mb-7 border-l bg-white">
@@ -16,11 +28,11 @@
     >
       사진
     </div>
-    {#each seongdos as item}
+    {#each seongdoEdus as item}
       <div class="flex justify-center px-2 items-center h-10">
         <img
           class="mx-auto object-cover w-8 h-8"
-          src={item.avatar || "/avatar.png"}
+          src={item.seongdo.avatar || "/avatar.png"}
           alt=""
         />
       </div>
@@ -48,7 +60,7 @@
       }}
       on:focus={null}
       on:click={() => {
-        const { order, page, ...rest } = searchParams
+        const { order, className, ...rest } = searchParams
         let newOrder
         if (order == "nameAsc") {
           newOrder = "nameDesc"
@@ -57,13 +69,14 @@
         } else {
           newOrder = "nameAsc"
         }
-        const url = `/seongdos${getSeongdosSearchParams({
-          order: newOrder,
-          page: 1,
-          ...rest,
-        })}`
 
-        goto(url)
+        goto(
+          `/educations/${className ?? "전체"}${getSearchParams({
+            order: newOrder,
+            page: 1,
+            ...rest,
+          })}`
+        )
       }}
     >
       이름
@@ -81,25 +94,25 @@
         <ArrowDown id="nameDesc" class="ml-3 hidden " />{/if}
     </button>
 
-    {#each seongdos as item, index}
+    {#each seongdoEdus as item, index}
       <div class="flex px-3 items-center h-10">
-        <a href={`/seongdos/${item.name}`}>
+        <a href={`/seongdos/${item.seongdo.name}`}>
           <button>
-            {item.name}
+            {item.seongdo.name}
           </button>
         </a>
       </div>
     {/each}
   </div>
   <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
-    <button
+    <div
       class="flex gap-2 px-3 bg-[#D9D9D8] font-bold items-center w-full text-center h-10"
     >
       직분
-    </button>
-    {#each seongdos as item}
+    </div>
+    {#each seongdoEdus as item}
       <div class="flex px-3 items-center h-10">
-        {item.jikbun}
+        {item.seongdo.jikbun}
       </div>
     {/each}
   </div>
@@ -125,7 +138,7 @@
       }}
       on:focus={null}
       on:click={() => {
-        const { order, page, ...rest } = searchParams
+        const { order, className, ...rest } = searchParams
         let newOrder
         if (order == "birthAsc") {
           newOrder = "birthDesc"
@@ -134,13 +147,13 @@
         } else {
           newOrder = "birthAsc"
         }
-        const url = `/seongdos${getSeongdosSearchParams({
-          order: newOrder,
-          page: 1,
-          ...rest,
-        })}`
-
-        goto(url)
+        goto(
+          `/educations/${className ?? "전체"}${getSearchParams({
+            order: newOrder,
+            page: 1,
+            ...rest,
+          })}`
+        )
       }}
     >
       생년월일
@@ -158,62 +171,176 @@
         <ArrowDown id="birthDesc" class="ml-3 hidden " />
       {/if}
     </button>
-    {#each seongdos as item}
+    {#each seongdoEdus as item}
       <div class="flex justify-center px-3 items-center h-10">
-        {item.birth}
-      </div>
-    {/each}
-  </div>
-  <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
-    <button
-      class=" flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
-    >
-      나이
-    </button>
-    {#each seongdos as item}
-      <div class="flex px-3 justify-center items-center h-10">
-        {item.age ?? ""}
+        {item.seongdo.birth}
       </div>
     {/each}
   </div>
   <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
     <div
-      class=" flex justify-center px-3 bg-[#D9D9D8] font-bold items-center h-10"
+      class=" flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
     >
-      핸드폰
+      나이
     </div>
-    {#each seongdos as item}
-      <div class="flex justify-center px-3 items-center h-10">
-        {item.phone}
+    {#each seongdoEdus as item}
+      <div class="flex px-3 justify-center items-center h-10">
+        {item.seongdo.age ?? ""}
       </div>
     {/each}
   </div>
+
   <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
     <div
       class=" flex justify-center px-3 bg-[#D9D9D8] font-bold items-center h-10"
     >
       소속
     </div>
-    {#each seongdos as item}
+    {#each seongdoEdus as item}
       <div class="flex justify-center px-3 items-center h-10">
         <p class="whitespace-nowrap truncate">
-          {getGroupString(item.group1, item.group2)}
+          {getGroupString(item.seongdo.group1, item.seongdo.group2)}
         </p>
       </div>
     {/each}
   </div>
-  <div class="flex flex-col flex-auto border-r divide-y border-b">
+
+  <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
     <div
-      class=" flex justify-center px-3 bg-[#D9D9D8] font-bold items-center h-10 whitespace-nowrap truncate"
+      class=" flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
     >
-      주소
+      교육 이름
     </div>
-    {#each seongdos as item}
+    {#each seongdoEdus as item}
+      <button
+        class="flex px-3 justify-center items-center h-10"
+        on:click={() => {
+          goto(
+            `/educations/detail/${getEduSlug(
+              item.education.name,
+              item.education.semester,
+              item.education.startDate
+            )}`
+          )
+        }}
+      >
+        {item.education.name}
+      </button>
+    {/each}
+  </div>
+  <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
+    <button
+      class=" flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
+    >
+      학기
+    </button>
+    {#each seongdoEdus as item}
+      <div class="flex px-3 justify-center items-center h-10">
+        {item.education.semester}
+      </div>
+    {/each}
+  </div>
+  <div class="flex flex-col flex-auto border-r divide-y border-b">
+    <button
+      class="flex justify-between px-3 font-bold items-center h-10 bg-[#D9D9D8] whitespace-nowrap"
+    >
+      교육 기간
+    </button>
+
+    {#each seongdoEdus as item, index}
       <div class="flex px-3 items-center h-10">
         <p class="whitespace-nowrap truncate">
-          {item.address}
+          {`${item.education.startDate} ~ ${item.education.endDate}`}
         </p>
       </div>
     {/each}
   </div>
 </div>
+
+{#if pagination.length > 0}
+  <!-- content here -->
+
+  <div class="w-fit mx-auto flex items-center mb-8">
+    <button
+      on:click={async () => {
+        const arrayStart = pagination[0]
+
+        if (now > 1) {
+          goto(
+            `/educations/${
+              page.requestParams.className ?? "전체"
+            }${getSearchParams({
+              ...page.requestParams,
+              page: arrayStart - 1,
+            })}`
+          )
+        }
+      }}
+      class=" p-4 border text-base rounded-l-xl text-gray-600 bg-white hover:bg-gray-100"
+    >
+      <svg
+        width="9"
+        fill="currentColor"
+        height="8"
+        class=""
+        viewBox="0 0 1792 1792"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M1427 301l-531 531 531 531q19 19 19 45t-19 45l-166 166q-19 19-45 19t-45-19l-742-742q-19-19-19-45t19-45l742-742q19-19 45-19t45 19l166 166q19 19 19 45t-19 45z"
+        />
+      </svg>
+    </button>
+    {#each pagination as item}
+      <button
+        class="px-4 py-2 border-t border-b border-r text-base text-gray-600"
+        class:bg-gray-100={item == now}
+        class:bg-white={item != now}
+        on:click={() => {
+          goto(
+            `/educations/${
+              page.requestParams.className ?? "전체"
+            }${getSearchParams({
+              ...page.requestParams,
+              page: item,
+            })}`
+          )
+        }}
+      >
+        {item}
+      </button>
+    {/each}
+
+    <button
+      on:click={async () => {
+        const arrayEnd = pagination.slice(-1)[0]
+        const next = arrayEnd < last ? arrayEnd + 1 : arrayEnd
+
+        if (now != last) {
+          goto(
+            `/educations/${
+              page.requestParams.className ?? "전체"
+            }${getSearchParams({
+              ...page.requestParams,
+              page: next,
+            })}`
+          )
+        }
+      }}
+      class="w-full p-4 border-t border-b border-r text-base rounded-r-xl text-gray-600 bg-white hover:bg-gray-100"
+    >
+      <svg
+        width="9"
+        fill="currentColor"
+        height="8"
+        class=""
+        viewBox="0 0 1792 1792"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M1363 877l-742 742q-19 19-45 19t-45-19l-166-166q-19-19-19-45t19-45l531-531-531-531q-19-19-19-45t19-45l166-166q19-19 45-19t45 19l742 742q19 19 19 45t-19 45z"
+        />
+      </svg>
+    </button>
+  </div>
+{/if}

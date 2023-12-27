@@ -10,18 +10,19 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       ? JSON.parse(url.searchParams.get("jikbun"))
       : []
   const order = url.searchParams.get("order")
-  const eduName = url.searchParams.get("eduName")
+  const group1 = url.searchParams.get("group1")
+  const group2 = url.searchParams.get("group2")
+  const birthStart = url.searchParams.get("birthStart")
+  const birthEnd = url.searchParams.get("birthEnd")
   const page =
     url.searchParams.get("page") != null
       ? parseInt(url.searchParams.get("page"))
-      : 0
-  const group1 = url.searchParams.get("group1")
-  const group2 = url.searchParams.get("group2")
+      : 1
 
-  const take = url.searchParams.get("take")
-    ? parseInt(url.searchParams.get("take"))
-    : 12
-  const skip = page ? (page - 1) * 12 : 0
+  const take =
+    url.searchParams.get("take") != null
+      ? parseInt(url.searchParams.get("take"))
+      : 12
 
   let query = Seongdo.find()
   if (name) {
@@ -30,29 +31,28 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
   if (jikbun?.length > 0) {
     query = query.where({ jikbun: { $in: jikbun } })
   }
-
-  if (eduName) {
-    const { _id } = await Education.findOne({ name: eduName })
-    const eduId = _id.toString()
-
-    query = query.where({ eduIds: eduId })
+  if (birthStart) {
+    query = query.where({ birth: { $gte: birthStart } })
+  }
+  if (birthEnd) {
+    query = query.where({ birth: { $lte: birthEnd } })
   }
 
   switch (order) {
     case "nameAsc":
-      query.sort("name")
+      query.sort({ name: 1, updatedAt: -1, _id: 1 })
       break
     case "nameDesc":
-      query.sort("-name")
+      query.sort({ name: -1, updatedAt: -1, _id: 1 })
       break
     case "birthAsc":
-      query.sort("birth")
+      query.sort({ birth: 1, updatedAt: -1, _id: 1 })
       break
     case "birthDesc":
-      query.sort("-birth")
+      query.sort({ birth: -1, updatedAt: -1, _id: 1 })
       break
     default:
-      query.sort("-updatedAt")
+      query.sort({ updatedAt: -1, _id: 1 })
       break
   }
 
@@ -65,15 +65,29 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
 
   const seongdos = await Seongdo.find(query, null, {
     limit: take,
-    skip,
+    skip: (page - 1) * take,
   })
+
   const total = await Seongdo.count(query)
 
   return json({
     seongdos,
-    total,
-    take: seongdos.length <= take ? seongdos.length : take,
-    skip,
+    page: {
+      totalSize: total,
+      totalPage: Math.ceil(total / take),
+      requestPage: page,
+      requestSize: seongdos.length,
+      requestParams: {
+        name,
+        jikbun,
+        order,
+        group1,
+        group2,
+        birthStart,
+        birthEnd,
+        take,
+      },
+    },
   })
 }
 
@@ -128,9 +142,9 @@ export async function POST({ request }) {
 }
 
 export async function PUT({ request }) {
-  const { id: _id, ...rest } = await request.json()
+  const { _id, ...rest } = await request.json()
 
-  const { upsertedCount } = await Seongdo.updateOne(
+  const { upsertedCount, modifiedCount } = await Seongdo.updateOne(
     { _id },
     {
       ...rest,

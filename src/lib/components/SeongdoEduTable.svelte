@@ -1,12 +1,29 @@
 <script lang="ts">
+  import type {
+    ISeongdoEdu,
+    ISeongdoEduPopulate,
+    ISeongdoSearchParams,
+  } from "../interfaces/index.js"
   import { goto } from "$app/navigation"
   import { seongdoResponse, seongdoSearchParams } from "$lib/store"
-  import { getGroupString, getSeongdosSearchParams } from "$lib/utils"
+  import { getSeongdosSearchParams } from "$lib/utils"
   import { ArrowDown, ArrowUp, ArrowsVertical } from "carbon-icons-svelte"
 
-  $: seongdos = $seongdoResponse.seongdos
-  $: searchParams = $seongdoSearchParams
+  export let seongdoEdus: ISeongdoEduPopulate[]
+  export let searchParams: ISeongdoSearchParams
+  $: seongdoEdus = seongdoEdus
+  $: searchParams = searchParams
   $: order = searchParams.order
+
+  const getGroupString = (group1: any, group2: any) => {
+    if (group1 == "장년부") {
+      return (
+        group1 + " > " + group2.split(",")[0] + " > " + group2.split(",")[1]
+      )
+    } else {
+      return group1 + " > " + group2
+    }
+  }
 </script>
 
 <div class="overflow-scroll flex text-sm mb-7 border-l bg-white">
@@ -16,11 +33,11 @@
     >
       사진
     </div>
-    {#each seongdos as item}
+    {#each seongdoEdus as item}
       <div class="flex justify-center px-2 items-center h-10">
         <img
           class="mx-auto object-cover w-8 h-8"
-          src={item.avatar || "/avatar.png"}
+          src={item.seongdo.avatar || "/avatar.png"}
           alt=""
         />
       </div>
@@ -57,7 +74,7 @@
         } else {
           newOrder = "nameAsc"
         }
-        const url = `/seongdos${getSeongdosSearchParams({
+        const url = `/seongdoEdus${getSeongdosSearchParams({
           order: newOrder,
           page: 1,
           ...rest,
@@ -81,7 +98,7 @@
         <ArrowDown id="nameDesc" class="ml-3 hidden " />{/if}
     </button>
 
-    {#each seongdos as item, index}
+    {#each seongdoEdus as item, index}
       <div class="flex px-3 items-center h-10">
         <a href={`/seongdos/${item.name}`}>
           <button>
@@ -97,7 +114,7 @@
     >
       직분
     </button>
-    {#each seongdos as item}
+    {#each seongdoEdus as item}
       <div class="flex px-3 items-center h-10">
         {item.jikbun}
       </div>
@@ -134,7 +151,7 @@
         } else {
           newOrder = "birthAsc"
         }
-        const url = `/seongdos${getSeongdosSearchParams({
+        const url = `/seongdoEdus${getSeongdosSearchParams({
           order: newOrder,
           page: 1,
           ...rest,
@@ -158,7 +175,7 @@
         <ArrowDown id="birthDesc" class="ml-3 hidden " />
       {/if}
     </button>
-    {#each seongdos as item}
+    {#each seongdoEdus as item}
       <div class="flex justify-center px-3 items-center h-10">
         {item.birth}
       </div>
@@ -170,7 +187,7 @@
     >
       나이
     </button>
-    {#each seongdos as item}
+    {#each seongdoEdus as item}
       <div class="flex px-3 justify-center items-center h-10">
         {item.age ?? ""}
       </div>
@@ -182,7 +199,7 @@
     >
       핸드폰
     </div>
-    {#each seongdos as item}
+    {#each seongdoEdus as item}
       <div class="flex justify-center px-3 items-center h-10">
         {item.phone}
       </div>
@@ -194,10 +211,10 @@
     >
       소속
     </div>
-    {#each seongdos as item}
+    {#each seongdoEdus as item}
       <div class="flex justify-center px-3 items-center h-10">
         <p class="whitespace-nowrap truncate">
-          {getGroupString(item.group1, item.group2)}
+          {item.group1 ? getGroupString(item.group1, item.group2) : "미분류"}
         </p>
       </div>
     {/each}
@@ -208,7 +225,7 @@
     >
       주소
     </div>
-    {#each seongdos as item}
+    {#each seongdoEdus as item}
       <div class="flex px-3 items-center h-10">
         <p class="whitespace-nowrap truncate">
           {item.address}

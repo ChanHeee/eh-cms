@@ -5,10 +5,7 @@ import { json, type RequestHandler } from "@sveltejs/kit"
 
 export const GET: RequestHandler = async ({ request, url, locals }) => {
   const name = decodeURI(url.pathname).split("/")[3]
-  const seongdo = await Seongdo.findOne({ name }).populate({
-    path: "educations",
-    options: { sort: { startDate: -1 } },
-  })
+  const seongdo = await Seongdo.findOne({ name })
 
   return json({
     seongdo,

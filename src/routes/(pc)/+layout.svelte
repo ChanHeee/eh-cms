@@ -7,9 +7,8 @@
 
   import UserMultiple from "carbon-icons-svelte/lib/UserMultiple.svelte"
   import Logout from "carbon-icons-svelte/lib/Logout.svelte"
-  import { onMount } from "svelte"
-  import { Search } from "carbon-icons-svelte"
   import { goto } from "$app/navigation"
+  import toast, { Toaster } from "svelte-french-toast"
 
   export let data: {
     path: string
@@ -19,17 +18,9 @@
   const tab = { seongdos: "seongdos", educations: "educations" }
 
   $: hideMenu = true
-
-  onMount(() => {
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(
-      window.navigator.userAgent
-    )
-    if (isMobile) {
-      // document.getElementById("html")?.classList.remove("overflow-hidden")
-    }
-  })
 </script>
 
+<Toaster />
 <div class="flex flex-col h-[100dvh]">
   <nav
     class="flex w-full sm:px-16 items-center text-white bg-[#4C5153] border-b-[4px]"

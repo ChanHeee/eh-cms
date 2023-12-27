@@ -14,9 +14,17 @@ export async function POST({ request }) {
   if (user && (await user.matchPassword(password))) {
     return json({
       success: true,
-      token: jwt.sign({ id: user._id, name: user.name }, JWT_SECRET, {
-        expiresIn: "60m",
-      }),
+      token: jwt.sign(
+        {
+          id: user._id,
+          name: user.name,
+          allowedGroup: ["장년부_1교구", "청년부"],
+        },
+        JWT_SECRET,
+        {
+          expiresIn: "60m",
+        }
+      ),
     })
   } else {
     return json({ success: false, message: "fail to login" })

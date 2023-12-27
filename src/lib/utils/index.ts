@@ -47,3 +47,79 @@ export const getAgeFromBirth = (birth: string) => {
   }
   return age
 }
+
+export const getGroupItem = (
+  group1: string,
+  group2: string
+): { group1: string; group2: string; group2Add?: string } => {
+  if (!group2) {
+    return { group1, group2: "" }
+  } else if (group1 == "장년부") {
+    const first = group2.split(",")[0]
+    const second = group2.split(",")[1]
+    if (second) {
+      return { group1, group2: first, group2Add: second }
+    } else {
+      return { group1, group2: first }
+    }
+  }
+  return { group1, group2 }
+}
+
+export const getGroupString = (group1: any, group2: any) => {
+  if (!group2) {
+    if (!group1) {
+      return "미분류"
+    } else {
+      return group1 + " > 미분류"
+    }
+  } else {
+    if (group1 == "장년부") {
+      const first = group2.split(",")[0]
+      const second = group2.split(",")[1]
+      if (second) {
+        return group1 + " > " + first + " > " + second
+      } else {
+        return group1 + " > " + group2 + " > 미분류"
+      }
+    } else {
+      return group1 + " > " + group2
+    }
+  }
+}
+
+export const getSearchParams = (params: {}) => {
+  const paramList = Object.entries(params)
+
+  let searchParams: string[] = []
+  paramList.forEach((item) => {
+    {
+      if (!isNullable(item[1])) {
+        if (typeof item[1] == "object") {
+          searchParams.push(`${item[0]}=${JSON.stringify(item[1])}`)
+        } else {
+          searchParams.push(`${item[0]}=${item[1]}`)
+        }
+      }
+    }
+  })
+  return searchParams.length > 0 ? "?" + searchParams.join("&") : ""
+}
+
+export const getEduSlug = (
+  name: string,
+  semester: string,
+  startDate: string
+) => {
+  return `${name}-${semester}-${startDate}`
+}
+
+export const isNullable = (input: any) => {
+  if (!input) {
+    return true
+  }
+  if (typeof input == "object" && input.length == 0) {
+    return true
+  }
+  return false
+}

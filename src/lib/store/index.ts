@@ -3,6 +3,10 @@ import type {
   ISeongdoResponse,
   ISeongdoSearchBody,
   IEducationResponse,
+  IPage,
+  ISeongdoEduPopulate,
+  ISeongdo,
+  ISeongdoEduPage,
 } from "$lib/interfaces"
 import { writable } from "svelte/store"
 
@@ -13,6 +17,14 @@ export const seongdoSearchBody = writable<ISeongdoSearchBody>({
 export const seongdoSearchParams = writable<ISeongdoSearchParams>({})
 
 export const educationResponse = writable<IEducationResponse>()
+
+export const SeongdoEdusStore = writable<ISeongdoEduPopulate[]>()
+export const SeongdoEduPageStore = writable<ISeongdoEduPage>()
+
+export const SeongdosStore = writable<ISeongdo[]>([])
+export const SeongdoPageStore = writable<IPage>()
+
+export const PageStore = writable<IPage>()
 
 // export function customStore(url) {
 //   const name = writable("")

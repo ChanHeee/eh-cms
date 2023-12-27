@@ -2,7 +2,7 @@
   import TableForCSV from "./../../../../lib/components/TableForCSV.svelte"
   import { goto } from "$app/navigation"
   import { read, utils } from "xlsx"
-
+  import toast from "svelte-french-toast"
   import { Checkmark, Close } from "carbon-icons-svelte"
   import type { ISeongdo } from "$lib/interfaces"
 
@@ -24,26 +24,24 @@
 
     const wb = read(csv)
     const sheet = wb.Sheets[wb.SheetNames[0]]
-    console.log(sheet)
 
     Object.keys(sheet).map((item) => {
       if (sheet[item]["w"]) {
         sheet[item]["v"] = sheet[item]["w"]
       }
     })
-    console.log(sheet)
 
     csv = utils.sheet_to_json<ISeongdo>(wb.Sheets[wb.SheetNames[0]], {
       header: [
         "name",
         "jikbun",
         "birth",
+        "gender",
         "phone",
         "address",
-        "gender",
-        "singeup",
         "group1",
         "group2",
+        "singeup",
       ],
     })
 
@@ -52,7 +50,7 @@
 
   const submitHandler = async () => {
     if (seongdos.length == 0) {
-      return alert("추가할 성도가 없습니다.")
+      toast("추가할 성도가 없습니다.", { icon: "❗️" })
     }
     const response = await fetch("/api/seongdos", {
       method: "POST",
@@ -62,7 +60,7 @@
       },
     })
     if (response.ok) {
-      alert("저장되었습니다.")
+      toast.success("저장되었습니다.")
       goto(`/seongdos`)
     }
   }

@@ -16,6 +16,7 @@
       : Math.floor(now / paginationLen) * paginationLen + 1
   $: last = Math.ceil(total / pageSize)
   $: pages = getPages()
+
   $: getPages = () => {
     const result = []
     for (var i = 0; i < paginationLen; i++) {

@@ -6,19 +6,12 @@ const eduSchema = new Schema<IEducation>({
   name: { type: String, required: true },
   teacher: { type: String },
   semester: { type: String },
-  enrolledNum: { type: Number, default: 0 },
   day: { type: String },
   time: { type: String },
   place: { type: String },
   startDate: { type: String },
   endDate: { type: String },
-  status: { type: String, default: "proceeding" },
-  seongdos: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "seongdo",
-    },
-  ],
+  enrolledNum: { type: Number },
 })
 
 export const Education = conn.model<IEducation>("education", eduSchema)

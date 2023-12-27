@@ -1,9 +1,8 @@
 <script lang="ts">
   import { goto } from "$app/navigation"
-  import { getAgeFromBirth } from "$lib/utils"
-
+  import { getAgeFromBirth, getGroupItem } from "$lib/utils"
+  import toast from "svelte-french-toast"
   import { Checkmark, Close } from "carbon-icons-svelte"
-  $: console.log("(", group1, ")", "(", group2, ")")
 
   let name = ""
   let avatar = ""
@@ -15,6 +14,8 @@
   let jikbun = ""
   $: group1 = ""
   $: group2 = ""
+  $: groupItem = getGroupItem(group1, group2)
+  $: group2Add = groupItem.group2Add
   let singeup = ""
   $: addressWithExtraAddress = extraAddress
     ? address + " (" + extraAddress + ")"
@@ -69,7 +70,7 @@
         phone,
         jikbun,
         group1,
-        group2,
+        group2: group2Add ? group2 + "," + group2Add : group2,
         singeup,
         address: fullAddress,
       }),
@@ -81,8 +82,8 @@
       const {
         seongdo: { name: newName },
       } = await response.json()
-      alert("저장되었습니다.")
-      goto(`/seongdos/${newName}`)
+      toast.success("저장되었습니다.")
+      goto(`/seongdos/${newName}?create=true`)
     }
   }
 
@@ -284,7 +285,13 @@
                     <option value="장로">장로</option>
                     <option value="안수집사">안수집사</option>
                     <option value="권사">권사</option>
-                    <option value="집사">집사</option>
+                    <option value="은퇴권사">은퇴권사</option>
+                    <option value="무임권사">무임권사</option>
+                    <option value="무임은퇴권사">무임은퇴권사</option>
+                    <option value="서리집사">서리집사</option>
+                    <option value="은퇴집사">은퇴집사</option>
+                    <option value="무임집사">무임집사</option>
+                    <option value="무임은퇴집사">무임은퇴집사</option>
                     <option value="권찰">권찰</option>
                     <option value="성도">성도</option>
                   </select>
@@ -319,6 +326,7 @@
                 <input
                   id="phone"
                   type="text"
+                  placeholder="010-0000-0000"
                   bind:value={phone}
                   class="flex w-full px-2 bg-gray-50 text-gray-900 text-sm focus:outline-0"
                 />
@@ -348,19 +356,7 @@
                     <option value="교회학교">교회학교</option>
                   </select>
                   <div class="border-l border-gray-300" />
-                  <input
-                    id="temp"
-                    type="text"
-                    class="flex w-[45.5%] text-center bg-gray-50 text-gray-900 text-[12.5px] focus:outline-0"
-                    class:hidden={group1 == "장년부" && group2 != ""
-                      ? false
-                      : true}
-                    value={getGroupString(group1, group2)}
-                    on:focus={() => {
-                      group2 = ""
-                      document.querySelector("#group2").value = ""
-                    }}
-                  />
+
                   <select
                     id="group2"
                     required
@@ -368,24 +364,12 @@
                       group2 = document.querySelector("#group2").value
                     }}
                     class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                    class:hidden={group1 == "장년부" && group2 != ""
-                      ? true
-                      : false}
                   >
                     <option value="none" class="hidden" />
                     {#if group1 == "장년부"}
-                      <optgroup label="1구역">
-                        <option value="1구역,1교구">1교구</option>
-                        <option value="1구역,2교구">2교구</option>
-                        <option value="1구역,3교구">3교구</option>
-                        <option value="1구역,4교구">4교구</option>
-                      </optgroup>
-                      <optgroup label="2구역">
-                        <option value="2구역,1교구">1교구</option>
-                        <option value="2구역,2교구">2교구</option>
-                        <option value="2구역,3교구">3교구</option>
-                        <option value="2구역,4교구">4교구</option>
-                      </optgroup>
+                      <option value="1교구">1교구</option>
+                      <option value="2교구">2교구</option>
+                      <option value="3교구">3교구</option>
                     {:else if group1 == "청년부"}
                       <option value="1청년">1청년</option>
                       <option value="2청년">2청년</option>
@@ -396,7 +380,53 @@
                       <option value="초등부">초등부</option>
                       <option value="중등부">중등부</option>
                       <option value="고등부">고등부</option>
+                      <option value="은혜브릿지">은혜브릿지</option>
+                      <option value="늘푸른부">늘푸른부</option>
                     {/if}
+                  </select>
+                  <div
+                    class="border-l border-gray-300"
+                    class:hidden={group1 == "장년부" && group2 != ""
+                      ? false
+                      : true}
+                  />
+                  <select
+                    id="group2Add"
+                    required
+                    on:change={() => {
+                      group2Add = document.querySelector("#group2Add").value
+                    }}
+                    class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    class:hidden={group1 == "장년부" && group2 != ""
+                      ? false
+                      : true}
+                  >
+                    <option value="none" class="hidden" />
+                    <option value="1구역">1구역</option>
+                    <option value="2구역">2구역</option>
+                    <option value="3구역">3구역</option>
+                    <option value="4구역">4구역</option>
+                    <option value="5구역">5구역</option>
+                    <option value="6구역">6구역</option>
+                    <option value="7구역">7구역</option>
+                    <option value="8구역">8구역</option>
+                    <option value="9구역">9구역</option>
+                    <option value="10구역">10구역</option>
+                    <option value="11구역">11구역</option>
+                    <option value="12구역">12구역</option>
+                    <option value="13구역">13구역</option>
+                    <option value="14구역">14구역</option>
+                    <option value="15구역">15구역</option>
+                    <option value="16구역">16구역</option>
+                    <option value="17구역">17구역</option>
+                    <option value="18구역">18구역</option>
+                    <option value="19구역">19구역</option>
+                    <option value="20구역">20구역</option>
+                    <option value="21구역">21구역</option>
+                    <option value="22구역">22구역</option>
+                    <option value="23구역">23구역</option>
+                    <option value="24구역">24구역</option>
+                    <option value="25구역">25구역</option>
                   </select>
                 </div>
               </div>
@@ -517,6 +547,7 @@
                 type="text"
                 bind:value={phone}
                 class="flex w-full px-1 bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                placeholder="010-0000-0000"
               />
             </div>
           </div>
@@ -542,7 +573,13 @@
                   <option value="장로">장로</option>
                   <option value="안수집사">안수집사</option>
                   <option value="권사">권사</option>
-                  <option value="집사">집사</option>
+                  <option value="은퇴권사">은퇴권사</option>
+                  <option value="무임권사">무임권사</option>
+                  <option value="무임은퇴권사">무임은퇴권사</option>
+                  <option value="서리집사">서리집사</option>
+                  <option value="은퇴집사">은퇴집사</option>
+                  <option value="무임집사">무임집사</option>
+                  <option value="무임은퇴집사">무임은퇴집사</option>
                   <option value="권찰">권찰</option>
                   <option value="성도">성도</option>
                 </select>
@@ -581,7 +618,6 @@
                       "#group1M > option:checked"
                     ).value
                     group2 = ""
-                    console.log(getGroupString(group1, group2))
                   }}
                   class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
                 >
@@ -591,19 +627,7 @@
                   <option value="교회학교">교회학교</option>
                 </select>
                 <div class="border-l border-gray-300" />
-                <input
-                  id="tempM"
-                  type="text"
-                  class="flex w-[45.5%] text-center bg-gray-50 text-gray-900 text-[12.5px] focus:outline-0"
-                  class:hidden={group1 == "장년부" && group2 != ""
-                    ? false
-                    : true}
-                  value={getGroupString(group1, group2)}
-                  on:focus={() => {
-                    group2 = ""
-                    document.querySelector("#group2M").value = ""
-                  }}
-                />
+
                 <select
                   id="group2M"
                   required
@@ -611,24 +635,12 @@
                     group2 = document.querySelector("#group2M").value
                   }}
                   class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                  class:hidden={group1 == "장년부" && group2 != ""
-                    ? true
-                    : false}
                 >
                   <option value="none" class="hidden" />
                   {#if group1 == "장년부"}
-                    <optgroup label="1구역">
-                      <option value="1구역,1교구">1교구</option>
-                      <option value="1구역,2교구">2교구</option>
-                      <option value="1구역,3교구">3교구</option>
-                      <option value="1구역,4교구">4교구</option>
-                    </optgroup>
-                    <optgroup label="2구역">
-                      <option value="2구역,1교구">1교구</option>
-                      <option value="2구역,2교구">2교구</option>
-                      <option value="2구역,3교구">3교구</option>
-                      <option value="2구역,4교구">4교구</option>
-                    </optgroup>
+                    <option value="1교구">1교구</option>
+                    <option value="2교구">2교구</option>
+                    <option value="3교구">3교구</option>
                   {:else if group1 == "청년부"}
                     <option value="1청년">1청년</option>
                     <option value="2청년">2청년</option>
@@ -639,7 +651,53 @@
                     <option value="초등부">초등부</option>
                     <option value="중등부">중등부</option>
                     <option value="고등부">고등부</option>
+                    <option value="은혜브릿지">은혜브릿지</option>
+                    <option value="늘푸른부">늘푸른부</option>
                   {/if}
+                </select>
+                <div
+                  class="border-l border-gray-300"
+                  class:hidden={group1 == "장년부" && group2 != ""
+                    ? false
+                    : true}
+                />
+                <select
+                  id="group2MAdd"
+                  required
+                  on:change={() => {
+                    group2Add = document.querySelector("#group2MAdd").value
+                  }}
+                  class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                  class:hidden={group1 == "장년부" && group2 != ""
+                    ? false
+                    : true}
+                >
+                  <option value="none" class="hidden" />
+                  <option value="1구역">1구역</option>
+                  <option value="2구역">2구역</option>
+                  <option value="3구역">3구역</option>
+                  <option value="4구역">4구역</option>
+                  <option value="5구역">5구역</option>
+                  <option value="6구역">6구역</option>
+                  <option value="7구역">7구역</option>
+                  <option value="8구역">8구역</option>
+                  <option value="9구역">9구역</option>
+                  <option value="10구역">10구역</option>
+                  <option value="11구역">11구역</option>
+                  <option value="12구역">12구역</option>
+                  <option value="13구역">13구역</option>
+                  <option value="14구역">14구역</option>
+                  <option value="15구역">15구역</option>
+                  <option value="16구역">16구역</option>
+                  <option value="17구역">17구역</option>
+                  <option value="18구역">18구역</option>
+                  <option value="19구역">19구역</option>
+                  <option value="20구역">20구역</option>
+                  <option value="21구역">21구역</option>
+                  <option value="22구역">22구역</option>
+                  <option value="23구역">23구역</option>
+                  <option value="24구역">24구역</option>
+                  <option value="25구역">25구역</option>
                 </select>
               </div>
             </div>
@@ -682,374 +740,3 @@
     </div>
   </form>
 </div>
-
-<!-- <div id="content" class="px-12 py-8 flex w-full bg-white overflow-x-scroll">
-  <form class="flex flex-col" on:submit={submitHandler}>
-    <div class="flex justify-between items-start w-[43rem] mb-2">
-      <h1 class="text-lg font-medium">새 성도 추가</h1>
-      <div class="flex mb-2 ml-auto gap-2">
-        <button
-          type="submit"
-          class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-        >
-          <Checkmark scale={16} />
-          <span>저장</span>
-        </button>
-
-        <button
-          type="button"
-          class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
-          on:click={async () => {
-            history.back()
-          }}
-        >
-          <span class="flex items-center">
-            <p class="font-medium mr-1 text-[#F46055]">X</p>
-            <p>닫기</p>
-          </span>
-        </button>
-      </div>
-    </div>
-
-    <div class="flex flex-col text-sm gap-3">
-      <div class="flex gap-3 w-full">
-        <div class="flex">
-          <label for="photo-dropbox">
-            <img
-              alt=""
-              id="preview"
-              src={"/avatar.png"}
-              class="border-gray-300 border w-[7.5rem] min-w-[7.5rem] h-[7.5rem] object-cover hover:opacity-75"
-            />
-          </label>
-          <input
-            id="photo-dropbox"
-            type="file"
-            accept="image/*"
-            class="sr-only"
-            on:change={(e) => {
-              loadFile(e)
-            }}
-          />
-        </div>
-        <div class="flex flex-col gap-3">
-          <div class="flex gap-3">
-            <div class="flex h-8 border-gray-300 border-x border-y">
-              <label
-                for="name"
-                class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                >이름</label
-              >
-              <input
-                id="name"
-                type="text"
-                bind:value={name}
-                required
-                class="flex w-[9.5rem] bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 p-2"
-              />
-            </div>
-            <div
-              class="flex h-8 border-gray-300 bg-gray-50 border-x border-y w-[18.25rem]"
-            >
-              <label
-                for="date"
-                class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0]"
-                >생일 / 나이</label
-              >
-
-              <input
-                id="date"
-                type="date"
-                on:change={(e) => {
-                  birth = e.target.value
-                  age = getAgeFromBirth(birth)
-                }}
-                class="flex w-[9rem] bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 p-2 border-gray-300 border-r"
-                min="1900-01-01"
-                max="2023-12-31"
-                value={birth}
-              />
-              <input
-                id="age"
-                type="text"
-                value={ageWithString}
-                disabled
-                class="flex w-[3.5rem] text-center bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 p-2"
-              />
-            </div>
-          </div>
-          <div class="flex gap-3">
-            <div class="flex h-8 border-gray-300 border-x border-y">
-              <label
-                for="gender"
-                class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                >성별</label
-              >
-              <div class="flex w-[9.5rem] justify-start bg-gray-50 px-1">
-                <select
-                  id="gender"
-                  on:change={() => {
-                    gender = document.querySelector(
-                      "#gender > option:checked"
-                    ).value
-                  }}
-                  class="flex w-[8.8rem] bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                >
-                  <option value="none" class="hidden" />
-                  <option value="남자">남자</option>
-                  <option value="여자">여자</option>
-                </select>
-              </div>
-            </div>
-            <div class="flex h-8 border-gray-300 bg-gray-50 border-x border-y">
-              <label
-                for="jikbun"
-                class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0]"
-                >직분 / 신급</label
-              >
-              <div class="flex w-[12.25rem] justify-center gap-3 pr-1">
-                <select
-                  id="jikbun"
-                  on:change={() => {
-                    jikbun = document.querySelector(
-                      "#jikbun > option:checked"
-                    ).value
-                  }}
-                  class="flex w-[4.8rem] bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                >
-                  <option value="none" class="hidden" />
-                  <option value="장로">장로</option>
-                  <option value="안수집사">안수집사</option>
-                  <option value="권사">권사</option>
-                  <option value="집사">집사</option>
-                  <option value="권찰">권찰</option>
-                  <option value="성도">성도</option>
-                </select>
-                <div class="border-l border-gray-300" />
-                <select
-                  id="singeup"
-                  on:change={() => {
-                    singeup = document.querySelector(
-                      "#singeup > option:checked"
-                    ).value
-                  }}
-                  class="flex w-[4.8rem] bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                >
-                  <option value="none" class="hidden" />
-                  <option value="세례">세례</option>
-                  <option value="입교">입교</option>
-                  <option value="학습">학습</option>
-                  <option value="유아세례">유아세례</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="flex gap-3">
-            <div class="flex h-8 border-gray-300 border-x border-y">
-              <label
-                for="phone"
-                class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] text-ellipsis overflow-hidden"
-                >휴대전화</label
-              >
-
-              <input
-                id="phone"
-                type="text"
-                bind:value={phone}
-                class="flex w-[9.5rem] bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 p-2"
-                placeholder="ex) 010-0000-0000"
-              />
-            </div>
-            <div class="flex h-8 border-gray-300 bg-gray-50 border-x border-y">
-              <label
-                for="group1"
-                class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0]"
-                >소속</label
-              >
-              <div class="flex w-[12.25rem] justify-center gap-3 pr-1">
-                <select
-                  id="group1"
-                  on:change={() => {
-                    group1 = document.querySelector(
-                      "#group1 > option:checked"
-                    ).value
-                    group2 = ""
-                  }}
-                  class="flex w-[4.8rem] bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                >
-                  <option value="none" class="hidden" />
-                  <option value="장년부">장년부</option>
-                  <option value="청년부">청년부</option>
-                  <option value="교회학교">교회학교</option>
-                </select>
-                <div class="border-l border-gray-300" />
-                <input
-                  required
-                  type="text"
-                  class="flex w-[4.8rem] bg-gray-50 text-gray-900 text-[12.5px] focus:outline-0"
-                  class:hidden={group1 == "장년부" && group2 != ""
-                    ? false
-                    : true}
-                  value={`${group2.split(",")[0]} > ${group2.split(",")[1]}`}
-                  on:focus={() => {
-                    group2 = ""
-                    // document.querySelector("#group2").value = ""
-                  }}
-                />
-                <select
-                  id="group2"
-                  required
-                  on:change={() => {
-                    group2 = document.querySelector("#group2").value
-
-                    console.dir(document.querySelector("#group2"))
-                  }}
-                  class="flex w-[4.8rem] bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                  class:hidden={group1 == "장년부" && group2 != ""
-                    ? true
-                    : false}
-                >
-                  <option value="none" class="hidden" />
-                  {#if group1 == "장년부"}
-                    <optgroup label="1구역">
-                      <option value="1구역,1교구">1교구</option>
-                      <option value="1구역,2교구">2교구</option>
-                      <option value="1구역,3교구">3교구</option>
-                      <option value="1구역,4교구">4교구</option>
-                    </optgroup>
-                    <optgroup label="2구역">
-                      <option value="2구역,1교구">1교구</option>
-                      <option value="2구역,2교구">2교구</option>
-                      <option value="2구역,3교구">3교구</option>
-                      <option value="2구역,4교구">4교구</option>
-                    </optgroup>
-                  {:else if group1 == "청년부"}
-                    <option value="1청년">1청년</option>
-                    <option value="2청년">2청년</option>
-                  {:else if group1 == "교회학교"}
-                    <option value="영아부">영아부</option>
-                    <option value="유치부">유치부</option>
-                    <option value="유년부">유년부</option>
-                    <option value="초등부">초등부</option>
-                    <option value="중등부">중등부</option>
-                    <option value="고등부">고등부</option>
-                  {/if}
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex w-[43rem] h-8 border-gray-300 border-x border-y">
-        <label
-          for="address"
-          class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0]"
-          >주소</label
-        >
-
-        <input
-          id="address"
-          autocomplete="off"
-          bind:value={addressWithExtraAddress}
-          class="flex w-full justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
-          on:click={searchAddress}
-        />
-      </div>
-      <div
-        class="relative flex h-8 w-[43rem] border-gray-300 border-x border-y"
-      >
-        <label
-          for="detailAddress"
-          class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0]"
-          >상세주소</label
-        >
-
-        <input
-          id="detailAddress"
-          autocomplete="off"
-          bind:value={detailAddress}
-          type="text"
-          class="flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
-        />
-      </div>
-      <div
-        class="relative flex h-8 w-[43rem] border-gray-300 border-x border-y"
-      >
-        <label
-          for="기초반"
-          class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0]"
-          >수강내역</label
-        >
-
-        <div
-          class="gap-2 flex items-center bg-gray-50 border-0 text-gray-900 w-full text-xs focus:outline-0 p-2"
-        >
-          <div class="flex">
-            <input
-              class="hidden"
-              type="checkbox"
-              id="기초반"
-              checked={gichoChecked}
-              on:change={() => {
-                gichoChecked = !gichoChecked
-              }}
-            />
-            <label
-              id="gicho"
-              for="기초반"
-              class="select-none font-medium px-1.5 py-0.5 rounded"
-              class:bg-[#FBA244]={gichoChecked}
-              class:text-white={gichoChecked}
-              class:bg-gray-300={!gichoChecked}
-            >
-              기초반
-            </label>
-          </div>
-          <div class="flex">
-            <input
-              class="hidden"
-              type="checkbox"
-              id="열매반"
-              checked={yeolmaeChecked}
-              on:change={() => {
-                yeolmaeChecked = !yeolmaeChecked
-              }}
-            />
-            <label
-              id="yeolma"
-              for="열매반"
-              class="select-none font-medium px-1.5 py-0.5 rounded"
-              class:bg-[#FBA244]={yeolmaeChecked}
-              class:text-white={yeolmaeChecked}
-              class:bg-gray-300={!yeolmaeChecked}
-            >
-              열매반
-            </label>
-          </div>
-          <div class="flex">
-            <input
-              class="hidden"
-              type="checkbox"
-              id="청지기반"
-              checked={cheongjigiChecked}
-              on:change={() => {
-                cheongjigiChecked = !cheongjigiChecked
-              }}
-            />
-            <label
-              id="cheongjigi"
-              for="청지기반"
-              class="select-none font-medium px-1.5 py-0.5 rounded"
-              class:bg-[#FBA244]={cheongjigiChecked}
-              class:text-white={cheongjigiChecked}
-              class:bg-gray-300={!cheongjigiChecked}
-            >
-              청지기반
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
-  </form>
-</div> -->

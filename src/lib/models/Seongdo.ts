@@ -1,6 +1,9 @@
 import { Schema } from "mongoose"
 import { conn } from "$lib/db"
 import type { ISeongdo } from "$lib/interfaces"
+import { Simbang } from "./Simbang"
+import { Family } from "./Family"
+import { SeongdoEdu } from "./SeongdoEdu"
 
 const seongdoSchema = new Schema<ISeongdo>({
   name: { type: String, required: true },
@@ -16,12 +19,6 @@ const seongdoSchema = new Schema<ISeongdo>({
   group2: { type: String, required: false },
   address: { type: String, required: false },
   remarks: { type: String, required: false },
-  educations: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "education",
-    },
-  ],
 })
 
 seongdoSchema.set("timestamps", { createdAt: true, updatedAt: true })
@@ -58,6 +55,23 @@ seongdoSchema.pre("save", async function (next) {
     seongdoWithOriginalName.length > 0
       ? name + (seongdoWithOriginalName.length + 1)
       : name
+
+  next()
+})
+
+seongdoSchema.pre("deleteOne", async function (next) {
+  const { _id } = this.getFilter()
+  console.log(_id)
+
+  await Simbang.deleteMany({ seongdoId: _id })
+  const family = await Family.findOne({ memberIds: { $in: [_id] } })
+  const newMemberIds = family?.memberIds?.filter((member) => member._id != _id)
+  const newMemebers = family?.members?.filter((member) => member.seongdo != _id)
+  await Family.updateOne(
+    { _id: family?._id },
+    { members: newMemebers, memberIds: newMemberIds }
+  )
+  await SeongdoEdu.deleteMany({ seongdo: _id })
 
   next()
 })
