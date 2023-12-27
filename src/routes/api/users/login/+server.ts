@@ -18,7 +18,6 @@ export async function POST({ request }) {
         {
           id: user._id,
           name: user.name,
-          allowedGroup: ["장년부_1교구", "청년부"],
         },
         JWT_SECRET,
         {

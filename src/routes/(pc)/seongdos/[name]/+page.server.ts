@@ -8,8 +8,6 @@ export const load = loadFlash(async ({ url, fetch, locals, cookies }) => {
   console.log("seongdos/[name] page.server.ts")
   const { allowedGroup } = locals
 
-  console.log("trstasrt")
-
   const name = decodeURIComponent(url.pathname.split("/")[2])
 
   let seongdo, family, simbangs
