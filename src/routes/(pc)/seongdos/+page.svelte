@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { page as appPage } from "$app/stores"
   import Table from "./Table.svelte"
   import type { IPage, ISeongdo } from "$lib/interfaces"
   import { utils, writeFile } from "xlsx"
@@ -17,19 +16,11 @@
   export let data: {
     seongdos: ISeongdo[]
     page: IPage
-    pathname: string
   }
 
   $: name = ""
   $: seongdos = data.seongdos
   $: page = data.page
-  $: pathname = data.pathname
-
-  $: flash = getFlash(appPage)
-
-  $: $flash?.type == "error"
-    ? toast.error("접근할 수 없는 페이지입니다.")
-    : undefined
 
   const searchHandler = () => {
     const params = getSearchParams({
@@ -143,7 +134,7 @@
         </button>
       </div>
     </div>
-    <Table {seongdos} {page} {pathname} />
+    <Table {seongdos} {page} />
     <!-- <Table />
     <Pagination classString="mb-8" /> -->
   </div>

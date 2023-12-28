@@ -1,15 +1,9 @@
 <script lang="ts">
   import { goto } from "$app/navigation"
-  import type { IPage, ISeongdo, ISeongdoEduPopulate } from "$lib/interfaces"
+  import type { IPage, ISeongdo } from "$lib/interfaces"
   import { AllowedGroupStore } from "$lib/store"
 
-  import {
-    getEduSlug,
-    getGroupString,
-    getSearchParams,
-    getSeongdosSearchParams,
-    isAllowGroup,
-  } from "$lib/utils"
+  import { getGroupString, getSearchParams, isAllowGroup } from "$lib/utils"
   import { ArrowDown, ArrowUp, ArrowsVertical } from "carbon-icons-svelte"
   import toast from "svelte-french-toast"
 

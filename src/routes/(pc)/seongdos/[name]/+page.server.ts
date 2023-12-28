@@ -1,7 +1,4 @@
-import { loadFlash, redirect } from "sveltekit-flash-message/server"
-import { JWT_SECRET } from "$lib/env"
-import { getGroupItem } from "$lib/utils"
-import jwt from "jsonwebtoken"
+import { loadFlash } from "sveltekit-flash-message/server"
 /** @type {import('@sveltejs/kit').Load} */
 
 export const load = loadFlash(async ({ url, fetch, locals, cookies }) => {

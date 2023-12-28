@@ -36,7 +36,6 @@ export const load = async ({ url, locals, fetch }) => {
   const group2 = url.searchParams.get("group2")
   const birthStart = url.searchParams.get("birthStart")
   const birthEnd = url.searchParams.get("birthEnd")
-  const { token } = locals
 
   if (
     (group1 != null &&

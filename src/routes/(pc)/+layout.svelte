@@ -13,9 +13,10 @@
 
   export let data: {
     path: string
+    allowedGroup: string[]
   }
 
-  $: $AllowedGroupStore = ["장년부_1교구", "청년부", "교회학교_유치부"]
+  $: $AllowedGroupStore = data.allowedGroup
   $: path = data.path
 
   const tab = { seongdos: "seongdos", educations: "educations" }
