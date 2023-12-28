@@ -34,7 +34,9 @@
     })
     if (response.ok) {
       toast.success("저장되었습니다.")
-      goto(`/educations/${getSlug(name, semester, startDate)}?create=true`)
+      goto(
+        `/educations/detail/${getSlug(name, semester, startDate)}?create=true`
+      )
     }
   }
 

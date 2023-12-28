@@ -17,12 +17,16 @@
   export let data: {
     seongdos: ISeongdo[]
     page: IPage
+    pathname: string
   }
+
   $: name = ""
   $: seongdos = data.seongdos
   $: page = data.page
+  $: pathname = data.pathname
 
   $: flash = getFlash(appPage)
+
   $: $flash?.type == "error"
     ? toast.error("접근할 수 없는 페이지입니다.")
     : undefined
@@ -34,7 +38,7 @@
     })
 
     const url = params ? `/seongdos${params}` : "/seongdos"
-    goto(url)
+    goto(url, { state: { temp: 123 } })
   }
 </script>
 
@@ -139,7 +143,7 @@
         </button>
       </div>
     </div>
-    <Table {seongdos} {page} />
+    <Table {seongdos} {page} {pathname} />
     <!-- <Table />
     <Pagination classString="mb-8" /> -->
   </div>

@@ -15,12 +15,20 @@
     SeongdosStore,
   } from "$lib/store"
   import toast from "svelte-french-toast"
+  import { page as appPage } from "$app/stores"
+  import { getFlash } from "sveltekit-flash-message/client"
 
   export let data: {
     education: IEducation
     seongdoEdus: ISeongdoEduPopulate[]
     page: IPage
   }
+
+  $: flash = getFlash(appPage)
+
+  $: $flash?.type == "error"
+    ? toast.error("접근할 수 없는 페이지입니다.")
+    : undefined
 
   $: SeongdoEdusStore.set(data.seongdoEdus)
   $: SeongdoEduPageStore.set(data.page)
@@ -50,13 +58,14 @@
     const response = await fetch("/api/educations", {
       method: "DELETE",
       body: JSON.stringify({
-        id,
+        id: education._id,
       }),
       headers: {
         "content-type": "application/json",
       },
     })
     if (response.ok) {
+      toast.success("삭제되었습니다.")
       history.back()
     }
   }

@@ -8,7 +8,7 @@ export interface IUser {
   _id?: string
   name?: string
   password?: string
-  permissions?: string[]
+  allowedGroup?: string[]
 }
 
 export interface ISeongdo {

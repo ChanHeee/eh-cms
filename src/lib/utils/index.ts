@@ -123,3 +123,40 @@ export const isNullable = (input: any) => {
   }
   return false
 }
+
+export const isAllowGroup = (
+  allowedGroup: string[],
+  group1: string,
+  group2: string
+) => {
+  let isAllow = false
+  const seongdoGroupItem = getGroupItem(group1, group2)
+  allowedGroup.map((item) => {
+    const groupItemFromAllowed = getGroupItem(
+      item.split("_")[0],
+      item.split("_")[1]
+    )
+
+    if (!groupItemFromAllowed.group2) {
+      if (groupItemFromAllowed.group1 == seongdoGroupItem.group1) {
+        isAllow = true
+      }
+    } else {
+      if (
+        groupItemFromAllowed.group1 == seongdoGroupItem.group1 &&
+        groupItemFromAllowed.group2 == seongdoGroupItem.group2
+      ) {
+        isAllow = true
+      }
+    }
+    if (!seongdoGroupItem.group1) {
+      isAllow = true
+    }
+  })
+
+  if (allowedGroup.includes("전체")) {
+    isAllow = true
+  }
+
+  return isAllow
+}

@@ -1,5 +1,6 @@
 import { JWT_SECRET } from "$lib/env"
 import { User } from "$lib/models/User"
+
 import { json } from "@sveltejs/kit"
 import jwt from "jsonwebtoken"
 
@@ -18,6 +19,7 @@ export async function POST({ request }) {
         {
           id: user._id,
           name: user.name,
+          allowedGroup: user.allowedGroup,
         },
         JWT_SECRET,
         {

@@ -25,8 +25,6 @@ export const load = async ({ url, locals, fetch }) => {
     return count
   }
 
-  console.log("seongdos layout.server")
-
   const name = url.searchParams.get("name")
   const jikbun = JSON.parse(url.searchParams.get("jikbun"))
   const order = url.searchParams.get("order")
@@ -39,7 +37,6 @@ export const load = async ({ url, locals, fetch }) => {
   const birthStart = url.searchParams.get("birthStart")
   const birthEnd = url.searchParams.get("birthEnd")
   const { token } = locals
-  const allowedGroup = jwt.verify(token, JWT_SECRET).allowedGroup
 
   if (
     (group1 != null &&
@@ -51,7 +48,6 @@ export const load = async ({ url, locals, fetch }) => {
     throw redirect(303, "/seongdos")
   }
 
-  locals.allowedGroup = allowedGroup
   locals.searchParams = {
     name,
     jikbun,

@@ -42,7 +42,7 @@
             </button>
           </div>
 
-          <meta http-equiv="refresh" content="500; url=/" />
+          <meta http-equiv="refresh" content="5; url=/" />
         </div>
       </div>
     </div>

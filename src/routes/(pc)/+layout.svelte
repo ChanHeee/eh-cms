@@ -9,10 +9,13 @@
   import Logout from "carbon-icons-svelte/lib/Logout.svelte"
   import { goto } from "$app/navigation"
   import toast, { Toaster } from "svelte-french-toast"
+  import { AllowedGroupStore } from "$lib/store"
 
   export let data: {
     path: string
   }
+
+  $: $AllowedGroupStore = ["장년부_1교구", "청년부", "교회학교_유치부"]
   $: path = data.path
 
   const tab = { seongdos: "seongdos", educations: "educations" }

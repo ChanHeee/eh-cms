@@ -1,7 +1,12 @@
 <script lang="ts">
   import SearchTable from "./SearchTable.svelte"
   import { goto } from "$app/navigation"
-  import { getAgeFromBirth, getGroupItem, getGroupString } from "$lib/utils"
+  import {
+    getAgeFromBirth,
+    getGroupItem,
+    getGroupString,
+    isAllowGroup,
+  } from "$lib/utils"
   import {
     AddLarge,
     Checkmark,
@@ -9,7 +14,11 @@
     Search,
     TrashCan,
   } from "carbon-icons-svelte"
-  import { SeongdoPageStore, SeongdosStore } from "$lib/store"
+  import {
+    AllowedGroupStore,
+    SeongdoPageStore,
+    SeongdosStore,
+  } from "$lib/store"
   import type { ISeongdo } from "$lib/interfaces"
   import toast from "svelte-french-toast"
   export let data
@@ -140,6 +149,7 @@
       },
     })
     if (response.ok) {
+      toast.success("삭제되었습니다.")
       history.back()
     }
   }
@@ -206,9 +216,6 @@
   }
 
   const familyHandler = async () => {
-    // let response
-    console.log(familyId)
-
     if (familyId) {
       const response = await fetch(`/api/families/${familyId}`, {
         method: "PUT",
@@ -609,7 +616,7 @@
                 <img
                   alt=""
                   id="previewM"
-                  src={"/avatar.png"}
+                  src={seongdo.avatar || "/avatar.png"}
                   class="border-gray-300 border w-[7.5rem] min-w-[7.5rem] h-[7.5rem] object-cover hover:opacity-75"
                 />
               </label>
@@ -648,6 +655,7 @@
                 <div class="flex w-full bg-gray-50 px-1">
                   <select
                     id="genderM"
+                    value={seongdo.gender}
                     on:change={() => {
                       seongdo.gender = document.querySelector(
                         "#gender > option:checked"
@@ -694,7 +702,7 @@
                     seongdo.birth = e.target.value
                     seongdo.age = getAgeFromBirth(seongdo.birth)
                   }}
-                  class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 px-1 border-gray-300"
+                  class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 border-gray-300"
                   min="1900-01-01"
                   max="2023-12-31"
                   value={seongdo.birth}
@@ -999,12 +1007,25 @@
           {#if members.length > 0}
             <!-- content here -->
             {#each members as member}
-              <button class="flex px-3 items-center h-10">
-                <a href={`/seongdos/${member.seongdo.name}`}>
-                  <div>
-                    {member.seongdo.name}
-                  </div>
-                </a>
+              <button
+                class="flex px-3 items-center h-10"
+                on:click={() => {
+                  if (
+                    !isAllowGroup(
+                      $AllowedGroupStore,
+                      member.seongdo.group1,
+                      member.seongdo.group2
+                    )
+                  ) {
+                    toast.error("접근할 수 없습니다.")
+                  } else {
+                    goto(`/seongdos/${member.seongdo.name}`)
+                  }
+                }}
+              >
+                <div>
+                  {member.seongdo.name}
+                </div>
               </button>
             {/each}
           {/if}

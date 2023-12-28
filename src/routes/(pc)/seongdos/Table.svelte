@@ -1,14 +1,17 @@
 <script lang="ts">
   import { goto } from "$app/navigation"
   import type { IPage, ISeongdo, ISeongdoEduPopulate } from "$lib/interfaces"
+  import { AllowedGroupStore } from "$lib/store"
 
   import {
     getEduSlug,
     getGroupString,
     getSearchParams,
     getSeongdosSearchParams,
+    isAllowGroup,
   } from "$lib/utils"
   import { ArrowDown, ArrowUp, ArrowsVertical } from "carbon-icons-svelte"
+  import toast from "svelte-french-toast"
 
   export let seongdos: ISeongdo[]
   export let page: IPage
@@ -99,11 +102,17 @@
 
     {#each seongdos as item, index}
       <div class="flex px-3 items-center h-10">
-        <a href={`/seongdos/${item.name}`}>
-          <button>
-            {item.name}
-          </button>
-        </a>
+        <button
+          on:click={() => {
+            if (!isAllowGroup($AllowedGroupStore, item.group1, item.group2)) {
+              toast.error("접근할 수 없습니다.")
+            } else {
+              goto(`/seongdos/${item.name}`)
+            }
+          }}
+        >
+          {item.name}
+        </button>
       </div>
     {/each}
   </div>

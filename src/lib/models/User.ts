@@ -13,7 +13,7 @@ type DBUserModel = Model<IUser, {}, DBUserMethods>
 const userSchema = new Schema<IUser, DBUserModel, DBUserMethods>({
   name: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  permissions: [{ type: String, required: false }],
+  allowedGroup: [{ type: String, required: false }],
 })
 
 userSchema.pre("save", async function (next) {
