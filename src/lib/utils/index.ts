@@ -160,3 +160,11 @@ export const isAllowGroup = (
 
   return isAllow
 }
+
+export const textShortenWithEllipsis = (text: string, maxLen: number) => {
+  if (text.length > maxLen) {
+    return text.substring(0, maxLen) + "..."
+  } else {
+    return text
+  }
+}

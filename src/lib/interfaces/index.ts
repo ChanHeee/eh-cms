@@ -110,10 +110,10 @@ export interface IMember {
 export interface ISimbang {
   _id?: string
   seongdoId?: string
-  date?: string
+  date: string
   hymn?: string
   bible?: string
-  simbangja?: string
+  simbangja: string
   detail?: string
 }
 

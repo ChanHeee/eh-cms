@@ -6,6 +6,7 @@
     getGroupItem,
     getGroupString,
     isAllowGroup,
+    textShortenWithEllipsis,
   } from "$lib/utils"
   import {
     AddLarge,
@@ -19,7 +20,7 @@
     SeongdoPageStore,
     SeongdosStore,
   } from "$lib/store"
-  import type { ISeongdo } from "$lib/interfaces"
+  import type { ISeongdo, ISimbang } from "$lib/interfaces"
   import toast from "svelte-french-toast"
   export let data
 
@@ -64,12 +65,15 @@
 
   // value for simbang
   $: simbangs = data.simbangs
+
   $: date = ""
   $: hymn = ""
   $: bible = ""
   $: simbangja = ""
   $: detail = ""
   $: teacherList = JSON.parse(data.selectList).teacherList
+  let selectedSimbang: ISimbang | null
+  $: selectedSimbang = selectedSimbang
 
   $: isFamilyModalHidden = true
   $: isSimbangModalHidden = true
@@ -252,21 +256,39 @@
     if (!date || !simbangja) {
       toast.error("심방날짜와 심방자를 입력해주세요.")
     } else {
-      const response = await fetch(`/api/simbangs`, {
-        method: "POST",
-        body: JSON.stringify({
-          seongdoId: seongdo._id,
-          date,
-          hymn,
-          bible,
-          simbangja,
-          detail,
-        }),
-        headers: {
-          "content-type": "application/json",
-        },
-      })
-      return response.ok
+      if (selectedSimbang) {
+        const response = await fetch(`/api/simbangs`, {
+          method: "PUT",
+          body: JSON.stringify({
+            id: selectedSimbang._id,
+            date,
+            hymn,
+            bible,
+            simbangja,
+            detail,
+          }),
+          headers: {
+            "content-type": "application/json",
+          },
+        })
+        return response.ok
+      } else {
+        const response = await fetch(`/api/simbangs`, {
+          method: "POST",
+          body: JSON.stringify({
+            seongdoId: seongdo._id,
+            date,
+            hymn,
+            bible,
+            simbangja,
+            detail,
+          }),
+          headers: {
+            "content-type": "application/json",
+          },
+        })
+        return response.ok
+      }
     }
   }
 
@@ -1144,9 +1166,20 @@
           {#if simbangs.length > 0}
             <!-- content here -->
             {#each simbangs as simbang}
-              <div class="flex justify-center px-3 items-center h-10">
+              <button
+                class="flex justify-center px-3 items-center h-10"
+                on:click={() => {
+                  selectedSimbang = simbang
+                  date = simbang.date
+                  hymn = simbang.hymn
+                  bible = simbang.bible
+                  simbangja = simbang.simbangja
+                  detail = simbang.detail
+                  isSimbangModalHidden = !isSimbangModalHidden
+                }}
+              >
                 {simbang.date}
-              </div>
+              </button>
             {/each}
           {/if}
         </div>
@@ -1206,7 +1239,7 @@
             {#each simbangs as simbang}
               <div class="flex px-3 items-center h-10">
                 <p class="text-ellipsis overflow-hidden">
-                  {simbang.detail}
+                  {textShortenWithEllipsis(simbang.detail, 50)}
                 </p>
               </div>
             {/each}
@@ -1449,7 +1482,11 @@
         <div
           class="w-full overflow-scroll h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
         >
-          <h1 class="text-left text-lg font-medium mb-2">심방 생성</h1>
+          {#if selectedSimbang}
+            <h1 class="text-left text-lg font-medium mb-2">심방 내용</h1>
+          {:else}
+            <h1 class="text-left text-lg font-medium mb-2">심방 생성</h1>
+          {/if}
           <form class="flex flex-col" on:submit={submitHandler}>
             <div class="flex flex-col text-sm gap-3">
               <div class="flex w-full h-8 border-gray-300 border-x border-y">
@@ -1458,7 +1495,9 @@
                   class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
                   >심방 날짜</label
                 >
-                <div class="flex flex-auto justify-start bg-gray-50 px-1">
+                <div
+                  class="flex flex-auto justify-start bg-gray-50 pl-1.5 pr-1"
+                >
                   <input
                     id="simbangDate"
                     type="date"
@@ -1473,15 +1512,16 @@
                   class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
                   >심방자</label
                 >
-                <div class="flex flex-auto justify-start bg-gray-50">
+                <div class="flex flex-auto justify-start bg-gray-50 pr-1">
                   <select
                     id="simbangSimbangja"
-                    class="px-2 flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    class="px-1 flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
                     on:change={() => {
                       simbangja = document.querySelector(
                         "#simbangSimbangja > option:checked"
                       ).value
                     }}
+                    value={simbangja}
                   >
                     <option value="none" class="hidden" />
                     {#each teacherList as teacher}
@@ -1522,18 +1562,17 @@
                 </div>
               </div>
 
-              <div class="flex w-full h-8 border-gray-300 border-x border-y">
+              <div class="flex w-full h-32 border-gray-300 border-x border-y">
                 <label
                   for="simbangDetail"
                   class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
                   >내용</label
                 >
                 <div class="flex flex-auto justify-start bg-gray-50">
-                  <input
+                  <textarea
                     id="simbangDetail"
-                    type="text"
                     bind:value={detail}
-                    class="px-2 flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    class="resize-none flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
                   />
                 </div>
               </div>
@@ -1548,6 +1587,7 @@
             class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
             on:click={async () => {
               isSimbangModalHidden = !isSimbangModalHidden
+              selectedSimbang = null
               date = ""
               hymn = ""
               bible = ""
@@ -1564,15 +1604,40 @@
             type="submit"
             class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
             on:click={async () => {
-              const result = await simbangHandler()
-              if (result) {
-                simbangs = [result.simbang, ...simbangs]
-                isSimbangModalHidden = !isSimbangModalHidden
-                date = ""
-                hymn = ""
-                bible = ""
-                simbangja = ""
-                detail = ""
+              if (selectedSimbang) {
+                const result = await simbangHandler()
+                if (result) {
+                  const response = await fetch(
+                    `/api/simbangs?seongdoId=${seongdo._id}`
+                  )
+                  const responseJson = await response.json()
+                  simbangs = responseJson.simbangs
+                  isSimbangModalHidden = !isSimbangModalHidden
+                  selectedSimbang = null
+                  date = ""
+                  hymn = ""
+                  bible = ""
+                  simbangja = ""
+                  detail = ""
+                  toast.success("수정되었습니다.")
+                }
+              } else {
+                const result = await simbangHandler()
+                if (result) {
+                  const response = await fetch(
+                    `/api/simbangs?seongdoId=${seongdo._id}`
+                  )
+                  const responseJson = await response.json()
+                  simbangs = responseJson.simbangs
+                  isSimbangModalHidden = !isSimbangModalHidden
+                  selectedSimbang = null
+                  date = ""
+                  hymn = ""
+                  bible = ""
+                  simbangja = ""
+                  detail = ""
+                  toast.success("저장되었습니다.")
+                }
               }
             }}
           >
