@@ -20,10 +20,16 @@
     SeongdoPageStore,
     SeongdosStore,
   } from "$lib/store"
-  import type { ISeongdo, ISimbang } from "$lib/interfaces"
+  import type { IFamily, ISeongdo, ISimbang } from "$lib/interfaces"
   import toast from "svelte-french-toast"
-  export let data
+  export let data: {
+    seongdo: ISeongdo
+    family: IFamily
+    simbangs: ISimbang[]
+    groupList: string[]
+  }
 
+  $: groupList = data.groupList
   // value for senogdo detail
   $: seongdo = data.seongdo
 
@@ -547,9 +553,9 @@
                       class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
                     >
                       <option value="none" class="hidden" />
-                      <option value="장년부">장년부</option>
-                      <option value="청년부">청년부</option>
-                      <option value="교회학교">교회학교</option>
+                      {#each Object.keys(groupList) as group1}
+                        <option value={group1}>{group1}</option>
+                      {/each}
                     </select>
                     <div class="border-l border-gray-300" />
 
@@ -564,21 +570,17 @@
                     >
                       <option value="none" class="hidden" />
                       {#if seongdo.group1 == "장년부"}
-                        <option value="1교구">1교구</option>
-                        <option value="2교구">2교구</option>
-                        <option value="3교구">3교구</option>
+                        {#each groupList["장년부"] as item}
+                          <option value={item}>{item}</option>
+                        {/each}
                       {:else if seongdo.group1 == "청년부"}
-                        <option value="1청년">1청년</option>
-                        <option value="2청년">2청년</option>
+                        {#each groupList["청년부"] as item}
+                          <option value={item}>{item}</option>
+                        {/each}
                       {:else if seongdo.group1 == "교회학교"}
-                        <option value="영아부">영아부</option>
-                        <option value="유치부">유치부</option>
-                        <option value="유년부">유년부</option>
-                        <option value="초등부">초등부</option>
-                        <option value="중등부">중등부</option>
-                        <option value="고등부">고등부</option>
-                        <option value="은혜브릿지">은혜브릿지</option>
-                        <option value="늘푸른부">늘푸른부</option>
+                        {#each groupList["교회학교"] as item}
+                          <option value={item}>{item}</option>
+                        {/each}
                       {/if}
                     </select>
                     <div
@@ -829,9 +831,9 @@
                     class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
                   >
                     <option value="none" class="hidden" />
-                    <option value="장년부">장년부</option>
-                    <option value="청년부">청년부</option>
-                    <option value="교회학교">교회학교</option>
+                    {#each Object.keys(groupList) as group1}
+                      <option value={group1}>{group1}</option>
+                    {/each}
                   </select>
                   <div class="border-l border-gray-300" />
 
@@ -846,21 +848,17 @@
                   >
                     <option value="none" class="hidden" />
                     {#if seongdo.group1 == "장년부"}
-                      <option value="1교구">1교구</option>
-                      <option value="2교구">2교구</option>
-                      <option value="3교구">3교구</option>
+                      {#each groupList["장년부"] as item}
+                        <option value={item}>{item}</option>
+                      {/each}
                     {:else if seongdo.group1 == "청년부"}
-                      <option value="1청년">1청년</option>
-                      <option value="2청년">2청년</option>
+                      {#each groupList["청년부"] as item}
+                        <option value={item}>{item}</option>
+                      {/each}
                     {:else if seongdo.group1 == "교회학교"}
-                      <option value="영아부">영아부</option>
-                      <option value="유치부">유치부</option>
-                      <option value="유년부">유년부</option>
-                      <option value="초등부">초등부</option>
-                      <option value="중등부">중등부</option>
-                      <option value="고등부">고등부</option>
-                      <option value="은혜브릿지">은혜브릿지</option>
-                      <option value="늘푸른부">늘푸른부</option>
+                      {#each groupList["교회학교"] as item}
+                        <option value={item}>{item}</option>
+                      {/each}
                     {/if}
                   </select>
                   <div

@@ -363,9 +363,6 @@
                     {#each Object.keys(groupList) as group1}
                       <option value={group1}>{group1}</option>
                     {/each}
-                    <!-- <option value="장년부">장년부</option>
-                    <option value="청년부">청년부</option>
-                    <option value="교회학교">교회학교</option> -->
                   </select>
                   <div class="border-l border-gray-300" />
 
