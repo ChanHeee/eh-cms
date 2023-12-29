@@ -248,9 +248,10 @@
         const arrayStart = pagination[0]
 
         if (now > 1) {
+          const { take, ...rest } = page.requestParams
           goto(
             `/seongdos/${getSearchParams({
-              ...page.requestParams,
+              ...rest,
               page: arrayStart - 1,
             })}`
           )
@@ -277,9 +278,10 @@
         class:bg-gray-100={item == now}
         class:bg-white={item != now}
         on:click={() => {
+          const { take, ...rest } = page.requestParams
           goto(
             `/seongdos/${getSearchParams({
-              ...page.requestParams,
+              ...rest,
               page: item,
             })}`
           )
@@ -295,9 +297,10 @@
         const next = arrayEnd < last ? arrayEnd + 1 : arrayEnd
 
         if (now != last) {
+          const { take, ...rest } = page.requestParams
           goto(
             `/seongdos/${getSearchParams({
-              ...page.requestParams,
+              ...rest,
               page: next,
             })}`
           )

@@ -59,7 +59,6 @@ export const GET: RequestHandler = async ({ request, url }) => {
   if (birthStart) {
     seongdoMatch.birth = { ...seongdoMatch.birth, $lte: birthEnd }
   }
-  console.log(seongdoMatch)
 
   if (className && className != "전체") {
     educationMatch.name = className

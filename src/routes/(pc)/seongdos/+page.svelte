@@ -10,8 +10,6 @@
   } from "carbon-icons-svelte"
   import { goto } from "$app/navigation"
   import { getSearchParams } from "$lib/utils"
-  import { getFlash } from "sveltekit-flash-message/client"
-  import toast from "svelte-french-toast"
 
   export let data: {
     seongdos: ISeongdo[]
@@ -21,6 +19,7 @@
   $: name = ""
   $: seongdos = data.seongdos
   $: page = data.page
+  $: requestParams = page.requestParams
 
   const searchHandler = () => {
     const params = getSearchParams({
@@ -88,13 +87,17 @@
         <button
           class="hidden md:flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#237334]"
           on:click={async () => {
+            const { take, ...rest } = requestParams
             let seongdos
-            let response = await await fetch("/api/seongdos?take=100000", {
-              method: "GET",
-              headers: {
-                "content-type": "application/json",
-              },
-            })
+            let response = await await fetch(
+              `/api/seongdos${getSearchParams({ ...rest, take: 10000 })}`,
+              {
+                method: "GET",
+                headers: {
+                  "content-type": "application/json",
+                },
+              }
+            )
             if (response.ok) {
               seongdos = (await response.json()).seongdos
             }
@@ -112,11 +115,6 @@
                 소속2: item.group2,
                 핸드폰: item.phone,
                 주소: item.address,
-                수강내역: item.eduIds
-                  .map((edu) => {
-                    return edu.name
-                  })
-                  .toString(),
               }
             })
 
@@ -125,7 +123,9 @@
             utils.book_append_sheet(workbook, worksheet)
             writeFile(
               workbook,
-              `성도목록_${new Date().toISOString().substring(0, 10)}.xlsx`
+              `성도목록_${new Date()
+                .toISOString()
+                .substring(0, 10)}${getSearchParams({ ...rest })}.xlsx`
             )
           }}
         >

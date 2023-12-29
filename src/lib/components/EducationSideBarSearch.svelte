@@ -15,6 +15,7 @@
 
   const searchHandler = () => {
     const params = getSearchParams({
+      page: 1,
       name,
       jikbun: jikbunArray,
       birthStart,
@@ -24,8 +25,9 @@
     if (!["기초반", "열매반", "청지기반", "전체", ""].includes(className)) {
       className = "전체"
     }
+    console.log(params, "here")
 
-    const url = `/educations/${className}/${params}`
+    const url = `/educations/${className}${params}`
     goto(url)
   }
 </script>

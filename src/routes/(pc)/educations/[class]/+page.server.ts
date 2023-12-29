@@ -1,13 +1,26 @@
 import { getSearchParams, getSeongdosSearchParams } from "$lib/utils"
 import { redirect } from "@sveltejs/kit"
-import type { PageServerLoad } from "../$types"
 
 export const load = async ({ request, fetch, url, locals }) => {
   const { name, jikbun, order, page, birthStart, birthEnd } =
     locals.searchParams
-
   const className = decodeURI(url.pathname).split("/")[2]
-  console.log("educations class server", className)
+  console.log(page, "here")
+
+  if (isNaN(page) || page < 0 || page == "") {
+    const url = `/educations/${className ?? "전체"}${getSearchParams({
+      name,
+      jikbun,
+      order,
+      page: 1,
+      birthStart,
+      birthEnd,
+    })}`
+
+    console.log(url, "redirect")
+
+    throw redirect(302, encodeURI(url))
+  }
 
   let response = await fetch(
     `/api/seongdoEdus${getSearchParams({
@@ -28,7 +41,8 @@ export const load = async ({ request, fetch, url, locals }) => {
 
   const { seongdoEdus, page: seongdoEduPage } = await response.json()
 
-  if (seongdoEduPage.totalPage < page) {
+  if (seongdoEduPage.totalPage == 0) {
+  } else if (seongdoEduPage.totalPage < page) {
     const url = `/educations/${className ?? "전체"}${getSearchParams({
       name,
       jikbun,
@@ -37,6 +51,7 @@ export const load = async ({ request, fetch, url, locals }) => {
       birthStart,
       birthEnd,
     })}`
+
     throw redirect(302, encodeURI(url))
   }
 

@@ -19,10 +19,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       ? parseInt(url.searchParams.get("page"))
       : 1
 
-  const take =
-    url.searchParams.get("take") != null
-      ? parseInt(url.searchParams.get("take"))
-      : 12
+  const take = 12
 
   let query = Seongdo.find()
   if (name) {

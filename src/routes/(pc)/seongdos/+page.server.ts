@@ -6,8 +6,23 @@ import { redirect } from "@sveltejs/kit"
 
 /** @type {import('@sveltejs/kit').Load} */
 export const load = async ({ request, fetch, url, locals }) => {
-  const { name, jikbun, order, group1, group2, birthStart, birthEnd } =
+  const { name, jikbun, page, order, group1, group2, birthStart, birthEnd } =
     locals.searchParams
+
+  if (isNaN(page) || page < 0 || page == "") {
+    const url = `/seongdos${getSeongdosSearchParams({
+      name,
+      jikbun,
+      order,
+      page: 1,
+      group1,
+      group2,
+      birthStart,
+      birthEnd,
+    })}`
+
+    throw redirect(302, encodeURI(url))
+  }
 
   const requestUrl = `/api/seongdos${decodeURI(url.search)}`
 
@@ -18,26 +33,26 @@ export const load = async ({ request, fetch, url, locals }) => {
   })
 
   if (response.ok) {
-    const { seongdos, page } = await response.json()
-
-    if (page.totalPage < page) {
+    const { seongdos, page: seongdoPage } = await response.json()
+    if (seongdoPage.totalPage == 0) {
+    } else if (seongdoPage.totalPage < page) {
       const url = `/seongdos${getSeongdosSearchParams({
         name,
         jikbun,
         order,
-        page: page.totalPage,
+        page: seongdoPage.totalPage,
         group1,
         group2,
         birthStart,
         birthEnd,
       })}`
 
-      throw redirect(302, url)
+      throw redirect(302, encodeURI(url))
     }
 
     return {
       seongdos,
-      page,
+      page: seongdoPage,
     }
   }
 }

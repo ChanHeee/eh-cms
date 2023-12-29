@@ -2,11 +2,13 @@
   import { goto } from "$app/navigation"
   import type { IEducation, IPage } from "$lib/interfaces"
   import { getEduSlug, getSearchParams } from "$lib/utils"
+  import { ArrowDown, ArrowUp, ArrowsVertical } from "carbon-icons-svelte"
 
   export let educations: IEducation[]
   export let page: IPage
 
   $: searchParams = page.requestParams
+  $: order = searchParams.order
   $: now = page.requestPage
   $: min =
     now % 5 == 0 ? (parseInt(now / 5) - 1) * 5 + 1 : parseInt(now / 5) * 5 + 1
@@ -18,14 +20,62 @@
 
 <div class="overflow-scroll flex text-sm mb-7 border-l bg-white">
   <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
-    <div
-      class="flex justify-center px-2 bg-[#D9D9D8] font-bold items-center h-10"
+    <button
+      id="nameField"
+      class=" flex justify-between px-3 font-bold items-center h-10 hover:bg-[#B0B1B0]"
+      class:bg-[#B0B1B0]={order == "nameAsc" || order == "nameDesc"
+        ? true
+        : false}
+      class:bg-[#D9D9D8]={order == "nameAsc" || order == "nameDesc"
+        ? false
+        : true}
+      on:mouseover={(e) => {
+        if (order != "nameAsc" && order != "nameDesc") {
+          document.getElementById("nameDefault")?.classList.remove("invisible")
+        }
+      }}
+      on:mouseleave={(e) => {
+        if (order != "nameAsc" && order != "nameDesc") {
+          document.getElementById("nameDefault")?.classList.add("invisible")
+        }
+      }}
+      on:focus={null}
+      on:click={() => {
+        const { order } = searchParams
+        let newOrder
+        if (order == "nameAsc") {
+          newOrder = "nameDesc"
+        } else if (order == "nameDesc") {
+          newOrder = ""
+        } else {
+          newOrder = "nameAsc"
+        }
+
+        goto(
+          `/educations${getSearchParams({
+            order: newOrder,
+            page: 1,
+          })}`
+        )
+      }}
     >
       교육 이름
-    </div>
+      {#if order == "nameAsc"}
+        <ArrowsVertical id="nameDefault" class="ml-3 hidden" />
+        <ArrowUp id="nameAsc" class="ml-3 " />
+        <ArrowDown id="nameDesc" class="ml-3 hidden " />
+      {:else if order == "nameDesc"}
+        <ArrowsVertical id="nameDefault" class="ml-3 hidden" />
+        <ArrowUp id="nameAsc" class="ml-3 hidden" />
+        <ArrowDown id="nameDesc" class="ml-3  " />
+      {:else}
+        <ArrowsVertical id="nameDefault" class="ml-3 invisible" />
+        <ArrowUp id="nameAsc" class="ml-3 hidden" />
+        <ArrowDown id="nameDesc" class="ml-3 hidden " />{/if}
+    </button>
     {#each educations as item}
       <button
-        class="flex justify-center px-2 items-center h-10"
+        class="flex px-3 items-center h-10"
         on:click={() => {
           goto(
             `/educations/detail/${getEduSlug(
@@ -117,9 +167,61 @@
   </div>
   <div class="flex flex-col flex-auto border-r divide-y border-b">
     <button
-      class="flex justify-between px-3 font-bold items-center h-10 bg-[#D9D9D8] whitespace-nowrap"
+      id="eduDateField"
+      class=" flex px-3 font-bold items-center h-10 hover:bg-[#B0B1B0]"
+      class:bg-[#B0B1B0]={order == "startDateAsc" || order == "startDateDesc"
+        ? true
+        : false}
+      class:bg-[#D9D9D8]={order == "startDateAsc" || order == "startDateDesc"
+        ? false
+        : true}
+      on:mouseover={(e) => {
+        if (order != "startDateAsc" && order != "startDateDesc") {
+          document
+            .getElementById("startDateDefault")
+            ?.classList.remove("invisible")
+        }
+      }}
+      on:mouseleave={(e) => {
+        if (order != "startDateAsc" && order != "startDateDesc") {
+          document
+            .getElementById("startDateDefault")
+            ?.classList.add("invisible")
+        }
+      }}
+      on:focus={null}
+      on:click={() => {
+        const { order } = searchParams
+        let newOrder
+        if (order == "startDateAsc") {
+          newOrder = "startDateDesc"
+        } else if (order == "startDateDesc") {
+          newOrder = ""
+        } else {
+          newOrder = "startDateAsc"
+        }
+
+        goto(
+          `/educations${getSearchParams({
+            order: newOrder,
+            page: 1,
+          })}`
+        )
+      }}
     >
       교육 기간
+      {#if order == "startDateAsc"}
+        <ArrowsVertical id="startDateDefault" class="ml-3 hidden" />
+        <ArrowUp id="startDateAsc" class="ml-3 " />
+        <ArrowDown id="startDateDesc" class="ml-3 hidden " />
+      {:else if order == "startDateDesc"}
+        <ArrowsVertical id="startDateDefault" class="ml-3 hidden" />
+        <ArrowUp id="startDateAsc" class="ml-3 hidden" />
+        <ArrowDown id="startDateDesc" class="ml-3  " />
+      {:else}
+        <ArrowsVertical id="startDateDefault" class="ml-3 invisible" />
+        <ArrowUp id="startDateAsc" class="ml-3 hidden" />
+        <ArrowDown id="startDateDesc" class="ml-3 hidden " />{/if}
     </button>
 
     {#each educations as item, index}

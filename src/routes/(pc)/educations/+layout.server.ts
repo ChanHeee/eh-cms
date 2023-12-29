@@ -9,7 +9,12 @@ export const load = async ({ url, locals, fetch }) => {
   const birthStart = url.searchParams.get("birthStart")
   const birthEnd = url.searchParams.get("birthEnd")
   const order = url.searchParams.get("order")
-  const page = url.searchParams.get("page")
+  const page =
+    url.searchParams.get("page") == ""
+      ? 1
+      : url.searchParams.get("page") != null
+      ? parseInt(url.searchParams.get("page"))
+      : 1
 
   locals.searchParams = {
     name,

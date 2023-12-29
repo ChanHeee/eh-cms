@@ -6,16 +6,13 @@ export const GET: RequestHandler = async ({ request, url }) => {
   const name = url.searchParams.get("name")
   const semester = url.searchParams.get("semester")
   const startDate = url.searchParams.get("startDate")
-
+  const order = url.searchParams.get("order")
   const page =
     url.searchParams.get("page") != null
       ? parseInt(url.searchParams.get("page"))
       : 1
 
-  const take =
-    url.searchParams.get("take") != null
-      ? parseInt(url.searchParams.get("take"))
-      : 12
+  const take = 12
 
   let query = Education.find()
   if (name) {
@@ -30,7 +27,23 @@ export const GET: RequestHandler = async ({ request, url }) => {
     query = query.find({ startDate })
   }
 
-  query.sort("-startDate")
+  switch (order) {
+    case "nameAsc":
+      query.sort({ name: 1, startDate: -1, _id: 1 })
+      break
+    case "nameDesc":
+      query.sort({ name: -1, startDate: -1, _id: 1 })
+      break
+    case "startDateAsc":
+      query.sort({ startDate: 1, _id: 1 })
+      break
+    case "startDateDesc":
+      query.sort({ startDate: -1, _id: 1 })
+      break
+    default:
+      query.sort({ startDate: -1, _id: 1 })
+      break
+  }
 
   const educations = await Education.find(query)
     .skip((page - 1) * take)
@@ -54,7 +67,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
       requestSize: educations.length,
       requestParams: {
         name,
-        take,
+        order,
       },
     },
   })

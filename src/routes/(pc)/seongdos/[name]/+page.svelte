@@ -1354,6 +1354,10 @@
                         class="flex w-full bg-gray-50 text-gray-900 py-2 px-1 items-center focus:outline-0"
                         class:hidden={classification != "직접입력"}
                         bind:value={classificationValue}
+                        on:focusout={() => {
+                          classification = ""
+                          classificationValue = ""
+                        }}
                       />
                     </div>
                   </div>

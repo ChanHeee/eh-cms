@@ -29,9 +29,11 @@ export const load = async ({ url, locals, fetch }) => {
   const jikbun = JSON.parse(url.searchParams.get("jikbun"))
   const order = url.searchParams.get("order")
   const page =
-    url.searchParams.get("page") != null
+    url.searchParams.get("page") == ""
+      ? 1
+      : url.searchParams.get("page") != null
       ? parseInt(url.searchParams.get("page"))
-      : 0
+      : 1
   const group1 = url.searchParams.get("group1")
   const group2 = url.searchParams.get("group2")
   const birthStart = url.searchParams.get("birthStart")
