@@ -1,3 +1,4 @@
+import { redirect } from "@sveltejs/kit"
 import { loadFlash } from "sveltekit-flash-message/server"
 /** @type {import('@sveltejs/kit').Load} */
 
@@ -14,6 +15,10 @@ export const load = loadFlash(async ({ url, fetch, locals, cookies }) => {
 
   if (response.ok) {
     seongdo = (await response.json()).seongdo
+  }
+
+  if (!seongdo) {
+    throw redirect(303, "/seongdos")
   }
 
   response = await fetch(`/api/families?seongdoId=${seongdo._id}`, {

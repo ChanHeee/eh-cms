@@ -26,6 +26,7 @@
   $: address = ""
   $: detailAddress = ""
   $: extraAddress = ""
+
   $: fullAddress = getFullAddress()
   $: getFullAddress = () => {
     if (extraAddress == "" && detailAddress == "") {
@@ -62,6 +63,19 @@
   }
 
   const submitHandler = async () => {
+    console.log(
+      name,
+      birth,
+      age,
+      gender,
+      phone,
+      jikbun,
+      group1,
+      group2,
+      singeup,
+      address
+    )
+
     const response = await fetch("/api/seongdos", {
       method: "POST",
       body: JSON.stringify({
@@ -135,14 +149,6 @@
         document.getElementById("detailAddress").focus()
       },
     }).open()
-  }
-
-  const getGroupString = (group1: any, group2: any) => {
-    if (group1 == "장년부") {
-      return group2.split(",")[0] + " > " + group2.split(",")[1]
-    } else {
-      return group2
-    }
   }
 </script>
 
@@ -484,7 +490,7 @@
                   id="genderM"
                   on:change={() => {
                     gender = document.querySelector(
-                      "#gender > option:checked"
+                      "#genderM > option:checked"
                     ).value
                   }}
                   class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"

@@ -1,3 +1,4 @@
+import { redirect } from "@sveltejs/kit"
 import type { PageServerLoad } from "../../$types"
 
 export const load: PageServerLoad = async ({ url, fetch }) => {
@@ -18,6 +19,10 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
   let educations
   if (response.ok) {
     educations = (await response.json()).educations
+  }
+
+  if (!educations[0]) {
+    throw redirect(303, "/educations")
   }
 
   response = await fetch(

@@ -15,6 +15,7 @@
     SeongdosStore,
   } from "$lib/store"
   import toast from "svelte-french-toast"
+  import { getEduSlug } from "$lib/utils"
 
   export let data: {
     education: IEducation
@@ -43,6 +44,7 @@
         "content-type": "application/json",
       },
     })
+
     return response.ok
   }
 
@@ -89,6 +91,13 @@
         const isSuccess = await submitHandler()
         if (isSuccess) {
           toast.success("저장 되었습니다.")
+          goto(
+            `/educations/detail/${getEduSlug(
+              education.name,
+              education.semester,
+              education.startDate
+            )}`
+          )
         }
       }}
     >

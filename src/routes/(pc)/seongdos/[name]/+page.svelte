@@ -26,6 +26,7 @@
 
   // value for senogdo detail
   $: seongdo = data.seongdo
+
   $: ageWithString = seongdo.age ? seongdo.age + " 세" : ""
   $: groupItem = getGroupItem(seongdo.group1, seongdo.group2)
   $: group2Add = groupItem.group2Add
@@ -34,9 +35,11 @@
     : address
   $: addressData = seongdo.address
   $: address = addressData.split(",")[0] || ""
-  $: detailAddress =
-    addressData.split(",")[1]?.split("(")[0]?.slice(1, -1) || ""
+  $: detailAddress = extraAddress
+    ? addressData.split(",")[1]?.split("(")[0]?.slice(1, -1)
+    : addressData.split(",")[1]?.split("(")[0] || ""
   $: extraAddress = addressData.split(" (")[1]?.slice(0, -1) || ""
+
   $: fullAddress = getFullAddress()
   $: getFullAddress = () => {
     if (extraAddress == "" && detailAddress == "") {
@@ -122,6 +125,7 @@
 
   const submitHandler = async () => {
     const { name, age, group2, address, ...rest } = seongdo
+    console.log(seongdo)
 
     const response = await fetch("/api/seongdos", {
       method: "PUT",
@@ -680,7 +684,7 @@
                     value={seongdo.gender}
                     on:change={() => {
                       seongdo.gender = document.querySelector(
-                        "#gender > option:checked"
+                        "#genderM > option:checked"
                       ).value
                     }}
                     class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
@@ -1541,7 +1545,7 @@
                     id="simbangHymn"
                     type="text"
                     bind:value={hymn}
-                    class="px-2 flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                   />
                 </div>
               </div>
@@ -1557,7 +1561,7 @@
                     id="simbangBible"
                     type="text"
                     bind:value={bible}
-                    class="px-2 flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                   />
                 </div>
               </div>
