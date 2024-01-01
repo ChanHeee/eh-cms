@@ -6,6 +6,10 @@ export const load = async ({ request, fetch, url, locals }) => {
     locals.searchParams
   const className = decodeURI(url.pathname).split("/")[2]
 
+  if (!["기초반", "성숙반", "사명자반", "전체"].includes(className)) {
+    throw redirect(302, encodeURI(`/educations`))
+  }
+
   if (isNaN(page) || page < 0 || page == "") {
     const url = `/educations/${className ?? "전체"}${getSearchParams({
       name,
@@ -15,8 +19,6 @@ export const load = async ({ request, fetch, url, locals }) => {
       birthStart,
       birthEnd,
     })}`
-
-    console.log(url, "redirect")
 
     throw redirect(302, encodeURI(url))
   }

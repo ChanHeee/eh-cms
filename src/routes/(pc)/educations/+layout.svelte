@@ -76,48 +76,50 @@
     </li>
     <li
       class="hover:bg-[#D9D9D8] cursor-pointer"
-      class:bg-[#D9D9D8]={className == "열매반" ? true : false}
+      class:bg-[#D9D9D8]={className == "성숙반" ? true : false}
     >
       <button
         class="py-4 flex w-full flex-col items-center text-white hover:text-[#FBA244] font-medium"
-        class:text-[#FBA244]={className == "열매반" ? true : false}
-        class:text-white={className != "열매반" ? true : false}
+        class:text-[#FBA244]={className == "성숙반" ? true : false}
+        class:text-white={className != "성숙반" ? true : false}
         on:click={() => {
           name = ""
-          goto(`/educations/열매반`)
+          goto(`/educations/성숙반`)
         }}
       >
         <!-- <Book size={20} class="mb-1" /> -->
         <BookStroke
-          color={className == "열매반" ? "#FBA244" : "#FFFFFF"}
+          color={className == "성숙반" ? "#FBA244" : "#FFFFFF"}
           width="20px"
           classString="mb-1"
         />
-        <p>열매반</p>
+        <p>성숙반</p>
       </button>
     </li>
     <li
       class="hover:bg-[#D9D9D8] cursor-pointer"
-      class:bg-[#D9D9D8]={className == "청지기반" ? true : false}
+      class:bg-[#D9D9D8]={className == "사명자반" ? true : false}
     >
       <button
         class="py-4 flex w-full flex-col items-center text-white hover:text-[#FBA244] font-medium"
-        class:text-[#FBA244]={className == "청지기반" ? true : false}
-        class:text-white={className != "청지기반" ? true : false}
+        class:text-[#FBA244]={className == "사명자반" ? true : false}
+        class:text-white={className != "사명자반" ? true : false}
         on:click={() => {
           name = ""
-          goto(`/educations/청지기반`)
+          goto(`/educations/사명자반`)
         }}
       >
         <!-- <Book size={20} class="mb-1" /> -->
         <BookStroke
-          color={className == "청지기반" ? "#FBA244" : "#FFFFFF"}
+          color={className == "사명자반" ? "#FBA244" : "#FFFFFF"}
           width="20px"
           classString="mb-1"
         />
-        <p>청지기반</p>
+        <p>사명자반</p>
       </button>
     </li>
+
+    <!--     
     <li
       class="hover:bg-[#D9D9D8] cursor-pointer"
       class:bg-[#D9D9D8]={className == "새신자반" ? true : false}
@@ -131,7 +133,6 @@
           goto(`/educations/새신자반`)
         }}
       >
-        <!-- <Book size={20} class="mb-1" /> -->
         <BookStroke
           color={className == "새신자반" ? "#FBA244" : "#FFFFFF"}
           width="20px"
@@ -139,7 +140,7 @@
         />
         <p>새신자반</p>
       </button>
-    </li>
+    </li> -->
   </ul>
 </aside>
 <EducationSideBarSearch {searchParams} />

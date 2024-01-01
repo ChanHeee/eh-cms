@@ -171,9 +171,8 @@
               >
                 <option value="none" class="hidden" />
                 <option value="기초반">기초반</option>
-                <option value="열매반">열매반</option>
-                <option value="청지기반">청지기반</option>
-                <option value="새신자반">새신자반</option>
+                <option value="성숙반">성숙반</option>
+                <option value="사명자반">사명자반</option>
               </select>
             </div>
           </div>

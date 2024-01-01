@@ -22,7 +22,7 @@
       birthEnd,
     })
 
-    if (!["기초반", "열매반", "청지기반", "전체", ""].includes(className)) {
+    if (!["기초반", "성숙반", "사명자반", "전체", ""].includes(className)) {
       className = "전체"
     }
 

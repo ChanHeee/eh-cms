@@ -43,7 +43,7 @@
   $: address = addressData.split(",")[0] || ""
   $: detailAddress = extraAddress
     ? addressData.split(",")[1]?.split("(")[0]?.slice(1, -1)
-    : addressData.split(",")[1]?.split("(")[0] || ""
+    : addressData.split(",")[1]?.split("(")[0]?.slice(1) || ""
   $: extraAddress = addressData.split(" (")[1]?.slice(0, -1) || ""
 
   $: fullAddress = getFullAddress()
@@ -131,7 +131,6 @@
 
   const submitHandler = async () => {
     const { name, age, group2, address, ...rest } = seongdo
-    console.log(seongdo)
 
     const response = await fetch("/api/seongdos", {
       method: "PUT",
