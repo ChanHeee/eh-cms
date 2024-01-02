@@ -21,6 +21,8 @@ export const GET: RequestHandler = async ({ request, url }) => {
   const className = url.searchParams.get("class")
   const birthStart = url.searchParams.get("birthStart")
   const birthEnd = url.searchParams.get("birthEnd")
+  const group1 = url.searchParams.get("group1")
+  const group2 = url.searchParams.get("group2")
 
   const educationId = url.searchParams.get("educationId")
   const seongdoId = url.searchParams.get("seongdoId")
@@ -39,6 +41,12 @@ export const GET: RequestHandler = async ({ request, url }) => {
     case "birthDesc":
       aggregateSort = { "seongdo.birth": -1, _id: 1 }
       break
+    case "startDateAsc":
+      aggregateSort = { "education.startDate": 1, _id: 1 }
+      break
+    case "startDateDesc":
+      aggregateSort = { "education.startDate": -1, _id: 1 }
+      break
     default:
       aggregateSort = { "education.startDate": -1, _id: 1 }
       break
@@ -56,8 +64,14 @@ export const GET: RequestHandler = async ({ request, url }) => {
   if (birthStart) {
     seongdoMatch.birth = { $gte: birthStart }
   }
-  if (birthStart) {
+  if (birthEnd) {
     seongdoMatch.birth = { ...seongdoMatch.birth, $lte: birthEnd }
+  }
+  if (group1) {
+    seongdoMatch.group1 = group1
+  }
+  if (group2) {
+    seongdoMatch.group2 = group2
   }
 
   if (className && className != "전체") {
@@ -122,6 +136,8 @@ export const GET: RequestHandler = async ({ request, url }) => {
     total = totalArray.length > 0 ? totalArray[0].total : 0
   }
 
+  console.log(order, aggregateSort)
+
   return json({
     seongdoEdus,
     page: {
@@ -137,6 +153,10 @@ export const GET: RequestHandler = async ({ request, url }) => {
         take,
         seongdoId,
         educationId,
+        birthStart,
+        birthEnd,
+        group1,
+        group2,
       },
     },
   })

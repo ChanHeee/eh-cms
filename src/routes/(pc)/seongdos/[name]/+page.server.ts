@@ -1,3 +1,4 @@
+import { isAllowGroup } from "$lib/utils"
 import { redirect } from "@sveltejs/kit"
 import { loadFlash } from "sveltekit-flash-message/server"
 /** @type {import('@sveltejs/kit').Load} */
@@ -60,6 +61,10 @@ export const load = loadFlash(async ({ url, fetch, locals, cookies }) => {
   }
 
   if (!seongdo) {
+    throw redirect(303, "/seongdos")
+  }
+
+  if (!isAllowGroup(allowedGroup, seongdo.group1, seongdo.group2)) {
     throw redirect(303, "/seongdos")
   }
 

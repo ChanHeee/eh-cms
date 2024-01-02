@@ -147,8 +147,16 @@
               class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
             >
               <option value="none" class="hidden" />
-              <option value="1학기">1학기</option>
-              <option value="2학기">2학기</option>
+              {#if name == "기초반"}
+                <option value="1학기">1학기</option>
+                <option value="2학기">2학기</option>
+              {:else if name == "성숙반"}
+                <option value="큐티학교">큐티학교</option>
+                <option value="기독교교양">기독교교양</option>
+              {:else if name == "사명자반"}
+                <option value="기도학교">기도학교</option>
+                <option value="선교학교">선교학교</option>
+              {/if}
             </select>
           </div>
         </div>

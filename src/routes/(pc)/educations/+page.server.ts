@@ -4,6 +4,11 @@ import { redirect } from "@sveltejs/kit"
 /** @type {import('@sveltejs/kit').Load} */
 export const load = async ({ request, fetch, url, locals }) => {
   const { page, order } = locals.searchParams
+  const { allowedGroup } = locals
+
+  if (!allowedGroup.includes("교육") && !allowedGroup.includes("전체")) {
+    throw redirect(302, encodeURI(`/educations/전체`))
+  }
 
   if (isNaN(page) || page < 0 || page == "") {
     const url = `/educations${getSearchParams({

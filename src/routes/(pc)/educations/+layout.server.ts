@@ -1,4 +1,5 @@
 import type { IGroup } from "$lib/interfaces"
+import { getGroupList } from "$lib/utils"
 import { redirect } from "@sveltejs/kit"
 
 /** @type {import('@sveltejs/kit').Load} */
@@ -8,6 +9,8 @@ export const load = async ({ url, locals, fetch }) => {
   const jikbun = JSON.parse(url.searchParams.get("jikbun"))
   const birthStart = url.searchParams.get("birthStart")
   const birthEnd = url.searchParams.get("birthEnd")
+  const group1 = url.searchParams.get("group1")
+  const group2 = url.searchParams.get("group2")
   const order = url.searchParams.get("order")
   const page =
     url.searchParams.get("page") == ""
@@ -16,6 +19,8 @@ export const load = async ({ url, locals, fetch }) => {
       ? parseInt(url.searchParams.get("page"))
       : 1
 
+  const { allowedGroup } = locals
+
   locals.searchParams = {
     name,
     jikbun,
@@ -23,6 +28,8 @@ export const load = async ({ url, locals, fetch }) => {
     page,
     birthStart,
     birthEnd,
+    group1,
+    group2,
   }
 
   return {
@@ -34,6 +41,9 @@ export const load = async ({ url, locals, fetch }) => {
       className,
       birthStart,
       birthEnd,
+      group1,
+      group2,
     },
+    groupList: getGroupList(allowedGroup),
   }
 }

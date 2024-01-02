@@ -2,7 +2,7 @@ import { getSearchParams, getSeongdosSearchParams } from "$lib/utils"
 import { redirect } from "@sveltejs/kit"
 
 export const load = async ({ request, fetch, url, locals }) => {
-  const { name, jikbun, order, page, birthStart, birthEnd } =
+  const { name, jikbun, order, page, birthStart, birthEnd, group1, group2 } =
     locals.searchParams
   const className = decodeURI(url.pathname).split("/")[2]
 
@@ -18,6 +18,8 @@ export const load = async ({ request, fetch, url, locals }) => {
       page: 1,
       birthStart,
       birthEnd,
+      group1,
+      group2,
     })}`
 
     throw redirect(302, encodeURI(url))
@@ -32,6 +34,8 @@ export const load = async ({ request, fetch, url, locals }) => {
       page,
       birthStart,
       birthEnd,
+      group1,
+      group2,
     })}`,
     {
       headers: {
@@ -51,6 +55,8 @@ export const load = async ({ request, fetch, url, locals }) => {
       page: seongdoEduPage.totalPage,
       birthStart,
       birthEnd,
+      group1,
+      group2,
     })}`
 
     throw redirect(302, encodeURI(url))

@@ -9,11 +9,13 @@
 
   export let data: {
     searchParams: ISeongdoEduSearchParams
+    groupList: any
   }
 
   const nameData = data.searchParams.name
 
   $: searchParams = data.searchParams
+  $: groupList = data.groupList
   $: name = nameData ?? ""
   $: className = searchParams.className || "전체"
   $: jikbunArray = searchParams.jikbun ?? []
@@ -143,6 +145,6 @@
     </li> -->
   </ul>
 </aside>
-<EducationSideBarSearch {searchParams} />
+<EducationSideBarSearch {searchParams} {groupList} />
 
 <slot><!-- optional fallback --></slot>

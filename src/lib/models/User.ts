@@ -12,6 +12,7 @@ type DBUserModel = Model<IUser, {}, DBUserMethods>
 
 const userSchema = new Schema<IUser, DBUserModel, DBUserMethods>({
   name: { type: String, required: true, unique: true },
+  username: { type: String, required: false },
   password: { type: String, required: true },
   allowedGroup: [{ type: String, required: false }],
 })

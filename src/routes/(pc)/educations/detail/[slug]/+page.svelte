@@ -21,6 +21,8 @@
     education: IEducation
     seongdoEdus: ISeongdoEduPopulate[]
     page: IPage
+    allowedGroup: string[]
+    selectList: any
   }
 
   $: SeongdoEdusStore.set(data.seongdoEdus)
@@ -31,6 +33,7 @@
 
   $: searchName = ""
   $: education = data.education
+  $: teacherList = JSON.parse(data.selectList).teacherList
 
   $: isModalHidden = true
 
@@ -196,7 +199,9 @@
                 class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
               >
                 <option value="none" class="hidden" />
-                <option value="고재국 담임목사님">고재국 담임목사님</option>
+                {#each teacherList as item}
+                  <option value={item}>{item}</option>
+                {/each}
               </select>
             </div>
           </div>
@@ -220,8 +225,16 @@
                 class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
               >
                 <option value="none" class="hidden" />
-                <option value="1학기">1학기</option>
-                <option value="2학기">2학기</option>
+                {#if education.name == "기초반"}
+                  <option value="1학기">1학기</option>
+                  <option value="2학기">2학기</option>
+                {:else if education.name == "성숙반"}
+                  <option value="큐티학교">큐티학교</option>
+                  <option value="기독교교양">기독교교양</option>
+                {:else if education.name == "사명자반"}
+                  <option value="기도학교">기도학교</option>
+                  <option value="선교학교">선교학교</option>
+                {/if}
               </select>
             </div>
           </div>

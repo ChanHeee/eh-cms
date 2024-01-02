@@ -60,7 +60,7 @@
       }}
       on:focus={null}
       on:click={() => {
-        const { order, ...rest } = searchParams
+        const { order, take, ...rest } = searchParams
         let newOrder
         if (order == "nameAsc") {
           newOrder = "nameDesc"
@@ -144,7 +144,7 @@
       }}
       on:focus={null}
       on:click={() => {
-        const { order, ...rest } = searchParams
+        const { order, take, ...rest } = searchParams
         let newOrder
         if (order == "birthAsc") {
           newOrder = "birthDesc"

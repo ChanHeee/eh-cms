@@ -7,6 +7,7 @@ export interface IGroup {
 export interface IUser {
   _id?: string
   name?: string
+  username?: string
   password?: string
   allowedGroup?: string[]
 }
@@ -52,6 +53,8 @@ export interface ISeongdoEduPage {
     seongdoId?: string
     educationId?: string
     className?: string
+    birthStart?: string
+    birthEnd?: string
   }
 }
 
@@ -159,6 +162,8 @@ export interface ISeongdoEduSearchParams {
   educationId?: string
   birthStart?: string
   birthEnd?: string
+  group1?: string
+  group2?: string
 }
 
 export interface IEducationResponse {

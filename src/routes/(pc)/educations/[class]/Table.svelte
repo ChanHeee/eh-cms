@@ -1,6 +1,10 @@
 <script lang="ts">
   import { goto } from "$app/navigation"
-  import type { IPage, ISeongdoEduPopulate } from "$lib/interfaces"
+  import type {
+    IPage,
+    ISeongdoEduPage,
+    ISeongdoEduPopulate,
+  } from "$lib/interfaces"
   import { AllowedGroupStore } from "$lib/store"
 
   import {
@@ -13,9 +17,10 @@
   import toast from "svelte-french-toast"
 
   export let seongdoEdus: ISeongdoEduPopulate[]
-  export let page: IPage
+  export let page: ISeongdoEduPage
 
   $: searchParams = page.requestParams
+
   $: order = page.requestParams.order
   $: now = page.requestPage
   $: min =
@@ -65,7 +70,7 @@
       }}
       on:focus={null}
       on:click={() => {
-        const { order, className, ...rest } = searchParams
+        const { order, className, take, ...rest } = searchParams
         let newOrder
         if (order == "nameAsc") {
           newOrder = "nameDesc"
@@ -155,7 +160,7 @@
       }}
       on:focus={null}
       on:click={() => {
-        const { order, className, ...rest } = searchParams
+        const { order, className, take, ...rest } = searchParams
         let newOrder
         if (order == "birthAsc") {
           newOrder = "birthDesc"
@@ -246,11 +251,11 @@
     {/each}
   </div>
   <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
-    <button
-      class=" flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
+    <div
+      class="flex justify-center gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
     >
       학기
-    </button>
+    </div>
     {#each seongdoEdus as item}
       <div class="flex px-3 justify-center items-center h-10">
         {item.education.semester}
@@ -259,12 +264,65 @@
   </div>
   <div class="flex flex-col flex-auto border-r divide-y border-b">
     <button
-      class="flex justify-between px-3 font-bold items-center h-10 bg-[#D9D9D8] whitespace-nowrap"
+      id="eduDateField"
+      class=" flex px-3 font-bold items-center h-10 hover:bg-[#B0B1B0]"
+      class:bg-[#B0B1B0]={order == "startDateAsc" || order == "startDateDesc"
+        ? true
+        : false}
+      class:bg-[#D9D9D8]={order == "startDateAsc" || order == "startDateDesc"
+        ? false
+        : true}
+      on:mouseover={(e) => {
+        if (order != "startDateAsc" && order != "startDateDesc") {
+          document
+            .getElementById("startDateDefault")
+            ?.classList.remove("invisible")
+        }
+      }}
+      on:mouseleave={(e) => {
+        if (order != "startDateAsc" && order != "startDateDesc") {
+          document
+            .getElementById("startDateDefault")
+            ?.classList.add("invisible")
+        }
+      }}
+      on:focus={null}
+      on:click={() => {
+        const { order, className, take, ...rest } = searchParams
+
+        let newOrder
+        if (order == "startDateAsc") {
+          newOrder = "startDateDesc"
+        } else if (order == "startDateDesc") {
+          newOrder = ""
+        } else {
+          newOrder = "startDateAsc"
+        }
+        goto(
+          `/educations/${className ?? "전체"}${getSearchParams({
+            order: newOrder,
+            page: 1,
+            ...rest,
+          })}`
+        )
+      }}
     >
       교육 기간
+      {#if order == "startDateAsc"}
+        <ArrowsVertical id="startDateDefault" class="ml-3 hidden" />
+        <ArrowUp id="startDateAsc" class="ml-3 " />
+        <ArrowDown id="startDateDesc" class="ml-3 hidden " />
+      {:else if order == "startDateDesc"}
+        <ArrowsVertical id="startDateDefault" class="ml-3 hidden" />
+        <ArrowUp id="startDateAsc" class="ml-3 hidden" />
+        <ArrowDown id="startDateDesc" class="ml-3  " />
+      {:else}
+        <ArrowsVertical id="startDateDefault" class="ml-3 invisible" />
+        <ArrowUp id="startDateAsc" class="ml-3 hidden" />
+        <ArrowDown id="startDateDesc" class="ml-3 hidden " />{/if}
     </button>
 
-    {#each seongdoEdus as item, index}
+    {#each seongdoEdus as item}
       <div class="flex px-3 items-center h-10">
         <p class="whitespace-nowrap truncate">
           {`${item.education.startDate} ~ ${item.education.endDate}`}
@@ -281,13 +339,13 @@
     <button
       on:click={async () => {
         const arrayStart = pagination[0]
-
+        const { className, take, ...rest } = page.requestParams
         if (now > 1) {
           goto(
             `/educations/${
               page.requestParams.className ?? "전체"
             }${getSearchParams({
-              ...page.requestParams,
+              ...rest,
               page: arrayStart - 1,
             })}`
           )
@@ -314,11 +372,12 @@
         class:bg-gray-100={item == now}
         class:bg-white={item != now}
         on:click={() => {
+          const { className, take, ...rest } = page.requestParams
           goto(
             `/educations/${
               page.requestParams.className ?? "전체"
             }${getSearchParams({
-              ...page.requestParams,
+              ...rest,
               page: item,
             })}`
           )
@@ -332,13 +391,13 @@
       on:click={async () => {
         const arrayEnd = pagination.slice(-1)[0]
         const next = arrayEnd < last ? arrayEnd + 1 : arrayEnd
-
+        const { className, take, ...rest } = page.requestParams
         if (now != last) {
           goto(
             `/educations/${
               page.requestParams.className ?? "전체"
             }${getSearchParams({
-              ...page.requestParams,
+              ...rest,
               page: next,
             })}`
           )

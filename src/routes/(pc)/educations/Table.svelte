@@ -104,11 +104,11 @@
     {/each}
   </div>
   <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
-    <button
+    <div
       class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
     >
       강사
-    </button>
+    </div>
     {#each educations as item}
       <div class="flex px-3 items-center h-10">
         {item.teacher}
@@ -118,11 +118,11 @@
   <div
     class="flex flex-col flex-auto sm:flex-none whitespace-nowrap border-r divide-y border-b"
   >
-    <button
+    <div
       class="flex justify-between px-3 font-bold items-center h-10 bg-[#D9D9D8]"
     >
       수강 인원
-    </button>
+    </div>
     {#each educations as item}
       <div class="flex justify-center px-3 items-center h-10">
         {item.enrolledNum}
@@ -130,11 +130,11 @@
     {/each}
   </div>
   <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
-    <button
+    <div
       class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
     >
       교육 요일
-    </button>
+    </div>
     {#each educations as item}
       <div class="flex px-3 justify-center items-center h-10">
         {item.day}

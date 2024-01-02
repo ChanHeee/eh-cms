@@ -4,16 +4,19 @@
   import { goto } from "$app/navigation"
   import { ListBoxes, Search } from "carbon-icons-svelte"
   import { getSearchParams } from "$lib/utils"
+  import toast from "svelte-french-toast"
 
   export let data: {
     seongdoEdus: ISeongdoEduPopulate[]
     page: IPage
+    allowedGroup: string[]
   }
 
   $: name = ""
   $: className = data.page.requestParams.className
   $: seongdoEdus = data.seongdoEdus
   $: page = data.page
+  $: allowedGroup = data.allowedGroup
 
   const searchHandler = () => {
     const params = getSearchParams({
@@ -54,7 +57,14 @@
       <button
         class="flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#FBA244]"
         on:click={() => {
-          goto("/educations")
+          if (
+            !allowedGroup.includes("교육") &&
+            !allowedGroup.includes("전체")
+          ) {
+            toast.error("접근할 수 없습니다.")
+          } else {
+            goto("/educations")
+          }
         }}
       >
         <ListBoxes size={16} />
