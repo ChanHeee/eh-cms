@@ -1,25 +1,40 @@
 <script lang="ts">
+  import TableForDelete from "./TableForDelete.svelte"
   import Table from "./Table.svelte"
   import type { IPage, ISeongdo } from "$lib/interfaces"
   import { utils, writeFile } from "xlsx"
   import {
+    Close,
     Document,
     Search,
+    TrashCan,
     UserFollow,
     UserMultiple,
   } from "carbon-icons-svelte"
   import { goto } from "$app/navigation"
-  import { getSearchParams } from "$lib/utils"
+  import { getSearchParams, isAllowDeleteGroup, isAllowGroup } from "$lib/utils"
+  import { onMount } from "svelte"
+  import toast from "svelte-french-toast"
+  import { SeongdoDeleteIdsStore } from "$lib/store"
 
   export let data: {
     seongdos: ISeongdo[]
     page: IPage
+    allowedGroup: string[]
+    deleteMany: boolean
   }
 
   $: name = ""
   $: seongdos = data.seongdos
   $: page = data.page
   $: requestParams = page.requestParams
+
+  $: allowedGroup = data.allowedGroup
+  $: group1 = page.requestParams.group1
+  $: group2 = page.requestParams.group2
+
+  $: deleteMany = data.deleteMany
+  $: ids = $SeongdoDeleteIdsStore
 
   const searchHandler = () => {
     const params = getSearchParams({
@@ -28,7 +43,23 @@
     })
 
     const url = params ? `/seongdos${params}` : "/seongdos"
-    goto(url, { state: { temp: 123 } })
+    goto(url)
+  }
+
+  const deleteHandler = async (ids: string[]) => {
+    const response = await fetch("/api/seongdos", {
+      method: "DELETE",
+      body: JSON.stringify({
+        ids,
+      }),
+      headers: {
+        "content-type": "application/json",
+      },
+    })
+    if (response.ok) {
+      toast.success("삭제되었습니다.")
+      history.back()
+    }
   }
 </script>
 
@@ -65,26 +96,7 @@
         </p>
       </div>
       <div class="rounded flex ml-auto gap-2">
-        <button
-          class="flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-          on:click={() => {
-            goto("/seongdos/add")
-          }}
-        >
-          <UserFollow scale={16} />
-          <span>등록</span>
-        </button>
-
-        <button
-          class="hidden md:flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-          on:click={() => {
-            goto("/seongdos/addMany")
-          }}
-        >
-          <UserMultiple scale={16} />
-          <span>여러명 등록</span>
-        </button>
-        <button
+        <!-- <button
           class="hidden md:flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#237334]"
           on:click={async () => {
             const { take, ...rest } = requestParams
@@ -131,10 +143,80 @@
         >
           <Document scale={16} />
           <span>엑셀로 내보내기</span>
-        </button>
+        </button> -->
+
+        {#if deleteMany}
+          <button
+            class="flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+            on:click={async () => {
+              if (ids.length == 0) {
+                toast.error("선택된 성도가 없습니다.")
+              } else if (
+                !confirm(
+                  `선택된 ${ids.length}명의 성도 정보를 삭제하시겠습니까?`
+                )
+              ) {
+                return false
+              } else {
+                await deleteHandler(ids)
+              }
+            }}
+          >
+            <TrashCan scale={16} />
+            <span>삭제</span>
+          </button>
+
+          <button
+            type="button"
+            class="flex h-fit items-center gap-1 rounded-sm text-xs px-2 py-[0.335rem] border-gray-300 border"
+            on:click={async () => {
+              deleteMany = false
+            }}
+          >
+            <span class="flex items-center">
+              <Close class="text-[#F46055]" />
+              <p>닫기</p>
+            </span>
+          </button>
+        {:else}
+          <button
+            class="flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+            on:click={() => {
+              goto("/seongdos/add")
+            }}
+          >
+            <UserFollow scale={16} />
+            <span>등록</span>
+          </button>
+
+          <button
+            class="hidden md:flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+            on:click={() => {
+              goto("/seongdos/addMany")
+            }}
+          >
+            <UserMultiple scale={16} />
+            <span>여러명 등록</span>
+          </button>
+          <button
+            type="button"
+            class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+            on:click={() => {
+              deleteMany = true
+            }}
+          >
+            <TrashCan scale={16} />
+            <span>여러명 삭제</span>
+          </button>
+        {/if}
       </div>
     </div>
-    <Table {seongdos} {page} />
+    {#if deleteMany}
+      <TableForDelete {seongdos} {page} {allowedGroup} />
+    {:else}
+      <!-- else content here -->
+      <Table {seongdos} {page} />
+    {/if}
     <!-- <Table />
     <Pagination classString="mb-8" /> -->
   </div>

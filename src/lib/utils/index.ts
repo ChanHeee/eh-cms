@@ -166,6 +166,47 @@ export const isAllowGroup = (
   return isAllow
 }
 
+export const isAllowDeleteGroup = (
+  allowedGroup: string[],
+  group1: string,
+  group2: string
+) => {
+  let isAllow = false
+  if (allowedGroup.includes("전체")) {
+    isAllow = true
+  }
+
+  const urlGroupItem = getGroupItem(group1, group2)
+  allowedGroup.map((item) => {
+    const groupItemFromAllowed = getGroupItem(
+      item.split("_")[0],
+      item.split("_")[1]
+    )
+
+    if (!urlGroupItem.group2) {
+      if (
+        !groupItemFromAllowed.group2 &&
+        urlGroupItem.group1 == groupItemFromAllowed.group1
+      ) {
+        isAllow = true
+      }
+    } else {
+      if (
+        !groupItemFromAllowed.group2 &&
+        groupItemFromAllowed.group1 == urlGroupItem.group1
+      ) {
+        isAllow = true
+      } else if (
+        groupItemFromAllowed.group1 == urlGroupItem.group1 &&
+        groupItemFromAllowed.group2 == urlGroupItem.group2
+      ) {
+        isAllow = true
+      }
+    }
+  })
+  return isAllow
+}
+
 export const textShortenWithEllipsis = (text: string, maxLen: number) => {
   if (text.length > maxLen) {
     return text.substring(0, maxLen) + "..."
@@ -199,10 +240,7 @@ export const getGroupList = (allowedGroup: string[]) => {
         ]
       }
     } else {
-      console.log("in else", child)
-
       groupList[item.split("_")[0]].push(child)
-      console.log(groupList)
     }
   })
   if (allowedGroup.includes("전체")) {

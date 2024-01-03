@@ -136,8 +136,6 @@ export const GET: RequestHandler = async ({ request, url }) => {
     total = totalArray.length > 0 ? totalArray[0].total : 0
   }
 
-  console.log(order, aggregateSort)
-
   return json({
     seongdoEdus,
     page: {

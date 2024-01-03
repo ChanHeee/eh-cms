@@ -3,11 +3,14 @@ import { Seongdo } from "$lib/models/Seongdo"
 import { seongdoSearchBody } from "$lib/store"
 import { getSeongdosSearchParams } from "$lib/utils"
 import { redirect } from "@sveltejs/kit"
+import { getSearchParams } from "../../../lib/utils/index"
 
 /** @type {import('@sveltejs/kit').Load} */
 export const load = async ({ request, fetch, url, locals }) => {
   const { name, jikbun, page, order, group1, group2, birthStart, birthEnd } =
     locals.searchParams
+
+  const deleteMany = url.searchParams.get("deleteMany") || false
 
   if (isNaN(page) || page < 0 || page == "") {
     const url = `/seongdos${getSeongdosSearchParams({
@@ -53,6 +56,7 @@ export const load = async ({ request, fetch, url, locals }) => {
     return {
       seongdos,
       page: seongdoPage,
+      deleteMany,
     }
   }
 }

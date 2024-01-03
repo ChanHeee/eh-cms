@@ -130,12 +130,21 @@ export async function PUT({ request }) {
 }
 
 export async function DELETE({ request }) {
-  const { id: _id } = await request.json()
+  const { id: _id, ids } = await request.json()
 
-  const result = await Seongdo.deleteOne({ _id })
-  if (result.deletedCount == 1) {
-    return json({ success: true })
+  if (ids) {
+    const result = await Seongdo.deleteMany({ _id: { $in: ids } })
+    if (result.deletedCount > 0) {
+      return json({ success: true })
+    } else {
+      return json({ success: false })
+    }
   } else {
-    return json({ success: false })
+    const result = await Seongdo.deleteOne({ _id })
+    if (result.deletedCount == 1) {
+      return json({ success: true })
+    } else {
+      return json({ success: false })
+    }
   }
 }
