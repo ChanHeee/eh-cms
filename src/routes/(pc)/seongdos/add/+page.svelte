@@ -208,8 +208,7 @@
                   type="text"
                   bind:value={name}
                   required
-                  disabled
-                  class="flex w-full border-0 text-gray-900 text-sm focus:outline-0 p-2"
+                  class="flex w-full bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 p-2"
                 />
                 <div class="border-l border-gray-300" />
                 <select
