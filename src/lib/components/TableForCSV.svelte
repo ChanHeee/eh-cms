@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ISeongdo } from "$lib/interfaces"
+  import { getAgeFromBirth } from "$lib/utils"
 
   //icon
 
@@ -7,7 +8,7 @@
   export let seongdos: ISeongdo[]
 </script>
 
-<section class="mb-10 flex flex-col w-full mx-auto select-none">
+<section class="mb-10 flex flex-col w-full mx-auto select-none overflow-scroll">
   <div class="flex divide-x text-sm">
     <div
       class="flex flex-col divide-y whitespace-nowrap border-l border-b border-t"
@@ -67,13 +68,33 @@
       class="flex flex-col divide-y whitespace-nowrap border-l border-b border-t"
     >
       <button
-        class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold divide-b divide-x items-center h-10"
+        id="gender"
+        class="flex justify-between px-3 font-bold items-center h-10 bg-[#D9D9D8]"
       >
-        직분
+        성별
       </button>
-      {#each seongdos as item}
+      {#each seongdos as item, index}
         <div class="flex px-3 divide-b divide-x items-center h-10">
-          {item.jikbun}
+          <button>
+            {item.gender || ""}
+          </button>
+        </div>
+      {/each}
+    </div>
+    <div
+      class="flex flex-col divide-y whitespace-nowrap border-l border-b border-t"
+    >
+      <button
+        id="enrolled"
+        class="flex justify-between px-3 font-bold items-center h-10 bg-[#D9D9D8]"
+      >
+        등록일자
+      </button>
+      {#each seongdos as item, index}
+        <div class="flex px-3 divide-b divide-x items-center h-10">
+          <button>
+            {item.enrolled_at || ""}
+          </button>
         </div>
       {/each}
     </div>
@@ -90,7 +111,7 @@
         <div
           class="flex justify-center px-3 divide-b divide-x items-center h-10"
         >
-          {item.birth}
+          {item.birth || ""}
         </div>
       {/each}
     </div>
@@ -106,10 +127,40 @@
         <div
           class="flex px-3 divide-b divide-x justify-center items-center h-10"
         >
-          {item.age ?? ""}
+          {getAgeFromBirth(item.birth) || ""}
         </div>
       {/each}
     </div>
+    <div
+      class="flex flex-col divide-y whitespace-nowrap border-l border-b border-t"
+    >
+      <button
+        class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold divide-b divide-x items-center h-10"
+      >
+        직분
+      </button>
+      {#each seongdos as item}
+        <div class="flex px-3 divide-b divide-x items-center h-10">
+          {item.jikbun || ""}
+        </div>
+      {/each}
+    </div>
+
+    <div
+      class="flex flex-col divide-y whitespace-nowrap border-l border-b border-t"
+    >
+      <button
+        class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold divide-b divide-x items-center h-10"
+      >
+        신급
+      </button>
+      {#each seongdos as item}
+        <div class="flex px-3 divide-b divide-x items-center h-10">
+          {item.singeup || ""}
+        </div>
+      {/each}
+    </div>
+
     <div
       class="flex flex-col divide-y whitespace-nowrap border-l border-b border-t"
     >
@@ -122,7 +173,40 @@
         <div
           class="flex justify-center px-3 divide-b divide-x items-center h-10"
         >
-          {item.phone}
+          {item.phone || ""}
+        </div>
+      {/each}
+    </div>
+
+    <div
+      class="flex flex-col divide-y whitespace-nowrap border-l border-b border-t"
+    >
+      <div
+        class="flex justify-center px-3 bg-[#D9D9D8] font-bold divide-b divide-x items-center h-10"
+      >
+        소속1
+      </div>
+      {#each seongdos as item}
+        <div
+          class="flex justify-center px-3 divide-b divide-x items-center h-10"
+        >
+          {item.group1 || ""}
+        </div>
+      {/each}
+    </div>
+    <div
+      class="flex flex-col divide-y whitespace-nowrap border-l border-b border-t"
+    >
+      <div
+        class="flex justify-center px-3 bg-[#D9D9D8] font-bold divide-b divide-x items-center h-10"
+      >
+        소속2
+      </div>
+      {#each seongdos as item}
+        <div
+          class="flex justify-center px-3 divide-b divide-x items-center h-10"
+        >
+          {item.group2 || ""}
         </div>
       {/each}
     </div>
@@ -137,7 +221,7 @@
       {#each seongdos as item}
         <div class="flex px-3 items-center h-10 border-r">
           <p class="whitespace-nowrap truncate">
-            {item.address}
+            {item.address || ""}
           </p>
         </div>
       {/each}

@@ -34,18 +34,48 @@
     csv = utils.sheet_to_json<ISeongdo>(wb.Sheets[wb.SheetNames[0]], {
       header: [
         "name",
-        "jikbun",
-        "birth",
         "gender",
+        "enrolled_at",
+        "birth",
+        "jikbun",
+        "singeup",
         "phone",
-        "address",
         "group1",
         "group2",
-        "singeup",
+        "address",
       ],
     })
 
+    console.log(csv)
+
     seongdos = csv.slice(1)
+    seongdos.map((seongdo) => {
+      const {
+        name,
+        gender,
+        enrolled_at,
+        birth,
+        jikbun,
+        singeup,
+        phone,
+        group1,
+        group2,
+        address,
+      } = seongdo
+
+      seongdo.name = name.trim()
+      seongdo.originalName = name.trim()
+      seongdo.gender = gender || ""
+      seongdo.enrolled_at = enrolled_at || ""
+      seongdo.birth = birth || ""
+      seongdo.jikbun = jikbun || ""
+      seongdo.singeup = singeup || ""
+      seongdo.phone = phone || ""
+      seongdo.group1 = group1 || ""
+      seongdo.group2 = group2 || ""
+      seongdo.address = address || ""
+    })
+    console.log(seongdos)
   }
 
   const submitHandler = async () => {
