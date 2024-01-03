@@ -27,6 +27,7 @@ export interface ISeongdo {
   group2: string
   address: string
   remarks: string
+  enrolled_at: string
 }
 
 export interface IEducation {

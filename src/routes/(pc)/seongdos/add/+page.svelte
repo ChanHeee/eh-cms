@@ -10,8 +10,9 @@
   let name = ""
   let avatar = ""
   $: birth = ""
+  $: enrolled_at = ""
   let age: number
-  $: ageWithString = age ? age + " 세" : ""
+  $: ageWithString = age > -1 ? age + " 세" : ""
   let gender = ""
   let phone = ""
   let jikbun = ""
@@ -63,19 +64,6 @@
   }
 
   const submitHandler = async () => {
-    console.log(
-      name,
-      birth,
-      age,
-      gender,
-      phone,
-      jikbun,
-      group1,
-      group2,
-      singeup,
-      address
-    )
-
     const response = await fetch("/api/seongdos", {
       method: "POST",
       body: JSON.stringify({
@@ -90,6 +78,7 @@
         group2: group2Add ? group2 + "," + group2Add : group2,
         singeup,
         address: fullAddress,
+        enrolled_at,
       }),
       headers: {
         "content-type": "application/json",
@@ -159,7 +148,7 @@
   <form class="flex flex-col w-full-if-mobile">
     <div class="flex justify-between items-start mb-2">
       <h1 class="text-lg font-medium">새 성도 추가</h1>
-      <div class="flex mb-2 ml-auto gap-2">
+      <div class="flex ml-auto gap-2">
         <button
           type="submit"
           class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
@@ -211,17 +200,57 @@
               <label
                 for="name"
                 class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                >이름</label
+                >이름 / 성별</label
               >
-              <input
-                id="name"
-                type="text"
-                bind:value={name}
-                required
-                class="flex w-full bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 p-2"
-              />
+              <div class="flex w-full justify-center gap-1 pr-1 bg-gray-50">
+                <input
+                  id="name"
+                  type="text"
+                  bind:value={name}
+                  required
+                  disabled
+                  class="flex w-full border-0 text-gray-900 text-sm focus:outline-0 p-2"
+                />
+                <div class="border-l border-gray-300" />
+                <select
+                  id="gender"
+                  value={gender}
+                  on:change={() => {
+                    gender = document.querySelector(
+                      "#gender > option:checked"
+                    ).value
+                  }}
+                  class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                >
+                  <option value="none" class="hidden" />
+                  <option value="남자">남자</option>
+                  <option value="여자">여자</option>
+                </select>
+              </div>
             </div>
             <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
+              <div class="flex w-full gap-1">
+                <label
+                  for="enrolled"
+                  class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                  >등록일자</label
+                >
+                <input
+                  id="enrolled"
+                  type="date"
+                  on:change={(e) => {
+                    enrolled_at = e.target.value
+                  }}
+                  class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 pl-1 pr-2 border-gray-300"
+                  min="1900-01-01"
+                  max="2024-12-31"
+                  value={enrolled_at}
+                />
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-col w-full md:flex-row gap-3">
+            <div class="flex w-full h-8 border-gray-300 border bg-gray-50">
               <div class="flex w-full gap-1">
                 <label
                   for="name"
@@ -247,30 +276,6 @@
                   disabled
                   class="flex flex-none w-[2.8rem] text-center bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0"
                 />
-              </div>
-            </div>
-          </div>
-          <div class="flex flex-col w-full md:flex-row gap-3">
-            <div class="flex w-full h-8 border-gray-300 border">
-              <label
-                for="gender"
-                class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                >성별</label
-              >
-              <div class="flex w-full bg-gray-50 px-1">
-                <select
-                  id="gender"
-                  on:change={() => {
-                    gender = document.querySelector(
-                      "#gender > option:checked"
-                    ).value
-                  }}
-                  class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                >
-                  <option value="none" class="hidden" />
-                  <option value="남자">남자</option>
-                  <option value="여자">여자</option>
-                </select>
               </div>
             </div>
             <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
@@ -516,6 +521,7 @@
             </div>
           </div>
         </div>
+
         <div class="flex flex-col w-full gap-3">
           <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
             <div class="flex w-full gap-1">
@@ -540,18 +546,40 @@
           </div>
         </div>
         <div class="flex flex-col w-full gap-3">
+          <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
+            <div class="flex w-full gap-1">
+              <label
+                for="erolledM"
+                class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                >등록일자</label
+              >
+              <input
+                id="erolledM"
+                type="date"
+                on:change={(e) => {
+                  enrolled_at = e.target.value
+                }}
+                class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 border-gray-300 px-1"
+                min="1900-01-01"
+                max="2023-12-31"
+                value={enrolled_at}
+              />
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col w-full gap-3">
           <div class="flex w-full h-8 border-gray-300 border">
             <label
               for="phoneM"
               class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
               >휴대전화</label
             >
-            <div class="flex w-full bg-gray-50 px-1">
+            <div class="flex w-full bg-gray-50">
               <input
                 id="phoneM"
                 type="text"
                 bind:value={phone}
-                class="flex w-full px-1 bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                class="flex w-full px-2 bg-gray-50 text-gray-900 text-sm focus:outline-0"
                 placeholder="010-0000-0000"
               />
             </div>
@@ -572,7 +600,7 @@
                       "#jikbunM > option:checked"
                     ).value
                   }}
-                  class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                  class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                 >
                   <option value="none" class="hidden" />
                   <option value="장로">장로</option>
@@ -596,7 +624,7 @@
                       "#singeupM > option:checked"
                     ).value
                   }}
-                  class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                  class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                 >
                   <option value="none" class="hidden" />
                   <option value="세례">세례</option>
@@ -624,7 +652,7 @@
                     ).value
                     group2 = ""
                   }}
-                  class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                  class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                 >
                   <option value="none" class="hidden" />
                   {#each Object.keys(groupList) as group1}
@@ -639,7 +667,7 @@
                   on:change={() => {
                     group2 = document.querySelector("#group2M").value
                   }}
-                  class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                  class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                 >
                   <option value="none" class="hidden" />
                   {#if group1 == "장년부"}
@@ -668,7 +696,7 @@
                   on:change={() => {
                     group2Add = document.querySelector("#group2MAdd").value
                   }}
-                  class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                  class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                   class:hidden={group1 == "장년부" && group2 != ""
                     ? false
                     : true}

@@ -16,7 +16,7 @@ export const load = loadFlash(async ({ url, fetch, locals, cookies }) => {
 
   const { allowedGroup } = locals
   let groupList = {}
-  allowedGroup.map((item) => {
+  allowedGroup?.map((item) => {
     const child = item.split("_")[1]
     if (!child) {
       if (item.split("_")[0] == "장년부") {

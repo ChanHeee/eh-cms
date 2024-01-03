@@ -89,21 +89,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
 }
 
 export async function POST({ request }) {
-  const {
-    avatar,
-    name,
-    birth,
-    age,
-    gender,
-    phone,
-    jikbun,
-    group1,
-    group2,
-    singeup,
-    address,
-    remarks,
-    seongdos,
-  } = await request.json()
+  const { seongdos, ...rest } = await request.json()
 
   if (seongdos) {
     seongdos.map((seongdo) => {
@@ -120,19 +106,7 @@ export async function POST({ request }) {
   // const seongdoWithOriginalName = await Seongdo.find({ originalName: name })
 
   const seongdo = await Seongdo.create({
-    name,
-    originalName: name,
-    avatar,
-    gender,
-    birth,
-    age,
-    phone,
-    jikbun,
-    group1,
-    group2,
-    singeup,
-    address,
-    remarks,
+    ...rest,
   })
 
   return json({ seongdo })

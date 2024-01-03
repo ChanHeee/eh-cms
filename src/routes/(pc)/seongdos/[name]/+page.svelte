@@ -47,8 +47,11 @@
   $: extraAddress = addressData.split(" (")[1]?.slice(0, -1) || ""
 
   $: fullAddress = getFullAddress()
+
   $: getFullAddress = () => {
-    if (extraAddress == "" && detailAddress == "") {
+    if (address == "") {
+      return seongdo.address
+    } else if (extraAddress == "" && detailAddress == "") {
       return seongdo.address
     } else if (extraAddress == "") {
       return address + ", " + detailAddress
@@ -396,18 +399,57 @@
                 <label
                   for="name"
                   class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                  >이름</label
+                  >이름 / 성별</label
                 >
-                <input
-                  id="name"
-                  type="text"
-                  bind:value={seongdo.name}
-                  required
-                  disabled
-                  class="flex w-full bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 p-2"
-                />
+                <div class="flex w-full justify-center gap-1 pr-1 bg-gray-50">
+                  <input
+                    id="name"
+                    type="text"
+                    bind:value={seongdo.name}
+                    required
+                    disabled
+                    class="flex w-full border-0 text-gray-900 text-sm focus:outline-0 p-2"
+                  />
+                  <div class="border-l border-gray-300" />
+                  <select
+                    id="gender"
+                    value={seongdo.gender}
+                    on:change={() => {
+                      seongdo.gender = document.querySelector(
+                        "#gender > option:checked"
+                      ).value
+                    }}
+                    class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                  >
+                    <option value="none" class="hidden" />
+                    <option value="남자">남자</option>
+                    <option value="여자">여자</option>
+                  </select>
+                </div>
               </div>
               <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
+                <div class="flex w-full gap-1">
+                  <label
+                    for="enrolled"
+                    class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >등록일자</label
+                  >
+                  <input
+                    id="enrolled"
+                    type="date"
+                    on:change={(e) => {
+                      seongdo.enrolled_at = e.target.value
+                    }}
+                    class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 pl-1 pr-2 border-gray-300"
+                    min="1900-01-01"
+                    max="2024-12-31"
+                    value={seongdo.enrolled_at}
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col w-full md:flex-row gap-3">
+              <div class="flex w-full h-8 border-gray-300 border bg-gray-50">
                 <div class="flex w-full gap-1">
                   <label
                     for="name"
@@ -435,31 +477,6 @@
                   />
                 </div>
               </div>
-            </div>
-            <div class="flex flex-col w-full md:flex-row gap-3">
-              <div class="flex w-full h-8 border-gray-300 border">
-                <label
-                  for="gender"
-                  class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                  >성별</label
-                >
-                <div class="flex w-full bg-gray-50 px-1">
-                  <select
-                    id="gender"
-                    value={seongdo.gender}
-                    on:change={() => {
-                      seongdo.gender = document.querySelector(
-                        "#gender > option:checked"
-                      ).value
-                    }}
-                    class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                  >
-                    <option value="none" class="hidden" />
-                    <option value="남자">남자</option>
-                    <option value="여자">여자</option>
-                  </select>
-                </div>
-              </div>
               <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
                 <div class="flex w-full gap-1">
                   <label
@@ -476,7 +493,7 @@
                           "#jikbun > option:checked"
                         ).value
                       }}
-                      class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                     >
                       <option value="none" class="hidden" />
                       <option value="장로">장로</option>
@@ -501,7 +518,7 @@
                           "#singeup > option:checked"
                         ).value
                       }}
-                      class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                     >
                       <option value="none" class="hidden" />
                       <option value="세례">세례</option>
@@ -549,7 +566,7 @@
                         ).value
                         seongdo.group2 = ""
                       }}
-                      class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                     >
                       <option value="none" class="hidden" />
                       {#each Object.keys(groupList) as group1}
@@ -565,7 +582,7 @@
                       on:change={() => {
                         seongdo.group2 = document.querySelector("#group2").value
                       }}
-                      class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                     >
                       <option value="none" class="hidden" />
                       {#if seongdo.group1 == "장년부"}
@@ -596,7 +613,7 @@
                       on:change={() => {
                         group2Add = document.querySelector("#group2Add").value
                       }}
-                      class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                       class:hidden={seongdo.group1 == "장년부" &&
                       seongdo.group2 != ""
                         ? false
@@ -714,6 +731,7 @@
               </div>
             </div>
           </div>
+
           <div class="flex flex-col w-full gap-3">
             <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
               <div class="flex w-full gap-1">
@@ -729,10 +747,32 @@
                     seongdo.birth = e.target.value
                     seongdo.age = getAgeFromBirth(seongdo.birth)
                   }}
-                  class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 border-gray-300"
+                  class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 border-gray-300 px-1"
                   min="1900-01-01"
                   max="2023-12-31"
                   value={seongdo.birth}
+                />
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-col w-full gap-3">
+            <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
+              <div class="flex w-full gap-1">
+                <label
+                  for="erolledM"
+                  class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                  >등록일자</label
+                >
+                <input
+                  id="erolledM"
+                  type="date"
+                  on:change={(e) => {
+                    seongdo.enrolled_at = e.target.value
+                  }}
+                  class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 border-gray-300 px-1"
+                  min="1900-01-01"
+                  max="2023-12-31"
+                  value={seongdo.enrolled_at}
                 />
               </div>
             </div>
@@ -773,7 +813,7 @@
                       ).value
                     }}
                     value={seongdo.jikbun}
-                    class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                   >
                     <option value="none" class="hidden" />
                     <option value="장로">장로</option>
@@ -798,7 +838,7 @@
                         "#singeupM > option:checked"
                       ).value
                     }}
-                    class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                   >
                     <option value="none" class="hidden" />
                     <option value="세례">세례</option>
@@ -827,7 +867,7 @@
                       ).value
                       seongdo.group2 = ""
                     }}
-                    class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                   >
                     <option value="none" class="hidden" />
                     {#each Object.keys(groupList) as group1}
@@ -843,7 +883,7 @@
                     on:change={() => {
                       seongdo.group2 = document.querySelector("#group2M").value
                     }}
-                    class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                   >
                     <option value="none" class="hidden" />
                     {#if seongdo.group1 == "장년부"}
@@ -874,7 +914,7 @@
                     on:change={() => {
                       group2Add = document.querySelector("#group2MAdd").value
                     }}
-                    class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                     class:hidden={seongdo.group1 == "장년부" &&
                     seongdo.group2 != ""
                       ? false

@@ -19,6 +19,7 @@ const seongdoSchema = new Schema<ISeongdo>({
   group2: { type: String, required: false },
   address: { type: String, required: false },
   remarks: { type: String, required: false },
+  enrolled_at: { type: String, required: false },
 })
 
 seongdoSchema.set("timestamps", { createdAt: true, updatedAt: true })
