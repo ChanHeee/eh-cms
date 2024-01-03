@@ -29,7 +29,8 @@ export const load = async ({ request, fetch, url, locals }) => {
   if (response.ok) {
     const { educations, page: eduPage } = await response.json()
 
-    if (eduPage.totalPage < page) {
+    if (eduPage.totalPage == 0) {
+    } else if (eduPage.totalPage < page) {
       const url = `/educations${getSearchParams({
         order,
         page: eduPage.totalPage,
