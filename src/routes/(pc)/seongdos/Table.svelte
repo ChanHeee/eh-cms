@@ -198,7 +198,7 @@
 
   <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
     <button
-      class=" flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
+      class=" flex justify-center gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
     >
       핸드폰
     </button>

@@ -134,14 +134,15 @@
 
   const submitHandler = async () => {
     const { name, age, group2, address, ...rest } = seongdo
-
     const response = await fetch("/api/seongdos", {
       method: "PUT",
       body: JSON.stringify({
         name: name.trim(),
         originalName: name.trim(),
         age: age ? age : getAgeFromBirth(seongdo.birth),
-        group2: group2Add ? group2 + "," + group2Add : group2,
+        group2: group2Add
+          ? groupItem.group2 + "," + group2Add
+          : groupItem.group2,
         address: fullAddress,
         ...rest,
       }),
