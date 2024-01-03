@@ -23,32 +23,26 @@ const seongdoSchema = new Schema<ISeongdo>({
 })
 
 seongdoSchema.set("timestamps", { createdAt: true, updatedAt: true })
-seongdoSchema.pre("save", function (next) {
-  const { birth } = this
-  if (!birth) {
-    next()
-  }
-  var birthday = new Date(birth + "T00:00:00.000Z")
-
-  var now = new Date()
-  var dd = String(now.getDate()).padStart(2, "0")
-  var mm = String(now.getMonth() + 1).padStart(2, "0")
-  var yyyy = now.getFullYear()
-  var nowYMD = yyyy + "-" + mm + "-" + dd + "T00:00:00.000Z"
-  var today = new Date(nowYMD)
-
-  var age = today.getFullYear() - birthday.getFullYear()
-  birthday.setFullYear(today.getFullYear())
-
-  if (today < birthday) {
-    age--
-  }
-  this.age = age
-  next()
-})
-
 seongdoSchema.pre("save", async function (next) {
-  const { name } = this
+  const { birth, name } = this
+  if (birth) {
+    var birthday = new Date(birth + "T00:00:00.000Z")
+
+    var now = new Date()
+    var dd = String(now.getDate()).padStart(2, "0")
+    var mm = String(now.getMonth() + 1).padStart(2, "0")
+    var yyyy = now.getFullYear()
+    var nowYMD = yyyy + "-" + mm + "-" + dd + "T00:00:00.000Z"
+    var today = new Date(nowYMD)
+
+    var age = today.getFullYear() - birthday.getFullYear()
+    birthday.setFullYear(today.getFullYear())
+
+    if (today < birthday) {
+      age--
+    }
+    this.age = age
+  }
 
   const seongdoWithOriginalName = await Seongdo.find({ originalName: name })
 
@@ -62,7 +56,6 @@ seongdoSchema.pre("save", async function (next) {
 
 seongdoSchema.pre("deleteOne", async function (next) {
   const { _id } = this.getFilter()
-  console.log(_id)
 
   await Simbang.deleteMany({ seongdoId: _id })
   const family = await Family.findOne({ memberIds: { $in: [_id] } })

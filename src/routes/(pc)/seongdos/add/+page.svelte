@@ -68,6 +68,7 @@
       method: "POST",
       body: JSON.stringify({
         name: name.trim(),
+        originalName: name.trim(),
         avatar,
         birth,
         age,
