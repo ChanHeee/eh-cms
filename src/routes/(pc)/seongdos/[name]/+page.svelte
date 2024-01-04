@@ -573,6 +573,7 @@
                       {#each Object.keys(groupList) as group1}
                         <option value={group1}>{group1}</option>
                       {/each}
+                      <option value="교역자">교역자</option>
                     </select>
                     <div class="border-l border-gray-300" />
 
@@ -874,6 +875,7 @@
                     {#each Object.keys(groupList) as group1}
                       <option value={group1}>{group1}</option>
                     {/each}
+                    <option value="교역자">교역자</option>
                   </select>
                   <div class="border-l border-gray-300" />
 

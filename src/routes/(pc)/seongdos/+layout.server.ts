@@ -43,7 +43,8 @@ export const load = async ({ url, locals, fetch }) => {
     (group1 != null &&
       group1 != "장년부" &&
       group1 != "청년부" &&
-      group1 != "교회학교") ||
+      group1 != "교회학교" &&
+      group1 != "교역자") ||
     (group1 == null && group2 != null)
   ) {
     throw redirect(303, "/seongdos")
@@ -177,6 +178,12 @@ export const load = async ({ url, locals, fetch }) => {
           child: [],
         },
       ],
+    }
+  } else if (group1 == "교역자") {
+    groupTree = {
+      name: "교역자",
+      count: await getSeongdoCount({ group1: "교역자" }),
+      child: [],
     }
   }
 

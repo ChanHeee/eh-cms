@@ -88,15 +88,27 @@
         <p>교회학교</p>
       </button>
     </li>
+    <li
+      class="hover:bg-[#D9D9D8] cursor-pointer"
+      class:bg-[#D9D9D8]={group1 == "교역자" ? true : false}
+    >
+      <button
+        class="py-4 flex w-full flex-col items-center text-white hover:text-[#F46055] font-medium"
+        class:text-[#F46055]={group1 == "교역자" ? true : false}
+        class:text-white={group1 != "교역자" ? true : false}
+        on:click={() => {
+          goto(`/seongdos?group1=교역자`)
+        }}
+      >
+        <UserMultiple size={20} class="mb-1" />
+        <p>교역자</p>
+      </button>
+    </li>
   </ul>
 </aside>
 {#if group1 == "전체"}
   <SeongdoSideBarSearch {searchParams} />
-{:else if group1 == "장년부"}
-  <SeongdoSideBarGroup {groupTree} {searchParams} />
-{:else if group1 == "청년부"}
-  <SeongdoSideBarGroup {groupTree} {searchParams} />
-{:else if group1 == "교회학교"}
+{:else}
   <SeongdoSideBarGroup {groupTree} {searchParams} />
 {/if}
 

@@ -1,9 +1,5 @@
-import type { ISeongdoSearchBody } from "$lib/interfaces"
-import { Seongdo } from "$lib/models/Seongdo"
-import { seongdoSearchBody } from "$lib/store"
 import { getSeongdosSearchParams } from "$lib/utils"
 import { redirect } from "@sveltejs/kit"
-import { getSearchParams } from "../../../lib/utils/index"
 
 /** @type {import('@sveltejs/kit').Load} */
 export const load = async ({ request, fetch, url, locals }) => {

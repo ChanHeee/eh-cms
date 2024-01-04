@@ -67,6 +67,9 @@ export const getGroupItem = (
 }
 
 export const getGroupString = (group1: any, group2: any) => {
+  if (group1 == "교역자") {
+    return "교역자"
+  }
   if (!group2) {
     if (!group1) {
       return "미분류"
