@@ -58,6 +58,7 @@
     })
     if (response.ok) {
       toast.success("삭제되었습니다.")
+      ids = []
       history.back()
     }
   }

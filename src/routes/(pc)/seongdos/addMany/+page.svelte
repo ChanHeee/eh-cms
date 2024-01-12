@@ -7,6 +7,7 @@
   import type { ISeongdo } from "$lib/interfaces"
 
   $: seongdos = []
+  $: addedNum = 0
 
   var loadFile = async function (event) {
     var input = event.target
@@ -46,8 +47,6 @@
       ],
     })
 
-    console.log(csv)
-
     seongdos = csv.slice(1)
     seongdos.map((seongdo) => {
       const {
@@ -75,13 +74,9 @@
       seongdo.group2 = group2 || ""
       seongdo.address = address || ""
     })
-    console.log(seongdos)
   }
 
-  const submitHandler = async () => {
-    if (seongdos.length == 0) {
-      toast("추가할 성도가 없습니다.", { icon: "❗️" })
-    }
+  const seongdoAdd = async () => {
     const response = await fetch("/api/seongdos", {
       method: "POST",
       body: JSON.stringify({ seongdos }),
@@ -89,10 +84,37 @@
         "content-type": "application/json",
       },
     })
+
     if (response.ok) {
-      toast.success("저장되었습니다.")
+      const result = await response.json()
       goto(`/seongdos`)
     }
+  }
+
+  const submitHandler = async () => {
+    if (seongdos.length == 0) {
+      toast("추가할 성도가 없습니다.", { icon: "❗️" })
+    } else {
+      toast.promise(seongdoAdd(), {
+        loading: "저장 중입니다...",
+        success: `저장되었습니다!`,
+        error: "오류가 발생했습니다.",
+      })
+    }
+    // const response = await fetch("/api/seongdos", {
+    //   method: "POST",
+    //   body: JSON.stringify({ seongdos }),
+    //   headers: {
+    //     "content-type": "application/json",
+    //   },
+    // })
+
+    // if (response.ok) {
+    //   const result = await response.json()
+    //   const seongdos = result.seongdos
+    //   toast.success(`${seongdos.length}명의 성도가 저장되었습니다.`)
+    //   goto(`/seongdos`)
+    // }
   }
 </script>
 
@@ -104,7 +126,20 @@
     <h1 class="text-lg font-medium">
       추가될 성도 목록 {seongdos.length > 0 ? `(${seongdos.length}명)` : ""}
     </h1>
+
     <div class="flex ml-auto gap-2">
+      <a
+        href="https://chemical-slug-198.notion.site/e19681f2e69c4d5fb21747b50411111b"
+        target="_blank"
+      >
+        <button
+          type="submit"
+          class="flex h-fit border-[#F46055] border items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+        >
+          <span>❔</span>
+          <span>등록 가이드</span>
+        </button>
+      </a>
       <input
         id="example1"
         type="file"

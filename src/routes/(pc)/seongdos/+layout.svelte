@@ -104,6 +104,22 @@
         <p>교역자</p>
       </button>
     </li>
+    <li
+      class="hover:bg-[#D9D9D8] cursor-pointer"
+      class:bg-[#D9D9D8]={group1 == "기타" ? true : false}
+    >
+      <button
+        class="py-4 flex w-full flex-col items-center text-white hover:text-[#F46055] font-medium"
+        class:text-[#F46055]={group1 == "기타" ? true : false}
+        class:text-white={group1 != "기타" ? true : false}
+        on:click={() => {
+          goto(`/seongdos?group1=기타`)
+        }}
+      >
+        <UserMultiple size={20} class="mb-1" />
+        <p>기타</p>
+      </button>
+    </li>
   </ul>
 </aside>
 {#if group1 == "전체"}

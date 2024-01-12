@@ -44,7 +44,8 @@ export const load = async ({ url, locals, fetch }) => {
       group1 != "장년부" &&
       group1 != "청년부" &&
       group1 != "교회학교" &&
-      group1 != "교역자") ||
+      group1 != "교역자" &&
+      group1 != "기타") ||
     (group1 == null && group2 != null)
   ) {
     throw redirect(303, "/seongdos")
@@ -183,7 +184,50 @@ export const load = async ({ url, locals, fetch }) => {
     groupTree = {
       name: "교역자",
       count: await getSeongdoCount({ group1: "교역자" }),
-      child: [],
+      child: [
+        {
+          name: "담임목사",
+          count: await getSeongdoCount({ group2: "담임목사" }),
+          child: [],
+        },
+        {
+          name: "목사",
+          count: await getSeongdoCount({ group2: "목사" }),
+          child: [],
+        },
+        {
+          name: "강도사",
+          count: await getSeongdoCount({ group2: "강도사" }),
+          child: [],
+        },
+        {
+          name: "전도사",
+          count: await getSeongdoCount({ group2: "전도사" }),
+          child: [],
+        },
+        {
+          name: "교육전도사",
+          count: await getSeongdoCount({ group2: "교육전도사" }),
+          child: [],
+        },
+      ],
+    }
+  } else if (group1 == "기타") {
+    groupTree = {
+      name: "기타",
+      count: await getSeongdoCount({ group1: "기타" }),
+      child: [
+        {
+          name: "별명부",
+          count: await getSeongdoCount({ group2: "별명부" }),
+          child: [],
+        },
+        {
+          name: "재적",
+          count: await getSeongdoCount({ group2: "재적" }),
+          child: [],
+        },
+      ],
     }
   }
 

@@ -109,7 +109,14 @@ export interface IMember {
   _id?: string
   seongdo?: string
   classification?: string
+  name?: string
+  gender?: string
+  birth?: string
+  phone?: string
+  isSeongdo?: boolean
 }
+
+export interface INonSeongdoMember {}
 
 export interface ISimbang {
   _id?: string

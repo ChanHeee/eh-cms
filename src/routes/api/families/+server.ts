@@ -15,5 +15,8 @@ export const POST: RequestHandler = async ({ request, url }) => {
   const { members, memberIds } = await request.json()
 
   const family = await Family.create({ memberIds, members })
-  return json({ family })
+
+  const familyWithPopulate = await family.populate("members.seongdo")
+
+  return json({ family: familyWithPopulate })
 }

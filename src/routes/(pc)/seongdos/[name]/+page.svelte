@@ -1,6 +1,6 @@
 <script lang="ts">
   import SearchTable from "./SearchTable.svelte"
-  import { goto } from "$app/navigation"
+  import { goto, invalidateAll } from "$app/navigation"
   import {
     getAgeFromBirth,
     getGroupItem,
@@ -32,6 +32,7 @@
   $: groupList = data.groupList
   // value for senogdo detail
   $: seongdo = data.seongdo
+  let seongdoName = data.seongdo.name
 
   $: ageWithString = seongdo.age ? seongdo.age + " 세" : ""
   $: groupItem = getGroupItem(seongdo.group1, seongdo.group2)
@@ -67,9 +68,24 @@
   }
   let selectedSeongdo: ISeongdo | null
   $: selectedSeongdo = selectedSeongdo
-  $: familyId = data.family?._id
-  $: members = data.family?.members || []
-  $: memberIds = data.family?.memberIds || []
+  $: addNonSeongdo = false
+  $: addedName = ""
+  $: addedGender = ""
+  $: addedBirth = ""
+  $: addedPhone = ""
+  let selectedNonSeongdoFamily: {
+    classification: string
+    name: string
+    gender: string
+    birth: string
+    phone: string
+  } | null
+  $: selectedNonSeongdoFamily = selectedNonSeongdoFamily
+
+  $: family = data.family
+  $: familyId = family?._id
+  $: members = family?.members || []
+  $: memberIds = family?.memberIds || []
   $: searchName = ""
   $: classificationValue = ""
   $: classification = ""
@@ -88,6 +104,7 @@
   $: selectedSimbang = selectedSimbang
 
   $: isFamilyModalHidden = true
+
   $: isSimbangModalHidden = true
 
   var loadFile = function (event) {
@@ -101,11 +118,11 @@
     output.onload = function () {
       URL.revokeObjectURL(output.src) // free memory
     }
-    avatar = event.target.files[0]
+    seongdo.avatar = event.target.files[0]
     var reader = new FileReader()
     try {
       reader.onload = (result) => {
-        avatar = result.target.result
+        seongdo.avatar = result.target.result
       }
       //reader.readAsText(event.target.files[0])
       reader.readAsDataURL(event.target.files[0])
@@ -119,11 +136,11 @@
     outputM.onload = function () {
       URL.revokeObjectURL(outputM.src) // free memory
     }
-    avatar = event.target.files[0]
+    seongdo.avatar = event.target.files[0]
     var reader = new FileReader()
     try {
       reader.onload = (result) => {
-        avatar = result.target.result
+        seongdo.avatar = result.target.result
       }
       //reader.readAsText(event.target.files[0])
       reader.readAsDataURL(event.target.files[0])
@@ -134,24 +151,37 @@
 
   const submitHandler = async () => {
     const { name, age, group2, address, ...rest } = seongdo
-    const response = await fetch("/api/seongdos", {
-      method: "PUT",
-      body: JSON.stringify({
-        name: name.trim(),
-        originalName: name.trim(),
-        age: age ? age : getAgeFromBirth(seongdo.birth),
-        group2: group2Add
-          ? groupItem.group2 + "," + group2Add
-          : groupItem.group2,
-        address: fullAddress,
-        ...rest,
-      }),
+    let response = await fetch(`/api/seongdos/${name}`, {
       headers: {
         "content-type": "application/json",
       },
     })
-    if (response.ok) {
-      toast.success("저장되었습니다.")
+    const result = await response.json()
+
+    if (name != seongdoName && result.seongdo) {
+      toast.error("이미 등록된 이름은 사용할 수 없습니다.")
+    } else {
+      response = await fetch("/api/seongdos", {
+        method: "PUT",
+        body: JSON.stringify({
+          name: name.trim(),
+          originalName: name.trim(),
+          age: age ? age : getAgeFromBirth(seongdo.birth),
+          group2: group2Add
+            ? groupItem.group2 + "," + group2Add
+            : groupItem.group2,
+          address: fullAddress,
+          ...rest,
+        }),
+        headers: {
+          "content-type": "application/json",
+        },
+      })
+      if (response.ok) {
+        toast.success("저장되었습니다.")
+        seongdoName = seongdo.name
+        goto(`/seongdos/${seongdo.name}`)
+      }
     }
   }
 
@@ -245,6 +275,9 @@
         },
       })
 
+      if (response.ok) {
+        await invalidateAll()
+      }
       return response.ok
     } else {
       const response = await fetch(`/api/families`, {
@@ -258,8 +291,7 @@
         },
       })
       if (response.ok) {
-        const { family } = await response.json()
-        familyId = family._id
+        await invalidateAll()
       }
       return response.ok
     }
@@ -326,7 +358,7 @@
         class="sticky top-0 pt-8 bg-white flex justify-between items-start pb-2"
       >
         <h1 class="text-lg font-medium">
-          {seongdo.name}
+          {seongdoName}
           {seongdo.jikbun || ""}
         </h1>
         <div class="flex ml-auto gap-2">
@@ -408,8 +440,7 @@
                     type="text"
                     bind:value={seongdo.name}
                     required
-                    disabled
-                    class="flex w-full border-0 text-gray-900 text-sm focus:outline-0 p-2"
+                    class="flex w-full bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 p-2"
                   />
                   <div class="border-l border-gray-300" />
                   <select
@@ -574,6 +605,7 @@
                         <option value={group1}>{group1}</option>
                       {/each}
                       <option value="교역자">교역자</option>
+                      <option value="기타">기타</option>
                     </select>
                     <div class="border-l border-gray-300" />
 
@@ -599,6 +631,15 @@
                         {#each groupList["교회학교"] as item}
                           <option value={item}>{item}</option>
                         {/each}
+                      {:else if seongdo.group1 == "교역자"}
+                        <option value="담임목사">담임목사</option>
+                        <option value="목사">목사</option>
+                        <option value="강도사">강도사</option>
+                        <option value="전도사">전도사</option>
+                        <option value="교육전도사">교육전도사</option>
+                      {:else if seongdo.group1 == "기타"}
+                        <option value="별명부">별명부</option>
+                        <option value="재적">재적</option>
                       {/if}
                     </select>
                     <div
@@ -688,7 +729,6 @@
                   type="text"
                   bind:value={seongdo.name}
                   required
-                  disabled
                   class="flex w-full bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 p-2"
                 />
               </div>
@@ -876,6 +916,7 @@
                       <option value={group1}>{group1}</option>
                     {/each}
                     <option value="교역자">교역자</option>
+                    <option value="기타">기타</option>
                   </select>
                   <div class="border-l border-gray-300" />
 
@@ -901,6 +942,15 @@
                       {#each groupList["교회학교"] as item}
                         <option value={item}>{item}</option>
                       {/each}
+                    {:else if seongdo.group1 == "교역자"}
+                      <option value="담임목사">담임목사</option>
+                      <option value="목사">목사</option>
+                      <option value="강도사">강도사</option>
+                      <option value="전도사">전도사</option>
+                      <option value="교육전도사">교육전도사</option>
+                    {:else if seongdo.group1 == "기타"}
+                      <option value="별명부">별명부</option>
+                      <option value="재적">재적</option>
                     {/if}
                   </select>
                   <div
@@ -1021,6 +1071,9 @@
             on:click={() => {
               isFamilyModalHidden = !isFamilyModalHidden
               $SeongdosStore = []
+              if (!familyId) {
+                selectedSeongdo = seongdo
+              }
             }}
           >
             <AddLarge scale={16} />
@@ -1036,12 +1089,12 @@
             사진
           </div>
 
-          {#if members.length > 0}
+          {#if members?.length > 0}
             {#each members as member}
               <div class="flex justify-center px-2 items-center h-10">
                 <img
                   class="mx-auto object-cover w-8 h-8"
-                  src={member.seongdo.avatar || "/avatar.png"}
+                  src={member.seongdo?.avatar || "/avatar.png"}
                   alt=""
                 />
               </div>
@@ -1055,7 +1108,7 @@
           >
             구분
           </div>
-          {#if members.length > 0}
+          {#if members?.length > 0}
             <!-- content here -->
             {#each members as member}
               <div class="flex justify-center px-2 items-center h-10">
@@ -1070,27 +1123,32 @@
           >
             이름
           </div>
-          {#if members.length > 0}
+          {#if members?.length > 0}
             <!-- content here -->
             {#each members as member}
               <button
                 class="flex px-3 items-center h-10"
                 on:click={() => {
-                  if (
-                    !isAllowGroup(
-                      $AllowedGroupStore,
-                      member.seongdo.group1,
-                      member.seongdo.group2
-                    )
-                  ) {
-                    toast.error("접근할 수 없습니다.")
+                  if (member.isSeongdo) {
+                    if (
+                      !isAllowGroup(
+                        $AllowedGroupStore,
+                        member.seongdo.group1,
+                        member.seongdo.group2
+                      )
+                    ) {
+                      toast.error("접근할 수 없습니다.")
+                    } else {
+                      goto(`/seongdos/${member.seongdo.name}`)
+                    }
                   } else {
-                    goto(`/seongdos/${member.seongdo.name}`)
+                    selectedNonSeongdoFamily = member
+                    isFamilyModalHidden = !isFamilyModalHidden
                   }
                 }}
               >
                 <div>
-                  {member.seongdo.name}
+                  {member.isSeongdo ? member.seongdo.name : member.name}
                 </div>
               </button>
             {/each}
@@ -1102,11 +1160,11 @@
           >
             직분
           </button>
-          {#if members.length > 0}
+          {#if members?.length > 0}
             <!-- content here -->
             {#each members as member}
               <div class="flex px-3 justify-center items-center h-10">
-                {member.seongdo.jikbun}
+                {member.isSeongdo ? member.seongdo.jikbun : ""}
               </div>
             {/each}
           {/if}
@@ -1115,11 +1173,11 @@
           class="flex flex-col flex-auto sm:flex-none whitespace-nowrap border-r divide-y border-b"
         >
           <button class=" px-3 font-bold h-10 bg-[#D9D9D8]"> 생년월일 </button>
-          {#if members.length > 0}
+          {#if members?.length > 0}
             <!-- content here -->
             {#each members as member}
               <div class="flex justify-center px-3 items-center h-10">
-                {member.seongdo.birth}
+                {member.isSeongdo ? member.seongdo.birth : member.birth}
               </div>
             {/each}
           {/if}
@@ -1129,11 +1187,11 @@
           class="flex flex-col flex-auto sm:flex-none whitespace-nowrap border-r divide-y border-b"
         >
           <button class=" px-3 font-bold h-10 bg-[#D9D9D8]"> 핸드폰 </button>
-          {#if members.length > 0}
+          {#if members?.length > 0}
             <!-- content here -->
             {#each members as member}
               <div class="flex justify-center px-3 items-center h-10">
-                {member.seongdo.phone}
+                {member.isSeongdo ? member.seongdo.phone : member.phone}
               </div>
             {/each}
           {/if}
@@ -1147,11 +1205,13 @@
           >
             소속
           </div>
-          {#if members.length > 0}
+          {#if members?.length > 0}
             <!-- content here -->
             {#each members as member}
               <div class="flex justify-center px-3 items-center h-10">
-                {getGroupString(member.seongdo.group1, member.seongdo.group2)}
+                {member.isSeongdo
+                  ? getGroupString(member.seongdo.group1, member.seongdo.group2)
+                  : "미등록"}
               </div>
             {/each}
           {/if}
@@ -1160,19 +1220,32 @@
           <button
             class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
           />
-          {#if members.length > 0}
+          {#if members?.length > 0}
             {#each members as member}
               <div class="flex items-center px-3 h-10">
                 <button
                   type="button"
                   class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem]"
                   on:click={async () => {
-                    memberIds = memberIds.filter(
-                      (id) => id != member.seongdo._id
-                    )
-                    members = members.filter(
-                      (seongdo) => seongdo._id != member._id
-                    )
+                    if (member.isSeongdo) {
+                      memberIds = memberIds.filter(
+                        (id) => id != member.seongdo._id
+                      )
+
+                      if (member.seongdo == seongdo._id) {
+                        members = members.filter(
+                          (seongdo) => seongdo.isSeongdo == true
+                        )
+                      } else {
+                        members = members.filter(
+                          (seongdo) => seongdo.seongdo != member.seongdo
+                        )
+                      }
+                    } else {
+                      members = members.filter(
+                        (seongdo) => seongdo.name != member.name
+                      )
+                    }
                     await familyHandler()
                   }}
                 >
@@ -1334,12 +1407,617 @@
       <div
         class="sm:h-2/3 h-3/4 sm:max-md:w-2/3 md:w-1/3 w-full relative transform rounded-md bg-white shadow-xl transition-all"
       >
-        <div
+        {#if selectedSeongdo}
+          <div
+            class="overflow-scroll h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
+          >
+            <div class="flex flex-col gap-3 text-sm">
+              <div class="flex gap-3">
+                <div class="flex flex-none">
+                  <img
+                    alt=""
+                    id="previewForFamily"
+                    src={selectedSeongdo?.avatar || "/avatar.png"}
+                    class="border-gray-300 border w-[7.5rem] min-w-[7.5rem] h-[7.5rem] object-cover"
+                  />
+                </div>
+                <div class="flex flex-col gap-3 w-full">
+                  <div class="flex w-full h-8 border-gray-300 border">
+                    <div
+                      class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >
+                      이름
+                    </div>
+                    <p
+                      class="flex w-full bg-gray-50 text-gray-900 p-2 items-center"
+                    >
+                      {selectedSeongdo.name}
+                    </p>
+                  </div>
+                  <div class="flex w-full h-8 border-gray-300 border">
+                    <div
+                      class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >
+                      생년월일
+                    </div>
+                    <p
+                      class="flex w-full bg-gray-50 text-gray-900 p-2 items-center"
+                    >
+                      {selectedSeongdo.birth}
+                    </p>
+                  </div>
+                  <div class="flex w-full h-8 border-gray-300 border">
+                    <div
+                      class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >
+                      구분
+                    </div>
+                    <div class="flex w-full bg-gray-50 px-1">
+                      <select
+                        id="classification"
+                        class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                        class:hidden={classification == "직접입력"}
+                        on:change={() => {
+                          classification = document.querySelector(
+                            "#classification > option:checked"
+                          ).value
+                        }}
+                      >
+                        <option value="none" class="hidden" />
+                        <option value="직접입력">직접입력</option>
+                        {#each familyClassList as familyClass}
+                          <option value={familyClass}>{familyClass}</option>
+                        {/each}
+                      </select>
+                      <input
+                        placeholder="직접입력"
+                        class="flex w-full bg-gray-50 text-gray-900 py-2 px-1 items-center focus:outline-0"
+                        class:hidden={classification != "직접입력"}
+                        bind:value={classificationValue}
+                        on:focusout={() => {}}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="bg-gray-50 h-[55px] px-4 py-3 flex flex-row-reverse px-6 gap-2"
+          >
+            <button
+              class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
+              on:click={async () => {
+                if (familyId) {
+                  selectedSeongdo = null
+                } else {
+                  isFamilyModalHidden = !isFamilyModalHidden
+                }
+              }}
+            >
+              <span class="flex items-center">
+                <Close class="text-[#F46055]" />
+                <p>뒤로</p>
+              </span>
+            </button>
+            <button
+              class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              on:click={async () => {
+                if (
+                  classification == "" ||
+                  (classification == "직접입력" && classificationValue == "")
+                ) {
+                  return toast.error("구분을 입력해주세요.")
+                }
+
+                members = [
+                  ...members,
+                  {
+                    seongdo: selectedSeongdo,
+                    classification: classificationValue || classification,
+                    isSeongdo: true,
+                  },
+                ]
+                memberIds = [...memberIds, selectedSeongdo?._id]
+                const result = await familyHandler()
+                if (result) {
+                  selectedSeongdo = null
+                  isFamilyModalHidden = !isFamilyModalHidden
+                  classification = ""
+                  classificationValue = ""
+                  toast.success("추가되었습니다.")
+                }
+              }}
+            >
+              <AddLarge scale={16} />
+              <span>추가</span>
+            </button>
+          </div>
+        {:else if selectedNonSeongdoFamily}
+          <div
+            class="overflow-scroll h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
+          >
+            <form class="flex flex-col">
+              <div class="flex flex-col text-sm gap-3">
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="familyName"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >이름</label
+                  >
+                  <div
+                    class="flex flex-auto justify-start bg-gray-50 pl-1.5 pr-1"
+                  >
+                    <input
+                      id="familyName"
+                      type="text"
+                      bind:value={selectedNonSeongdoFamily.name}
+                      class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    />
+                  </div>
+                </div>
+                <div class="flex w-full h-8 border-gray-300 border">
+                  <div
+                    class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                  >
+                    구분
+                  </div>
+                  <div class="flex w-full bg-gray-50 px-1">
+                    <input
+                      class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      value={selectedNonSeongdoFamily.classification}
+                      disabled
+                    />
+                  </div>
+                </div>
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="familyGender"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >성별</label
+                  >
+                  <div class="flex flex-auto justify-start bg-gray-50 pr-1">
+                    <input
+                      class="px-1 flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      value={selectedNonSeongdoFamily.gender}
+                      disabled
+                    />
+                  </div>
+                </div>
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="familyBirth"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >생년월일</label
+                  >
+                  <div class="flex flex-auto justify-start bg-gray-50">
+                    <input
+                      id="familyBirth"
+                      type="date"
+                      value={selectedNonSeongdoFamily.birth}
+                      disabled
+                      class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    />
+                  </div>
+                </div>
+
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="familyBirth"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >나이</label
+                  >
+                  <div class="flex flex-auto justify-start bg-gray-50">
+                    <input
+                      id="age"
+                      type="text"
+                      value={selectedNonSeongdoFamily.birth
+                        ? getAgeFromBirth(selectedNonSeongdoFamily.birth) + "세"
+                        : ""}
+                      disabled
+                      class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    />
+                  </div>
+                </div>
+
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="familyPhone"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >핸드폰</label
+                  >
+                  <div class="flex flex-auto justify-start bg-gray-50">
+                    <input
+                      id="familyPhone"
+                      type="text"
+                      value={selectedNonSeongdoFamily.phone}
+                      disabled
+                      class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    />
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div
+            class="bg-gray-50 h-[55px] px-4 py-3 flex flex-row-reverse px-6 gap-2"
+          >
+            <button
+              class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
+              on:click={async () => {
+                selectedNonSeongdoFamily = null
+                isFamilyModalHidden = !isFamilyModalHidden
+              }}
+            >
+              <span class="flex items-center">
+                <Close class="text-[#F46055]" />
+                <p>뒤로</p>
+              </span>
+            </button>
+            <button
+              class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              on:click={async () => {
+                let response = await fetch(
+                  `/api/seongdos/${selectedNonSeongdoFamily?.name.trim()}`,
+                  {
+                    headers: {
+                      "content-type": "application/json",
+                    },
+                  }
+                )
+                const { seongdo } = await response.json()
+                if (seongdo) {
+                  toast.error("이미 등록된 이름은 사용할 수 없습니다.")
+                } else {
+                  response = await fetch("/api/seongdos", {
+                    method: "POST",
+                    body: JSON.stringify({
+                      name: selectedNonSeongdoFamily?.name,
+                      gender: selectedNonSeongdoFamily?.gender,
+                      birth: selectedNonSeongdoFamily?.birth,
+                      phone: selectedNonSeongdoFamily?.phone,
+                      originalName: selectedNonSeongdoFamily?.name.trim(),
+                      avatar: "",
+                      jikbun: "",
+                      group1: "",
+                      group2: "",
+                      singeup: "",
+                      address: "",
+                      enrolled_at: "",
+                    }),
+                    headers: {
+                      "content-type": "application/json",
+                    },
+                  })
+                  if (response.ok) {
+                    const { seongdo } = await response.json()
+                    memberIds = [...memberIds, seongdo._id]
+                    members = members.map((item) => {
+                      if (
+                        item.classification ==
+                        selectedNonSeongdoFamily?.classification
+                      ) {
+                        return {
+                          isSeongdo: true,
+                          seongdo: seongdo._id,
+                          classification:
+                            selectedNonSeongdoFamily?.classification,
+                        }
+                      } else {
+                        return item
+                      }
+                    })
+                    isFamilyModalHidden = true
+                    selectedNonSeongdoFamily = null
+                    await familyHandler()
+                    toast.success("성도로 등록되었습니다.")
+                  }
+                }
+              }}
+            >
+              <AddLarge scale={16} />
+              <span>성도로 등록</span>
+            </button>
+          </div>
+        {:else if addNonSeongdo}
+          <div
+            class="overflow-scroll h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
+          >
+            <h1 class="text-left text-lg font-medium mb-2">
+              가족관계 직접추가
+            </h1>
+            <form class="flex flex-col">
+              <div class="flex flex-col text-sm gap-3">
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="familyName"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >이름</label
+                  >
+                  <div
+                    class="flex flex-auto justify-start bg-gray-50 pl-1.5 pr-1"
+                  >
+                    <input
+                      id="familyName"
+                      type="text"
+                      bind:value={addedName}
+                      class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    />
+                  </div>
+                </div>
+                <div class="flex w-full h-8 border-gray-300 border">
+                  <div
+                    class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                  >
+                    구분
+                  </div>
+                  <div class="flex w-full bg-gray-50 px-1">
+                    <select
+                      id="classificationForAdd"
+                      class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      class:hidden={classification == "직접입력"}
+                      on:change={() => {
+                        classification = document.querySelector(
+                          "#classificationForAdd > option:checked"
+                        ).value
+                      }}
+                    >
+                      <option value="none" class="hidden" />
+                      <option value="직접입력">직접입력</option>
+                      {#each familyClassList as familyClass}
+                        <option value={familyClass}>{familyClass}</option>
+                      {/each}
+                    </select>
+                    <input
+                      placeholder="직접입력"
+                      class="flex w-full bg-gray-50 text-gray-900 py-2 px-1 items-center focus:outline-0"
+                      class:hidden={classification != "직접입력"}
+                      bind:value={classificationValue}
+                      on:focusout={() => {}}
+                    />
+                  </div>
+                </div>
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="familyGender"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >성별</label
+                  >
+                  <div class="flex flex-auto justify-start bg-gray-50 pr-1">
+                    <select
+                      id="familyGender"
+                      class="px-1 flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      on:change={() => {
+                        addedGender = document.querySelector(
+                          "#familyGender > option:checked"
+                        ).value
+                      }}
+                      value={addedGender}
+                    >
+                      <option value="none" class="hidden" />
+                      <option value="남자">남자</option>
+                      <option value="여자">여자</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="familyBirth"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >생년월일</label
+                  >
+                  <div class="flex flex-auto justify-start bg-gray-50">
+                    <input
+                      id="familyBirth"
+                      type="date"
+                      bind:value={addedBirth}
+                      class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    />
+                  </div>
+                </div>
+
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="familyBirth"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >나이</label
+                  >
+                  <div class="flex flex-auto justify-start bg-gray-50">
+                    <input
+                      id="age"
+                      type="text"
+                      value={addedBirth
+                        ? getAgeFromBirth(addedBirth) + "세"
+                        : ""}
+                      disabled
+                      class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    />
+                  </div>
+                </div>
+
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="familyPhone"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >핸드폰</label
+                  >
+                  <div class="flex flex-auto justify-start bg-gray-50">
+                    <input
+                      id="familyPhone"
+                      type="text"
+                      bind:value={addedPhone}
+                      class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    />
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div
+            class="bg-gray-50 h-[55px] px-4 py-3 flex flex-row-reverse px-6 gap-2"
+          >
+            <button
+              class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
+              class:hidden={!addNonSeongdo}
+              on:click={async () => {
+                addNonSeongdo = false
+              }}
+            >
+              <span class="flex items-center">
+                <Close class="text-[#F46055]" />
+                <p>뒤로</p>
+              </span>
+            </button>
+            <button
+              class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              class:hidden={!addNonSeongdo}
+              on:click={async () => {
+                if (addedName == "") {
+                  return toast.error("이름을 입력해주세요.")
+                } else if (
+                  classification == "" ||
+                  (classification == "직접입력" && classificationValue == "")
+                ) {
+                  return toast.error("구분을 입력해주세요.")
+                }
+
+                members = [
+                  ...members,
+                  {
+                    seongdo: null,
+                    classification: classificationValue || classification,
+                    isSeongdo: false,
+                    name: addedName,
+                    gender: addedGender,
+                    birth: addedBirth,
+                    phone: addedPhone,
+                  },
+                ]
+                const result = await familyHandler()
+                if (result) {
+                  selectedSeongdo = null
+                  isFamilyModalHidden = !isFamilyModalHidden
+                  classification = ""
+                  classificationValue = ""
+                  addNonSeongdo = !addNonSeongdo
+                  addedName = ""
+                  addedGender = ""
+                  addedBirth = ""
+                  addedPhone = ""
+                  toast.success("추가되었습니다.")
+                }
+              }}
+            >
+              <AddLarge scale={16} />
+              <span>추가</span>
+            </button>
+          </div>
+        {:else if $SeongdosStore.length > 0}
+          <div
+            class="overflow-scroll h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
+          >
+            <form class="flex w-full items-center mx-auto">
+              <input
+                id="name"
+                type="text"
+                bind:value={searchName}
+                on:focus={() => {
+                  searchName = ""
+                }}
+                class="w-full bg-gray-50 border-gray-300 border-y border-l text-gray-900 text-sm focus:outline-0 p-2"
+                placeholder="이름"
+              />
+              <button
+                class="bg-[#B0B1B0] p-2 border-gray-300 border-y border-r"
+                on:click|preventDefault={async () => {
+                  await searchHandler()
+                }}
+                ><Search size={20} class="text-gray-600" />
+              </button>
+            </form>
+            <SearchTable {familyAddHandler} />
+          </div>
+          <div
+            class="bg-gray-50 h-[55px] px-4 py-3 flex flex-row-reverse px-6 gap-2"
+          >
+            <button
+              class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
+              on:click={async () => {
+                isFamilyModalHidden = !isFamilyModalHidden
+                searchName = ""
+              }}
+            >
+              <span class="flex items-center">
+                <Close class="text-[#F46055]" />
+                <p>닫기</p>
+              </span>
+            </button>
+            <button
+              class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              on:click={() => {
+                addNonSeongdo = true
+              }}
+            >
+              <AddLarge scale={16} />
+              <span>직접 추가</span>
+            </button>
+          </div>
+        {:else}
+          <div
+            class="overflow-scroll h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
+          >
+            <form class="flex w-full items-center mx-auto">
+              <input
+                id="name"
+                type="text"
+                bind:value={searchName}
+                on:focus={() => {
+                  searchName = ""
+                }}
+                class="w-full bg-gray-50 border-gray-300 border-y border-l text-gray-900 text-sm focus:outline-0 p-2"
+                placeholder="이름"
+              />
+              <button
+                class="bg-[#B0B1B0] p-2 border-gray-300 border-y border-r"
+                on:click|preventDefault={async () => {
+                  await searchHandler()
+                }}
+                ><Search size={20} class="text-gray-600" />
+              </button>
+            </form>
+          </div>
+          <div
+            class="bg-gray-50 h-[55px] px-4 py-3 flex flex-row-reverse px-6 gap-2"
+          >
+            <button
+              class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
+              on:click={async () => {
+                isFamilyModalHidden = !isFamilyModalHidden
+                searchName = ""
+              }}
+            >
+              <span class="flex items-center">
+                <Close class="text-[#F46055]" />
+                <p>닫기</p>
+              </span>
+            </button>
+            <button
+              class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              on:click={() => {
+                addNonSeongdo = true
+              }}
+            >
+              <AddLarge scale={16} />
+              <span>직접 추가</span>
+            </button>
+          </div>
+        {/if}
+        <!-- <div
           class="overflow-scroll h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
         >
           <form
             class="flex w-full items-center mx-auto"
-            class:hidden={selectedSeongdo}
+            class:hidden={selectedSeongdo || addNonSeongdo}
           >
             <input
               id="name"
@@ -1365,6 +2043,138 @@
               {familyAddHandler}
               classString={selectedSeongdo ? "hidden" : ""}
             />
+          {/if}
+
+          {#if addNonSeongdo}
+            <h1 class="text-left text-lg font-medium mb-2">
+              가족관계 직접추가
+            </h1>
+            <form class="flex flex-col">
+              <div class="flex flex-col text-sm gap-3">
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="familyName"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >이름</label
+                  >
+                  <div
+                    class="flex flex-auto justify-start bg-gray-50 pl-1.5 pr-1"
+                  >
+                    <input
+                      id="familyName"
+                      type="text"
+                      bind:value={addedName}
+                      class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    />
+                  </div>
+                </div>
+                <div class="flex w-full h-8 border-gray-300 border">
+                  <div
+                    class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                  >
+                    구분
+                  </div>
+                  <div class="flex w-full bg-gray-50 px-1">
+                    <select
+                      id="classificationForAdd"
+                      class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      class:hidden={classification == "직접입력"}
+                      on:change={() => {
+                        classification = document.querySelector(
+                          "#classificationForAdd > option:checked"
+                        ).value
+                      }}
+                    >
+                      <option value="none" class="hidden" />
+                      <option value="직접입력">직접입력</option>
+                      {#each familyClassList as familyClass}
+                        <option value={familyClass}>{familyClass}</option>
+                      {/each}
+                    </select>
+                    <input
+                      placeholder="직접입력"
+                      class="flex w-full bg-gray-50 text-gray-900 py-2 px-1 items-center focus:outline-0"
+                      class:hidden={classification != "직접입력"}
+                      bind:value={classificationValue}
+                      on:focusout={() => {}}
+                    />
+                  </div>
+                </div>
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="familyGender"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >성별</label
+                  >
+                  <div class="flex flex-auto justify-start bg-gray-50 pr-1">
+                    <select
+                      id="familyGender"
+                      class="px-1 flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      on:change={() => {
+                        addedGender = document.querySelector(
+                          "#familyGender > option:checked"
+                        ).value
+                      }}
+                      value={addedGender}
+                    >
+                      <option value="none" class="hidden" />
+                      <option value="남자">남자</option>
+                      <option value="여자">여자</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="familyBirth"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >생년월일</label
+                  >
+                  <div class="flex flex-auto justify-start bg-gray-50">
+                    <input
+                      id="familyBirth"
+                      type="date"
+                      bind:value={addedBirth}
+                      class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    />
+                  </div>
+                </div>
+
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="familyBirth"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >나이</label
+                  >
+                  <div class="flex flex-auto justify-start bg-gray-50">
+                    <input
+                      id="age"
+                      type="text"
+                      value={addedBirth
+                        ? getAgeFromBirth(addedBirth) + "세"
+                        : ""}
+                      disabled
+                      class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    />
+                  </div>
+                </div>
+
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="familyPhone"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >핸드폰</label
+                  >
+                  <div class="flex flex-auto justify-start bg-gray-50">
+                    <input
+                      id="familyPhone"
+                      type="text"
+                      bind:value={addedPhone}
+                      class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    />
+                  </div>
+                </div>
+              </div>
+            </form>
           {/if}
 
           <div class="flex flex-col gap-3 text-sm">
@@ -1431,10 +2241,7 @@
                         class="flex w-full bg-gray-50 text-gray-900 py-2 px-1 items-center focus:outline-0"
                         class:hidden={classification != "직접입력"}
                         bind:value={classificationValue}
-                        on:focusout={() => {
-                          classification = ""
-                          classificationValue = ""
-                        }}
+                        on:focusout={() => {}}
                       />
                     </div>
                   </div>
@@ -1447,62 +2254,133 @@
         <div
           class="bg-gray-50 h-[55px] px-4 py-3 flex flex-row-reverse px-6 gap-2"
         >
-          <button
-            class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
-            class:hidden={selectedSeongdo}
-            on:click={async () => {
-              isFamilyModalHidden = !isFamilyModalHidden
-              searchName = ""
-            }}
-          >
-            <span class="flex items-center">
-              <Close class="text-[#F46055]" />
-              <p>닫기</p>
-            </span>
-          </button>
-          <button
-            class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
-            class:hidden={!selectedSeongdo}
-            on:click={async () => {
-              selectedSeongdo = null
-            }}
-          >
-            <span class="flex items-center">
-              <Close class="text-[#F46055]" />
-              <p>뒤로</p>
-            </span>
-          </button>
-          <button
-            class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-            class:hidden={!selectedSeongdo}
-            on:click={async () => {
-              if (
-                classification == "" ||
-                (classification == "직접입력" && classificationValue == "")
-              ) {
-                return toast.error("구분을 입력해주세요.")
-              }
+          {#if selectedSeongdo}
+            <button
+              class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
+              on:click={async () => {
+                if (familyId) {
+                  selectedSeongdo = null
+                } else {
+                  isFamilyModalHidden = !isFamilyModalHidden
+                }
+              }}
+            >
+              <span class="flex items-center">
+                <Close class="text-[#F46055]" />
+                <p>뒤로</p>
+              </span>
+            </button>
+            <button
+              class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              on:click={async () => {
+                if (
+                  classification == "" ||
+                  (classification == "직접입력" && classificationValue == "")
+                ) {
+                  return toast.error("구분을 입력해주세요.")
+                }
 
-              members = [
-                ...members,
-                {
-                  seongdo: selectedSeongdo,
-                  classification: classificationValue || classification,
-                },
-              ]
-              memberIds = [...memberIds, selectedSeongdo?._id]
-              const result = await familyHandler()
-              if (result) {
-                selectedSeongdo = null
+                members = [
+                  ...members,
+                  {
+                    seongdo: selectedSeongdo,
+                    classification: classificationValue || classification,
+                    isSeongdo: true,
+                  },
+                ]
+                memberIds = [...memberIds, selectedSeongdo?._id]
+                const result = await familyHandler()
+                if (result) {
+                  selectedSeongdo = null
+                  isFamilyModalHidden = !isFamilyModalHidden
+                  toast.success("추가되었습니다.")
+                }
+              }}
+            >
+              <AddLarge scale={16} />
+              <span>추가</span>
+            </button>
+          {:else if addNonSeongdo}
+            <button
+              class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
+              class:hidden={!addNonSeongdo}
+              on:click={async () => {
+                addNonSeongdo = false
+              }}
+            >
+              <span class="flex items-center">
+                <Close class="text-[#F46055]" />
+                <p>뒤로</p>
+              </span>
+            </button>
+            <button
+              class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              class:hidden={!addNonSeongdo}
+              on:click={async () => {
+                if (addedName == "") {
+                  return toast.error("이름을 입력해주세요.")
+                } else if (
+                  classification == "" ||
+                  (classification == "직접입력" && classificationValue == "")
+                ) {
+                  return toast.error("구분을 입력해주세요.")
+                }
+
+                members = [
+                  ...members,
+                  {
+                    seongdo: null,
+                    classification: classificationValue || classification,
+                    isSeongdo: false,
+                    name: addedName,
+                    gender: addedGender,
+                    birth: addedBirth,
+                    phone: addedPhone,
+                  },
+                ]
+                const result = await familyHandler()
+                if (result) {
+                  selectedSeongdo = null
+                  isFamilyModalHidden = !isFamilyModalHidden
+
+                  addNonSeongdo = !addNonSeongdo
+                  addedName = ""
+                  addedGender = ""
+                  addedBirth = ""
+                  addedPhone = ""
+                  toast.success("추가되었습니다.")
+                }
+              }}
+            >
+              <AddLarge scale={16} />
+              <span>추가</span>
+            </button>
+          {:else}
+            <button
+              class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
+              class:hidden={selectedSeongdo || addNonSeongdo}
+              on:click={async () => {
                 isFamilyModalHidden = !isFamilyModalHidden
-                toast.success("추가되었습니다.")
-              }
-            }}
-          >
-            <AddLarge scale={16} />
-            <span>추가</span>
-          </button>
-        </div>
+                searchName = ""
+              }}
+            >
+              <span class="flex items-center">
+                <Close class="text-[#F46055]" />
+                <p>닫기</p>
+              </span>
+            </button>
+            <button
+              class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              class:hidden={$SeongdosStore.length > 0 || addNonSeongdo}
+              on:click={() => {
+                addNonSeongdo = true
+              }}
+            >
+              <AddLarge scale={16} />
+              <span>직접 추가</span>
+            </button>
+          {/if}
+        </div> -->
       </div>
     </div>
   </div>

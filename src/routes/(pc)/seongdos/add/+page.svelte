@@ -64,33 +64,43 @@
   }
 
   const submitHandler = async () => {
-    const response = await fetch("/api/seongdos", {
-      method: "POST",
-      body: JSON.stringify({
-        name: name.trim(),
-        originalName: name.trim(),
-        avatar,
-        birth,
-        age,
-        gender,
-        phone,
-        jikbun,
-        group1,
-        group2: group2Add ? group2 + "," + group2Add : group2,
-        singeup,
-        address: fullAddress,
-        enrolled_at,
-      }),
+    let response = await fetch(`/api/seongdos/${name.trim()}`, {
       headers: {
         "content-type": "application/json",
       },
     })
-    if (response.ok) {
-      const {
-        seongdo: { name: newName },
-      } = await response.json()
-      toast.success("저장되었습니다.")
-      goto(`/seongdos/${newName}?create=true`)
+    const { seongdo } = await response.json()
+    if (seongdo) {
+      toast.error("이미 등록된 이름은 사용할 수 없습니다.")
+    } else {
+      response = await fetch("/api/seongdos", {
+        method: "POST",
+        body: JSON.stringify({
+          name: name.trim(),
+          originalName: name.trim(),
+          avatar,
+          birth,
+          age,
+          gender,
+          phone,
+          jikbun,
+          group1,
+          group2: group2Add ? group2 + "," + group2Add : group2,
+          singeup,
+          address: fullAddress,
+          enrolled_at,
+        }),
+        headers: {
+          "content-type": "application/json",
+        },
+      })
+      if (response.ok) {
+        const {
+          seongdo: { name: newName },
+        } = await response.json()
+        toast.success("저장되었습니다.")
+        goto(`/seongdos/${newName}?create=true`)
+      }
     }
   }
 
@@ -999,6 +1009,7 @@
                         <option value={group1}>{group1}</option>
                       {/each}
                       <option value="교역자">교역자</option>
+                      <option value="기타">기타</option>
                     </select>
                     <div class="border-l border-gray-300" />
 
@@ -1024,6 +1035,15 @@
                         {#each groupList["교회학교"] as item}
                           <option value={item}>{item}</option>
                         {/each}
+                      {:else if group1 == "교역자"}
+                        <option value="담임목사">담임목사</option>
+                        <option value="목사">목사</option>
+                        <option value="강도사">강도사</option>
+                        <option value="전도사">전도사</option>
+                        <option value="교육전도사">교육전도사</option>
+                      {:else if group1 == "기타"}
+                        <option value="별명부">별명부</option>
+                        <option value="재적">재적</option>
                       {/if}
                     </select>
                     <div
@@ -1299,6 +1319,7 @@
                       <option value={group1}>{group1}</option>
                     {/each}
                     <option value="교역자">교역자</option>
+                    <option value="기타">기타</option>
                   </select>
                   <div class="border-l border-gray-300" />
 
@@ -1324,6 +1345,15 @@
                       {#each groupList["교회학교"] as item}
                         <option value={item}>{item}</option>
                       {/each}
+                    {:else if group1 == "교역자"}
+                      <option value="담임목사">담임목사</option>
+                      <option value="목사">목사</option>
+                      <option value="강도사">강도사</option>
+                      <option value="전도사">전도사</option>
+                      <option value="교육전도사">교육전도사</option>
+                    {:else if group1 == "기타"}
+                      <option value="별명부">별명부</option>
+                      <option value="재적">재적</option>
                     {/if}
                   </select>
                   <div
