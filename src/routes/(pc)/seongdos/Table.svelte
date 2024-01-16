@@ -10,6 +10,23 @@
   export let seongdos: ISeongdo[]
   export let page: IPage
 
+  const getClassification = (
+    services: { group1: string; group2: string; classification: string }[]
+  ) => {
+    const item = services.find(
+      (service) => service.group1 == searchParams.group1
+    )
+    if (item) {
+      if (item?.group1 == "장년부") {
+        return item?.classification
+      } else {
+        return item?.group2 + " " + item?.classification
+      }
+    } else {
+      return ""
+    }
+  }
+
   $: searchParams = page.requestParams
   $: order = page.requestParams.order
   $: now = page.requestPage
@@ -223,6 +240,78 @@
       </div>
     {/each}
   </div>
+  {#if searchParams.group1 && !["교역자", "기타"].includes(searchParams.group1)}
+    <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
+      <button
+        id="classificationField"
+        class=" flex justify-between px-3 font-bold items-center h-10 hover:bg-[#B0B1B0]"
+        class:bg-[#B0B1B0]={order == "classificationAsc" ||
+        order == "classificationDesc"
+          ? true
+          : false}
+        class:bg-[#D9D9D8]={order == "classificationAsc" ||
+        order == "classificationDesc"
+          ? false
+          : true}
+        on:mouseover={(e) => {
+          if (order != "classificationAsc" && order != "classificationDesc") {
+            document
+              .getElementById("classificationDefault")
+              ?.classList.remove("invisible")
+          }
+        }}
+        on:mouseleave={(e) => {
+          if (order != "classificationAsc" && order != "classificationDesc") {
+            document
+              .getElementById("classificationDefault")
+              ?.classList.add("invisible")
+          }
+        }}
+        on:focus={null}
+        on:click={() => {
+          const { order, take, ...rest } = searchParams
+          let newOrder
+          if (order == "classificationAsc") {
+            newOrder = "classificationDesc"
+          } else if (order == "classificationDesc") {
+            newOrder = ""
+          } else {
+            newOrder = "classificationAsc"
+          }
+
+          goto(
+            `/seongdos/${getSearchParams({
+              ...rest,
+              order: newOrder,
+              page: 1,
+            })}`
+          )
+        }}
+      >
+        구분
+        {#if order == "classificationAsc"}
+          <ArrowsVertical id="classificationDefault" class="ml-3 hidden" />
+          <ArrowUp id="classificationAsc" class="ml-3 " />
+          <ArrowDown id="classificationDesc" class="ml-3 hidden " />
+        {:else if order == "classificationDesc"}
+          <ArrowsVertical id="classificationDefault" class="ml-3 hidden" />
+          <ArrowUp id="classificationAsc" class="ml-3 hidden" />
+          <ArrowDown id="classificationDesc" class="ml-3  " />
+        {:else}
+          <ArrowsVertical id="classificationDefault" class="ml-3 invisible" />
+          <ArrowUp id="classificationAsc" class="ml-3 hidden" />
+          <ArrowDown id="classificationDesc" class="ml-3 hidden " />{/if}
+      </button>
+      {#each seongdos as item}
+        <div class="flex px-3 items-center h-10">
+          <!-- {item.services.find(
+            (service) => service.group1 == searchParams.group1
+          )?.classification || ""} -->
+          {getClassification(item.services)}
+        </div>
+      {/each}
+    </div>
+  {/if}
   <div class="flex flex-col flex-auto border-r divide-y border-b">
     <div
       class=" flex justify-center px-3 bg-[#D9D9D8] font-bold items-center h-10 whitespace-nowrap truncate"

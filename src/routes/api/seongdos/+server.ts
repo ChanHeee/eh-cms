@@ -12,6 +12,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
   const order = url.searchParams.get("order")
   const group1 = url.searchParams.get("group1")
   const group2 = url.searchParams.get("group2")
+
   const birthStart = url.searchParams.get("birthStart")
   const birthEnd = url.searchParams.get("birthEnd")
   const page =
@@ -48,15 +49,43 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
     case "birthDesc":
       query.sort({ birth: -1, updatedAt: -1, _id: 1 })
       break
+    case "classificationAsc":
+      query.sort({ "services.classification": 1, updatedAt: -1, _id: 1 })
+      break
+    case "classificationDesc":
+      query.sort({ "services.classification": -1, updatedAt: -1, _id: 1 })
+      break
     default:
       query.sort({ updatedAt: -1, _id: 1 })
       break
   }
 
-  if (group1) {
-    query = query.where({ group1 })
-    if (group2) {
-      query = query.where({ group2: { $regex: group2 } })
+  if (group1 == "기타" && group2 == "미분류") {
+    query = query.where({ $or: [{ group1: "" }, { group1: undefined }] })
+  } else if (group1 == "기타") {
+    query = query.where({
+      $or: [{ group1: "기타" }, { group1: "" }, { group1: undefined }],
+    })
+  } else {
+    if (group1 && group2) {
+      if (group1 == "장년부") {
+        query = query.where({ group1, group2: { $regex: group2 } })
+      } else {
+        query = query.where({
+          $or: [
+            { group1, group2 },
+            { "services.group1": group1, "services.group2": group2 },
+          ],
+        })
+      }
+    } else if (group1) {
+      if (group1 == "장년부") {
+        query = query.where({ group1 })
+      } else {
+        query = query.where({
+          $or: [{ group1 }, { "services.group1": group1 }],
+        })
+      }
     }
   }
 

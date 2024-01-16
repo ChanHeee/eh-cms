@@ -23,7 +23,7 @@ export const load = async ({ request, fetch, url, locals }) => {
     throw redirect(302, encodeURI(url))
   }
 
-  const requestUrl = `/api/seongdos${decodeURI(url.search)}`
+  let requestUrl = `/api/seongdos${decodeURI(url.search)}`
 
   const response = await fetch(requestUrl, {
     headers: {

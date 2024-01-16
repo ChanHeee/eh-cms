@@ -28,6 +28,11 @@ export interface ISeongdo {
   address: string
   remarks: string
   enrolled_at: string
+  services: {
+    group1: string
+    group2: string
+    classification: string
+  }[]
 }
 
 export interface IEducation {

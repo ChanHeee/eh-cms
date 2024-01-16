@@ -66,7 +66,11 @@ export const getGroupItem = (
   return { group1, group2 }
 }
 
-export const getGroupString = (group1: any, group2: any) => {
+export const getGroupString = (
+  group1: any,
+  group2: any,
+  isAllowNull: boolean = false
+) => {
   if (group1 == "교역자") {
     return "교역자"
   }
@@ -74,7 +78,11 @@ export const getGroupString = (group1: any, group2: any) => {
     if (!group1) {
       return "미분류"
     } else {
-      return group1 + " > 미분류"
+      if (isAllowNull) {
+        return group1
+      } else {
+        return group1 + " > 미분류"
+      }
     }
   } else {
     if (group1 == "장년부") {
@@ -83,6 +91,9 @@ export const getGroupString = (group1: any, group2: any) => {
       if (second) {
         return group1 + " > " + first + " > " + second
       } else {
+        if (isAllowNull) {
+          return group1 + " > " + group2
+        }
         return group1 + " > " + group2 + " > 미분류"
       }
     } else {
