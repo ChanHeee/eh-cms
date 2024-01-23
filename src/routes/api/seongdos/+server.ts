@@ -22,79 +22,120 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
 
   const take = 12
 
-  let query = Seongdo.find()
+  let seongdoMatch: any = {}
   if (name) {
-    query = query.find({ name: { $regex: name } })
+    seongdoMatch.name = { $regex: name }
   }
   if (jikbun?.length > 0) {
-    query = query.where({ jikbun: { $in: jikbun } })
+    seongdoMatch.jikbun = { $in: jikbun }
   }
   if (birthStart) {
-    query = query.where({ birth: { $gte: birthStart } })
+    seongdoMatch.birth = { $gte: birthStart }
   }
   if (birthEnd) {
-    query = query.where({ birth: { $lte: birthEnd } })
+    seongdoMatch.birth = { $lte: birthEnd }
   }
 
+  let aggregateSort: any = {}
   switch (order) {
     case "nameAsc":
-      query.sort({ name: 1, updatedAt: -1, _id: 1 })
+      aggregateSort = { name: 1, _id: 1 }
       break
     case "nameDesc":
-      query.sort({ name: -1, updatedAt: -1, _id: 1 })
+      aggregateSort = { name: -1, _id: 1 }
       break
     case "birthAsc":
-      query.sort({ birth: 1, updatedAt: -1, _id: 1 })
+      aggregateSort = { birth: 1, _id: 1 }
       break
     case "birthDesc":
-      query.sort({ birth: -1, updatedAt: -1, _id: 1 })
-      break
-    case "classificationAsc":
-      query.sort({ "services.classification": 1, updatedAt: -1, _id: 1 })
-      break
-    case "classificationDesc":
-      query.sort({ "services.classification": -1, updatedAt: -1, _id: 1 })
+      aggregateSort = { birth: -1, _id: 1 }
       break
     default:
-      query.sort({ updatedAt: -1, _id: 1 })
+      if (["장년부", "청년부", "교회학교"].includes(group1 as string)) {
+        aggregateSort = { "services.order": -1, group1: 1, group2: 1, _id: 1 }
+      } else {
+        aggregateSort = { updatedAt: -1, _id: 1 }
+      }
       break
   }
 
-  if (group1 == "기타" && group2 == "미분류") {
-    query = query.where({ $or: [{ group1: "" }, { group1: undefined }] })
-  } else if (group1 == "기타") {
-    query = query.where({
-      $or: [{ group1: "기타" }, { group1: "" }, { group1: undefined }],
-    })
+  if (group1 == "기타") {
+    if (group2 == "미분류") {
+      seongdoMatch["$or"] = [{ group1: "" }, { group1: undefined }]
+    } else if (group2) {
+      seongdoMatch = { group1, group2 }
+    } else {
+      seongdoMatch["$or"] = [
+        { group1: "" },
+        { group1: undefined },
+        { group1, group2: { $in: ["별명부", "재적"] } },
+      ]
+    }
   } else {
     if (group1 && group2) {
       if (group1 == "장년부") {
-        query = query.where({ group1, group2: { $regex: group2 } })
+        seongdoMatch.group1 = group1
+        seongdoMatch.group2 = { $regex: group2 }
       } else {
-        query = query.where({
-          $or: [
-            { group1, group2 },
-            { "services.group1": group1, "services.group2": group2 },
-          ],
-        })
+        seongdoMatch["$or"] = [
+          { group1, group2 },
+          { "services.group1": group1, "services.group2": group2 },
+        ]
       }
     } else if (group1) {
       if (group1 == "장년부") {
-        query = query.where({ group1 })
+        seongdoMatch.group1 = group1
       } else {
-        query = query.where({
-          $or: [{ group1 }, { "services.group1": group1 }],
-        })
+        seongdoMatch["$or"] = [{ group1 }, { "services.group1": group1 }]
       }
     }
   }
 
-  const seongdos = await Seongdo.find(query, null, {
-    limit: take,
-    skip: (page - 1) * take,
-  })
+  const seongdos = await Seongdo.aggregate(
+    ["장년부", "청년부", "교회학교"].includes(group1 as string)
+      ? [
+          {
+            $project: {
+              name: 1,
+              jikbun: 1,
+              birth: 1,
+              age: 1,
+              phone: 1,
+              group1: 1,
+              group2: 1,
+              address: 1,
+              services: {
+                $filter: {
+                  input: {
+                    $cond: {
+                      if: {
+                        $eq: [
+                          {
+                            $type: "$services",
+                          },
+                          "array",
+                        ],
+                      },
+                      then: "$services",
+                      else: ["$services"],
+                    },
+                  },
+                  as: "data",
+                  cond: { $eq: ["$$data.group1", group1] },
+                },
+              },
+            },
+          },
+        ]
+      : []
+  )
+    .match(seongdoMatch)
+    .sort(aggregateSort)
+    .collation({ locale: "en_US", numericOrdering: true })
+    .skip((page - 1) * take)
+    .limit(take)
 
-  const total = await Seongdo.count(query)
+  const total = await Seongdo.count(seongdoMatch)
 
   return json({
     seongdos,

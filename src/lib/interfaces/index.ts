@@ -32,6 +32,7 @@ export interface ISeongdo {
     group1: string
     group2: string
     classification: string
+    order?: number
   }[]
 }
 

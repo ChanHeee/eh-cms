@@ -10,6 +10,20 @@
   export let seongdos: ISeongdo[]
   export let page: IPage
 
+  const getAddressString = (fullAddress: string) => {
+    let address = fullAddress.split(",")[0] || ""
+    let extraAddress = fullAddress.split(" (")[1]?.slice(0, -1) || ""
+    let detailAddress = extraAddress
+      ? fullAddress.split(",")[1]?.split("(")[0]?.slice(1, -1)
+      : fullAddress.split(",")[1]?.split("(")[0]?.slice(1) || ""
+
+    if (!address) {
+      return detailAddress
+    } else {
+      return fullAddress
+    }
+  }
+
   const getClassification = (
     services: { group1: string; group2: string; classification: string }[]
   ) => {
@@ -128,11 +142,11 @@
     {/each}
   </div>
   <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
-    <button
+    <div
       class="flex gap-2 px-3 bg-[#D9D9D8] font-bold items-center w-full text-center h-10"
     >
       직분
-    </button>
+    </div>
     {#each seongdos as item}
       <div class="flex px-3 items-center h-10">
         {item.jikbun}
@@ -201,11 +215,11 @@
     {/each}
   </div>
   <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
-    <button
+    <div
       class=" flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
     >
       나이
-    </button>
+    </div>
     {#each seongdos as item}
       <div class="flex px-3 justify-center items-center h-10">
         {item.age ?? ""}
@@ -214,11 +228,11 @@
   </div>
 
   <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
-    <button
+    <div
       class=" flex justify-center gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
     >
       핸드폰
-    </button>
+    </div>
     {#each seongdos as item}
       <div class="flex px-3 justify-center items-center h-10">
         {item.phone}
@@ -242,66 +256,12 @@
   </div>
   {#if searchParams.group1 && !["교역자", "기타"].includes(searchParams.group1)}
     <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
-      <button
+      <div
         id="classificationField"
-        class=" flex justify-between px-3 font-bold items-center h-10 hover:bg-[#B0B1B0]"
-        class:bg-[#B0B1B0]={order == "classificationAsc" ||
-        order == "classificationDesc"
-          ? true
-          : false}
-        class:bg-[#D9D9D8]={order == "classificationAsc" ||
-        order == "classificationDesc"
-          ? false
-          : true}
-        on:mouseover={(e) => {
-          if (order != "classificationAsc" && order != "classificationDesc") {
-            document
-              .getElementById("classificationDefault")
-              ?.classList.remove("invisible")
-          }
-        }}
-        on:mouseleave={(e) => {
-          if (order != "classificationAsc" && order != "classificationDesc") {
-            document
-              .getElementById("classificationDefault")
-              ?.classList.add("invisible")
-          }
-        }}
-        on:focus={null}
-        on:click={() => {
-          const { order, take, ...rest } = searchParams
-          let newOrder
-          if (order == "classificationAsc") {
-            newOrder = "classificationDesc"
-          } else if (order == "classificationDesc") {
-            newOrder = ""
-          } else {
-            newOrder = "classificationAsc"
-          }
-
-          goto(
-            `/seongdos/${getSearchParams({
-              ...rest,
-              order: newOrder,
-              page: 1,
-            })}`
-          )
-        }}
+        class=" flex justify-between px-3 font-bold items-center h-10 bg-[#D9D9D8]"
       >
         구분
-        {#if order == "classificationAsc"}
-          <ArrowsVertical id="classificationDefault" class="ml-3 hidden" />
-          <ArrowUp id="classificationAsc" class="ml-3 " />
-          <ArrowDown id="classificationDesc" class="ml-3 hidden " />
-        {:else if order == "classificationDesc"}
-          <ArrowsVertical id="classificationDefault" class="ml-3 hidden" />
-          <ArrowUp id="classificationAsc" class="ml-3 hidden" />
-          <ArrowDown id="classificationDesc" class="ml-3  " />
-        {:else}
-          <ArrowsVertical id="classificationDefault" class="ml-3 invisible" />
-          <ArrowUp id="classificationAsc" class="ml-3 hidden" />
-          <ArrowDown id="classificationDesc" class="ml-3 hidden " />{/if}
-      </button>
+      </div>
       {#each seongdos as item}
         <div class="flex px-3 items-center h-10">
           <!-- {item.services.find(
@@ -321,7 +281,7 @@
     {#each seongdos as item}
       <div class="flex px-3 items-center h-10">
         <p class="whitespace-nowrap truncate">
-          {item.address}
+          {getAddressString(item.address)}
         </p>
       </div>
     {/each}

@@ -6,12 +6,20 @@ export async function POST({ request }) {
   const { group1, group2 } = await request.json()
   let query = Seongdo.find()
 
-  if (group1 == "기타" && group2 == "미분류") {
-    query = query.where({ $or: [{ group1: "" }, { group1: undefined }] })
-  } else if (group1 == "기타") {
-    query = query.where({
-      $or: [{ group1: "기타" }, { group1: "" }, { group1: undefined }],
-    })
+  if (group1 == "기타") {
+    if (group2 == "미분류") {
+      query = query.where({ $or: [{ group1: "" }, { group1: undefined }] })
+    } else if (group2) {
+      query = query.where({ group1, group2 })
+    } else {
+      query = query.where({
+        $or: [
+          { group1: "" },
+          { group1: undefined },
+          { group1, group2: { $in: ["별명부", "재적"] } },
+        ],
+      })
+    }
   } else {
     if (group1 && group2) {
       if (group1 == "장년부") {

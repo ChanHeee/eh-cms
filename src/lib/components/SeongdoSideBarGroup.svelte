@@ -48,7 +48,7 @@
         <Renew size={20} class="text-gray-600" />
       </button>
     </div>
-    <div class="flex flex-auto items-center mx-auto">
+    <form class="flex flex-auto items-center mx-auto">
       <input
         id="name"
         type="text"
@@ -63,11 +63,12 @@
         placeholder="이름"
       />
       <button
+        type="submit"
         class="bg-[#B0B1B0] p-2 border-y border-r border-gray-300"
         on:click|preventDefault={searchHandler}
         ><Search size={20} class="text-gray-600" />
       </button>
-    </div>
+    </form>
   </div>
 
   <!-- 직분 검색 -->

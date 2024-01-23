@@ -45,6 +45,7 @@
   $: detailAddress = extraAddress
     ? addressData.split(",")[1]?.split("(")[0]?.slice(1, -1)
     : addressData.split(",")[1]?.split("(")[0]?.slice(1) || ""
+
   $: extraAddress = addressData.split(" (")[1]?.slice(0, -1) || ""
 
   $: fullAddress = getFullAddress()
@@ -540,7 +541,7 @@
                       }}
                       class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                     >
-                      <option value="none" class="hidden" />
+                      <option value="" class="" />
                       <option value="장로">장로</option>
                       <option value="안수집사">안수집사</option>
                       <option value="권사">권사</option>
@@ -2132,104 +2133,103 @@
         class="sm:h-2/3 h-3/4 sm:max-md:w-2/3 md:w-1/3 w-full relative transform rounded-md bg-white shadow-xl transition-all"
       >
         <div
-          class="w-full overflow-scroll h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
+          class="w-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
         >
           {#if selectedSimbang}
             <h1 class="text-left text-lg font-medium mb-2">심방 내용</h1>
           {:else}
             <h1 class="text-left text-lg font-medium mb-2">심방 생성</h1>
           {/if}
-          <form class="flex flex-col" on:submit={submitHandler}>
-            <div class="flex flex-col text-sm gap-3">
-              <div class="flex w-full h-8 border-gray-300 border-x border-y">
-                <label
-                  for="simbangDate"
-                  class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                  >심방 날짜</label
-                >
-                <div
-                  class="flex flex-auto justify-start bg-gray-50 pl-1.5 pr-1"
-                >
-                  <input
-                    id="simbangDate"
-                    type="date"
-                    bind:value={date}
-                    class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                  />
-                </div>
-              </div>
-              <div class="flex w-full h-8 border-gray-300 border-x border-y">
-                <label
-                  for="simbangSimbangja"
-                  class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                  >심방자</label
-                >
-                <div class="flex flex-auto justify-start bg-gray-50 pr-1">
-                  <select
-                    id="simbangSimbangja"
-                    class="px-1 flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                    on:change={() => {
-                      simbangja = document.querySelector(
-                        "#simbangSimbangja > option:checked"
-                      ).value
-                    }}
-                    value={simbangja}
-                  >
-                    <option value="none" class="hidden" />
-                    {#each teacherList as teacher}
-                      <option value={teacher}>{teacher}</option>
-                    {/each}
-                  </select>
-                </div>
-              </div>
-              <div class="flex w-full h-8 border-gray-300 border-x border-y">
-                <label
-                  for="simbangHymn"
-                  class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                  >찬송</label
-                >
-                <div class="flex flex-auto justify-start bg-gray-50">
-                  <input
-                    id="simbangHymn"
-                    type="text"
-                    bind:value={hymn}
-                    class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                  />
-                </div>
-              </div>
 
-              <div class="flex w-full h-8 border-gray-300 border-x border-y">
-                <label
-                  for="simbangBible"
-                  class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                  >말씀</label
-                >
-                <div class="flex flex-auto justify-start bg-gray-50">
-                  <input
-                    id="simbangBible"
-                    type="text"
-                    bind:value={bible}
-                    class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                  />
-                </div>
-              </div>
-
-              <div class="flex w-full h-32 border-gray-300 border-x border-y">
-                <label
-                  for="simbangDetail"
-                  class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                  >내용</label
-                >
-                <div class="flex flex-auto justify-start bg-gray-50">
-                  <textarea
-                    id="simbangDetail"
-                    bind:value={detail}
-                    class="resize-none flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
-                  />
-                </div>
+          <div class="flex flex-col h-full text-sm gap-3">
+            <div class="flex w-full h-8 border-gray-300 border-x border-y">
+              <label
+                for="simbangDate"
+                class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                >심방 날짜</label
+              >
+              <div class="flex flex-auto justify-start bg-gray-50 pl-1.5 pr-1">
+                <input
+                  id="simbangDate"
+                  type="date"
+                  bind:value={date}
+                  class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                />
               </div>
             </div>
-          </form>
+            <div class="flex w-full h-8 border-gray-300 border-x border-y">
+              <label
+                for="simbangSimbangja"
+                class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                >심방자</label
+              >
+              <div class="flex flex-auto justify-start bg-gray-50 pr-1">
+                <select
+                  id="simbangSimbangja"
+                  class="px-1 flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                  on:change={() => {
+                    simbangja = document.querySelector(
+                      "#simbangSimbangja > option:checked"
+                    ).value
+                  }}
+                  value={simbangja}
+                >
+                  <option value="none" class="hidden" />
+                  {#each teacherList as teacher}
+                    <option value={teacher}>{teacher}</option>
+                  {/each}
+                </select>
+              </div>
+            </div>
+            <div class="flex w-full h-8 border-gray-300 border-x border-y">
+              <label
+                for="simbangHymn"
+                class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                >찬송</label
+              >
+              <div class="flex flex-auto justify-start bg-gray-50">
+                <input
+                  id="simbangHymn"
+                  type="text"
+                  bind:value={hymn}
+                  class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                />
+              </div>
+            </div>
+
+            <div class="flex w-full h-8 border-gray-300 border-x border-y">
+              <label
+                for="simbangBible"
+                class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                >말씀</label
+              >
+              <div class="flex flex-auto justify-start bg-gray-50">
+                <input
+                  id="simbangBible"
+                  type="text"
+                  bind:value={bible}
+                  class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                />
+              </div>
+            </div>
+
+            <div
+              class="flex w-full sm:h-80 h-40 border-gray-300 border-x border-y"
+            >
+              <label
+                for="simbangDetail"
+                class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                >내용</label
+              >
+              <div class="flex flex-auto justify-start bg-gray-50">
+                <textarea
+                  id="simbangDetail"
+                  bind:value={detail}
+                  class="resize-none flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
+                />
+              </div>
+            </div>
+          </div>
         </div>
         <div
           class="bg-gray-50 h-[55px] px-4 py-3 flex flex-row-reverse px-6 gap-2"
@@ -2353,7 +2353,6 @@
                     <select
                       id="group2ForService"
                       value={groupItemForService.group2}
-                      required
                       on:change={() => {
                         service.group2 =
                           document.querySelector("#group2ForService").value
@@ -2388,7 +2387,6 @@
                     />
                     <select
                       id="group2AddForService"
-                      required
                       value={group2AddForService}
                       on:change={() => {
                         group2AddForService = document.querySelector(
@@ -2479,6 +2477,32 @@
               } else if (!service.classification) {
                 toast.error("구분을 입력해주세요.")
               } else {
+                let order
+                switch (service.classification) {
+                  case "교구장로":
+                    order = 10
+                    break
+                  case "교구장":
+                    order = 9
+                    break
+                  case "부교구장":
+                    order = 8
+                    break
+                  case "구역장":
+                    order = 7
+                    break
+                  case "부구역장":
+                    order = 6
+                    break
+                  case "부장":
+                    order = 5
+                    break
+                  case "부감":
+                    order = 4
+                    break
+                  default:
+                    break
+                }
                 seongdo.services = [
                   ...seongdo.services,
                   {
@@ -2487,6 +2511,7 @@
                       ? service.group2 + "," + group2AddForService
                       : service.group2,
                     classification: service.classification,
+                    order,
                   },
                 ]
 

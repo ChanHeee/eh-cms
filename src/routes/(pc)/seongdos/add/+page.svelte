@@ -64,6 +64,10 @@
   }
 
   const submitHandler = async () => {
+    if (name == "") {
+      toast.error("이름을 입력해주세요.")
+      return
+    }
     let response = await fetch(`/api/seongdos/${name.trim()}`, {
       headers: {
         "content-type": "application/json",
@@ -809,7 +813,7 @@
           </button>
         </div>
       </div>
-      <div class="flex flex-col text-sm gap-3">
+      <form class="flex flex-col text-sm gap-3">
         <div class="hidden md:flex gap-3">
           <div class="flex flex-none">
             <label for="photo-dropbox">
@@ -1131,7 +1135,6 @@
                   type="text"
                   bind:value={name}
                   required
-                  disabled
                   class="flex w-full bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 p-2"
                 />
               </div>
@@ -1443,7 +1446,7 @@
             class="flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
           />
         </div>
-      </div>
+      </form>
     </div>
   </div>
 </div>

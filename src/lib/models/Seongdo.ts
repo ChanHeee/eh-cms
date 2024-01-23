@@ -25,6 +25,7 @@ const seongdoSchema = new Schema<ISeongdo>({
       group1: String,
       group2: String,
       classification: String,
+      order: { type: Number, default: 1 },
     },
   ],
 })
