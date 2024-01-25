@@ -1,3 +1,4 @@
+import type { ISeongdo } from "$lib/interfaces"
 import { Education } from "$lib/models/Education"
 import { Seongdo } from "$lib/models/Seongdo"
 import { getAgeFromBirth } from "$lib/utils"
@@ -161,27 +162,48 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
 }
 
 export async function POST({ request }) {
-  const { seongdos, ...rest } = await request.json()
+  const { seongdos, update, ...rest } = await request.json()
 
   if (seongdos) {
-    seongdos.map((seongdo) => {
-      // seongdo.originalName = seongdo.name
-      if (seongdo.birth) {
-        seongdo.age = getAgeFromBirth(seongdo.birth)
-      }
+    if (update) {
+      await Promise.all(
+        seongdos.map(async (item) => {
+          let seongdo: ISeongdo = item
+          let keys = Object.keys(seongdo) as Array<keyof typeof seongdo>
+          let values = Object.values(seongdo)
+          let updateObject: any = {}
+          keys.map((item, idx) => {
+            {
+              updateObject[keys[idx]] = values[idx]
+            }
+          })
+          updateObject["age"] = getAgeFromBirth(updateObject.birth)
+
+          await Seongdo.updateOne(
+            { name: seongdo.name },
+            { $set: updateObject }
+          )
+        })
+      )
+      return json({ success: true })
+    } else {
+      seongdos.map((seongdo) => {
+        // seongdo.originalName = seongdo.name
+        if (seongdo.birth) {
+          seongdo.age = getAgeFromBirth(seongdo.birth)
+        }
+      })
+
+      const result = await Seongdo.create(seongdos)
+      return json({ seongdos: result })
+    }
+  } else {
+    const seongdo = await Seongdo.create({
+      ...rest,
     })
 
-    const result = await Seongdo.create(seongdos)
-    return json({ seongdos: result })
+    return json({ seongdo })
   }
-
-  // const seongdoWithOriginalName = await Seongdo.find({ originalName: name })
-
-  const seongdo = await Seongdo.create({
-    ...rest,
-  })
-
-  return json({ seongdo })
 }
 
 export async function PUT({ request }) {

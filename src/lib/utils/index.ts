@@ -30,8 +30,10 @@ export const getSeongdosSearchParams = ({
 export const isValidToken = (input: string) => {}
 
 export const getAgeFromBirth = (birth: string) => {
+  if (!birth) {
+    return null
+  }
   var birthday = new Date(birth + "T00:00:00.000Z")
-
   var now = new Date()
   var dd = String(now.getDate()).padStart(2, "0")
   var mm = String(now.getMonth() + 1).padStart(2, "0")
@@ -222,6 +224,11 @@ export const isAllowDeleteGroup = (
       }
     }
   })
+
+  if (group1 == "기타" || group1 == "교역자" || group1 == "") {
+    isAllow = true
+  }
+
   return isAllow
 }
 

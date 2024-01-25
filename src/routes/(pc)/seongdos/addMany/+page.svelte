@@ -3,7 +3,7 @@
   import { goto } from "$app/navigation"
   import { read, utils } from "xlsx"
   import toast from "svelte-french-toast"
-  import { Checkmark, Close } from "carbon-icons-svelte"
+  import { Checkmark, Close, Renew } from "carbon-icons-svelte"
   import type { ISeongdo } from "$lib/interfaces"
 
   $: seongdos = []
@@ -91,15 +91,40 @@
     }
   }
 
-  const submitHandler = async () => {
+  const seongdoUpdate = async () => {
+    const response = await fetch("/api/seongdos", {
+      method: "POST",
+      body: JSON.stringify({ seongdos, update: true }),
+      headers: {
+        "content-type": "application/json",
+      },
+    })
+
+    if (response.ok) {
+      const result = await response.json()
+      goto(`/seongdos`)
+    }
+  }
+
+  const submitHandler = async (
+    input: { update: boolean } = { update: false }
+  ) => {
     if (seongdos.length == 0) {
-      toast("추가할 성도가 없습니다.", { icon: "❗️" })
+      toast("입력된 성도가 없습니다.", { icon: "❗️" })
     } else {
-      toast.promise(seongdoAdd(), {
-        loading: "저장 중입니다...",
-        success: `저장되었습니다!`,
-        error: "오류가 발생했습니다.",
-      })
+      if (input.update) {
+        toast.promise(seongdoUpdate(), {
+          loading: "저장 중입니다...",
+          success: `저장되었습니다!`,
+          error: "오류가 발생했습니다.",
+        })
+      } else {
+        toast.promise(seongdoAdd(), {
+          loading: "저장 중입니다...",
+          success: `저장되었습니다!`,
+          error: "오류가 발생했습니다.",
+        })
+      }
     }
     // const response = await fetch("/api/seongdos", {
     //   method: "POST",
@@ -153,10 +178,17 @@
       <button
         type="submit"
         class="flex h-fit border-[#F46055] border items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-        on:click={submitHandler}
+        on:click={() => submitHandler()}
       >
         <Checkmark scale={16} />
-        <span>저장</span>
+        <span>추가</span>
+      </button>
+      <button
+        class="flex h-fit border-[#F46055] border items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+        on:click={() => submitHandler({ update: true })}
+      >
+        <Renew scale={16} />
+        <span>수정</span>
       </button>
 
       <button

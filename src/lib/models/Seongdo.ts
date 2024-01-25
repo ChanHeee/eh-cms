@@ -4,6 +4,7 @@ import type { ISeongdo } from "$lib/interfaces"
 import { Simbang } from "./Simbang"
 import { Family } from "./Family"
 import { SeongdoEdu } from "./SeongdoEdu"
+import { getAgeFromBirth } from "$lib/utils"
 
 const seongdoSchema = new Schema<ISeongdo>({
   name: { type: String, required: true },
@@ -34,22 +35,7 @@ seongdoSchema.set("timestamps", { createdAt: true, updatedAt: true })
 seongdoSchema.pre("save", async function (next) {
   const { birth, name } = this
   if (birth) {
-    var birthday = new Date(birth + "T00:00:00.000Z")
-
-    var now = new Date()
-    var dd = String(now.getDate()).padStart(2, "0")
-    var mm = String(now.getMonth() + 1).padStart(2, "0")
-    var yyyy = now.getFullYear()
-    var nowYMD = yyyy + "-" + mm + "-" + dd + "T00:00:00.000Z"
-    var today = new Date(nowYMD)
-
-    var age = today.getFullYear() - birthday.getFullYear()
-    birthday.setFullYear(today.getFullYear())
-
-    if (today < birthday) {
-      age--
-    }
-    this.age = age
+    this.age = getAgeFromBirth(birth)
   }
 
   const seongdoWithOriginalName = await Seongdo.find({ originalName: name })
