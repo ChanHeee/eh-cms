@@ -51,8 +51,10 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       aggregateSort = { birth: -1, _id: 1 }
       break
     default:
-      if (["장년부", "청년부", "교회학교"].includes(group1 as string)) {
+      if (group1 == "장년부") {
         aggregateSort = { "services.order": -1, group1: 1, group2: 1, _id: 1 }
+      } else if (group1 == "교회학교" || group1 == "청년부") {
+        aggregateSort = { "services.order": -1, _id: 1 }
       } else {
         aggregateSort = { updatedAt: -1, _id: 1 }
       }
@@ -163,7 +165,7 @@ export async function POST({ request }) {
 
   if (seongdos) {
     seongdos.map((seongdo) => {
-      seongdo.originalName = seongdo.name
+      // seongdo.originalName = seongdo.name
       if (seongdo.birth) {
         seongdo.age = getAgeFromBirth(seongdo.birth)
       }
