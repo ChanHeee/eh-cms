@@ -215,11 +215,60 @@
     {/each}
   </div>
   <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
-    <div
-      class=" flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
+    <button
+      id="ageField"
+      class=" flex justify-between px-3 font-bold items-center h-10 hover:bg-[#B0B1B0]"
+      class:bg-[#B0B1B0]={order == "ageAsc" || order == "ageDesc"
+        ? true
+        : false}
+      class:bg-[#D9D9D8]={order == "ageAsc" || order == "ageDesc"
+        ? false
+        : true}
+      on:mouseover={(e) => {
+        if (order != "ageAsc" && order != "ageDesc") {
+          document.getElementById("ageDefault")?.classList.remove("invisible")
+        }
+      }}
+      on:mouseleave={(e) => {
+        if (order != "ageAsc" && order != "ageDesc") {
+          document.getElementById("ageDefault")?.classList.add("invisible")
+        }
+      }}
+      on:focus={null}
+      on:click={() => {
+        const { order, take, ...rest } = searchParams
+        let newOrder
+        if (order == "ageAsc") {
+          newOrder = "ageDesc"
+        } else if (order == "ageDesc") {
+          newOrder = ""
+        } else {
+          newOrder = "ageAsc"
+        }
+        goto(
+          `/seongdos/${getSearchParams({
+            ...rest,
+            order: newOrder,
+            page: 1,
+          })}`
+        )
+      }}
     >
       나이
-    </div>
+      {#if order == "ageAsc"}
+        <ArrowsVertical id="ageDefault" class="ml-3 hidden" />
+        <ArrowUp id="ageAsc" class="ml-3 " />
+        <ArrowDown id="ageDesc" class="ml-3 hidden " />
+      {:else if order == "ageDesc"}
+        <ArrowsVertical id="ageDefault" class="ml-3 hidden" />
+        <ArrowUp id="ageAsc" class="ml-3 hidden" />
+        <ArrowDown id="ageDesc" class="ml-3  " />
+      {:else}
+        <ArrowsVertical id="ageDefault" class="ml-3 invisible" />
+        <ArrowUp id="ageAsc" class="ml-3 hidden" />
+        <ArrowDown id="ageDesc" class="ml-3 hidden " />
+      {/if}
+    </button>
     {#each seongdos as item}
       <div class="flex px-3 justify-center items-center h-10">
         {item.age ?? ""}
@@ -241,17 +290,78 @@
   </div>
 
   <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
-    <div
-      class=" flex justify-center px-3 bg-[#D9D9D8] font-bold items-center h-10"
+    <button
+      id="groupField"
+      class=" flex justify-between px-3 font-bold items-center h-10 hover:bg-[#B0B1B0]"
+      class:bg-[#B0B1B0]={order == "groupAsc" || order == "groupDesc"
+        ? true
+        : false}
+      class:bg-[#D9D9D8]={order == "groupAsc" || order == "groupDesc"
+        ? false
+        : true}
+      on:mouseover={(e) => {
+        if (order != "groupAsc" && order != "groupDesc") {
+          document.getElementById("groupDefault")?.classList.remove("invisible")
+        }
+      }}
+      on:mouseleave={(e) => {
+        if (order != "groupAsc" && order != "groupDesc") {
+          document.getElementById("groupDefault")?.classList.add("invisible")
+        }
+      }}
+      on:focus={null}
+      on:click={() => {
+        const { order, take, ...rest } = searchParams
+        let newOrder
+        if (order == "groupAsc") {
+          newOrder = "groupDesc"
+        } else if (order == "groupDesc") {
+          newOrder = ""
+        } else {
+          newOrder = "groupAsc"
+        }
+        goto(
+          `/seongdos/${getSearchParams({
+            ...rest,
+            order: newOrder,
+            page: 1,
+          })}`
+        )
+      }}
     >
       소속
-    </div>
+      {#if order == "groupAsc"}
+        <ArrowsVertical id="groupDefault" class="ml-3 hidden" />
+        <ArrowUp id="groupAsc" class="ml-3 " />
+        <ArrowDown id="groupDesc" class="ml-3 hidden " />
+      {:else if order == "groupDesc"}
+        <ArrowsVertical id="groupDefault" class="ml-3 hidden" />
+        <ArrowUp id="groupAsc" class="ml-3 hidden" />
+        <ArrowDown id="groupDesc" class="ml-3  " />
+      {:else}
+        <ArrowsVertical id="groupDefault" class="ml-3 invisible" />
+        <ArrowUp id="groupAsc" class="ml-3 hidden" />
+        <ArrowDown id="groupDesc" class="ml-3 hidden " />
+      {/if}
+    </button>
     {#each seongdos as item}
-      <div class="flex justify-center px-3 items-center h-10">
+      <button
+        class="flex px-3 items-center h-10"
+        on:click={() => {
+          if (item.group1) {
+            goto(
+              `/seongdos${getSearchParams({
+                group1: item.group1,
+                group2: item.group2,
+              })}`
+            )
+          }
+        }}
+      >
         <p class="whitespace-nowrap truncate">
           {getGroupString(item.group1, item.group2)}
         </p>
-      </div>
+      </button>
     {/each}
   </div>
   {#if searchParams.group1 && !["교역자", "기타"].includes(searchParams.group1)}

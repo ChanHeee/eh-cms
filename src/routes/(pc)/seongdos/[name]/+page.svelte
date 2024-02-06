@@ -5,6 +5,7 @@
     getAgeFromBirth,
     getGroupItem,
     getGroupString,
+    getSearchParams,
     isAllowGroup,
     textShortenWithEllipsis,
   } from "$lib/utils"
@@ -372,7 +373,7 @@
         class="sticky top-0 pt-8 bg-white flex justify-between items-start pb-2"
       >
         <h1 class="text-lg font-medium">
-          {seongdoName}
+          {seongdo.name}
           {seongdo.jikbun || ""}
         </h1>
         <div class="flex ml-auto gap-2">
@@ -599,9 +600,25 @@
                 <div class="flex w-full gap-1">
                   <label
                     for="name"
-                    class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                    >소속</label
+                    class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis hover:opacity-75"
                   >
+                    <button
+                      on:click={() => {
+                        if (groupItem.group1) {
+                          goto(
+                            `/seongdos${getSearchParams({
+                              group1: groupItem.group1,
+                              group2: groupItem.group2Add
+                                ? groupItem.group2 + "," + groupItem.group2Add
+                                : groupItem.group2Add,
+                            })}`
+                          )
+                        }
+                      }}
+                    >
+                      소속
+                    </button>
+                  </label>
                   <div class="flex w-full justify-center gap-1 pr-1">
                     <select
                       value={groupItem.group1}
@@ -911,8 +928,26 @@
                 <label
                   for="group1M"
                   class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                  >소속</label
                 >
+                  <button
+                    on:click={() => {
+                      if (groupItem.group1) {
+                        goto(
+                          encodeURI(
+                            `/seongdos${getSearchParams({
+                              group1: groupItem.group1,
+                              group2: groupItem.group2Add
+                                ? groupItem.group2 + "," + groupItem.group2Add
+                                : groupItem.group2Add,
+                            })}`
+                          )
+                        )
+                      }
+                    }}
+                  >
+                    소속
+                  </button>
+                </label>
                 <div class="flex w-full justify-center gap-1 pr-1">
                   <select
                     id="group1M"
@@ -2494,11 +2529,17 @@
                   case "부구역장":
                     order = 6
                     break
+                  case "담당교역자":
+                    order = 6
+                    break
                   case "부장":
                     order = 5
                     break
                   case "부감":
                     order = 4
+                    break
+                  case "교사":
+                    order = 3
                     break
                   default:
                     break

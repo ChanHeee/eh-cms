@@ -48,6 +48,7 @@
     })
 
     seongdos = csv.slice(1)
+
     seongdos.map((seongdo) => {
       const {
         name,
@@ -62,8 +63,8 @@
         address,
       } = seongdo
 
-      seongdo.name = name.trim()
-      seongdo.originalName = name.trim()
+      seongdo.name = name?.trim()
+      seongdo.originalName = name?.trim()
       seongdo.gender = gender || ""
       seongdo.enrolled_at = enrolled_at || ""
       seongdo.birth = birth || ""

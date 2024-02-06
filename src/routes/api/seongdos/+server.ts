@@ -1,7 +1,7 @@
 import type { ISeongdo } from "$lib/interfaces"
 import { Education } from "$lib/models/Education"
 import { Seongdo } from "$lib/models/Seongdo"
-import { getAgeFromBirth } from "$lib/utils"
+import { getAgeFromBirth, getGroupItem } from "$lib/utils"
 import { json, type RequestHandler } from "@sveltejs/kit"
 
 export const GET: RequestHandler = async ({ request, url, locals }) => {
@@ -46,16 +46,36 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       aggregateSort = { name: -1, _id: 1 }
       break
     case "birthAsc":
-      aggregateSort = { birth: 1, _id: 1 }
+      aggregateSort = { hasBirth: -1, birth: 1, _id: 1 }
       break
     case "birthDesc":
-      aggregateSort = { birth: -1, _id: 1 }
+      aggregateSort = { hasBirth: -1, birth: -1, _id: 1 }
+      break
+    case "ageAsc":
+      aggregateSort = { hasAge: -1, age: 1, _id: 1 }
+      break
+    case "ageDesc":
+      aggregateSort = { hasAge: -1, age: -1, _id: 1 }
+      break
+    case "groupAsc":
+      aggregateSort = { group1: 1, group2: 1, "services.order": -1, _id: 1 }
+      break
+    case "groupDesc":
+      aggregateSort = { group1: -1, group2: -1, "services.order": -1, _id: 1 }
       break
     default:
       if (group1 == "장년부") {
-        aggregateSort = { "services.order": -1, group1: 1, group2: 1, _id: 1 }
+        aggregateSort = {
+          orderValue: -1,
+          group2: 1,
+          "services.order": -1,
+          name: 1,
+        }
       } else if (group1 == "교회학교" || group1 == "청년부") {
-        aggregateSort = { "services.order": -1, _id: 1 }
+        aggregateSort = {
+          "services.order": -1,
+          updatedAt: -1,
+        }
       } else {
         aggregateSort = { updatedAt: -1, _id: 1 }
       }
@@ -100,6 +120,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
           {
             $project: {
               name: 1,
+              avatar: 1,
               jikbun: 1,
               birth: 1,
               age: 1,
@@ -124,7 +145,15 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
                     },
                   },
                   as: "data",
-                  cond: { $eq: ["$$data.group1", group1] },
+                  cond:
+                    group2 && group1 != "장년부"
+                      ? {
+                          $and: [
+                            { $eq: ["$$data.group1", group1] },
+                            { $eq: ["$$data.group2", group2] },
+                          ],
+                        }
+                      : { $eq: ["$$data.group1", group1] },
                 },
               },
             },
@@ -132,6 +161,39 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
         ]
       : []
   )
+
+    .addFields({
+      temp: { $max: "$services.order" },
+    })
+    .addFields({
+      orderValue: {
+        $cond: {
+          if: {
+            $gt: ["$temp", 7],
+          },
+          then: { $multiply: ["$temp", 10] },
+          else: 0,
+        },
+      },
+    })
+    .addFields(
+      order?.startsWith("birth")
+        ? {
+            hasBirth: {
+              $cond: [{ $eq: ["$birth", ""] }, false, true],
+            },
+          }
+        : {}
+    )
+    .addFields(
+      order?.startsWith("age")
+        ? {
+            hasAge: {
+              $eq: [{ $type: "$age" }, "int"],
+            },
+          }
+        : {}
+    )
     .match(seongdoMatch)
     .sort(aggregateSort)
     .collation({ locale: "en_US", numericOrdering: true })
