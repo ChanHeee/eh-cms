@@ -116,12 +116,10 @@
                 on:change={() => {
                   if (document.querySelector("#a").checked) {
                     jikbunArray = [...jikbunArray, "장로"]
-                    // jikbunList.set(jikbunArray)
                   } else {
                     jikbunArray = [
                       ...jikbunArray.filter((value) => value !== "장로"),
                     ]
-                    // jikbunList.set(jikbunArray)
                   }
                 }}
               />
@@ -136,12 +134,10 @@
                 on:change={() => {
                   if (document.querySelector("#b").checked) {
                     jikbunArray = [...jikbunArray, "안수집사"]
-                    // jikbunList.set(jikbunArray)
                   } else {
                     jikbunArray = [
                       ...jikbunArray.filter((value) => value !== "안수집사"),
                     ]
-                    // jikbunList.set(jikbunArray)
                   }
                 }}
               />
@@ -156,12 +152,10 @@
                 on:change={() => {
                   if (document.querySelector("#c").checked) {
                     jikbunArray = [...jikbunArray, "권사"]
-                    // jikbunList.set(jikbunArray)
                   } else {
                     jikbunArray = [
                       ...jikbunArray.filter((value) => value !== "권사"),
                     ]
-                    // jikbunList.set(jikbunArray)
                   }
                 }}
               />
@@ -176,12 +170,10 @@
                 on:change={() => {
                   if (document.querySelector("#d").checked) {
                     jikbunArray = [...jikbunArray, "은퇴권사"]
-                    // jikbunList.set(jikbunArray)
                   } else {
                     jikbunArray = [
                       ...jikbunArray.filter((value) => value !== "은퇴권사"),
                     ]
-                    // jikbunList.set(jikbunArray)
                   }
                 }}
               />
@@ -196,12 +188,10 @@
                 on:change={() => {
                   if (document.querySelector("#e").checked) {
                     jikbunArray = [...jikbunArray, "무임권사"]
-                    // jikbunList.set(jikbunArray)
                   } else {
                     jikbunArray = [
                       ...jikbunArray.filter((value) => value !== "무임권사"),
                     ]
-                    // jikbunList.set(jikbunArray)
                   }
                 }}
               />
@@ -217,14 +207,12 @@
                 on:change={() => {
                   if (document.querySelector("#f").checked) {
                     jikbunArray = [...jikbunArray, "무임은퇴권사"]
-                    // jikbunList.set(jikbunArray)
                   } else {
                     jikbunArray = [
                       ...jikbunArray.filter(
                         (value) => value !== "무임은퇴권사"
                       ),
                     ]
-                    // jikbunList.set(jikbunArray)
                   }
                 }}
               />
@@ -239,12 +227,10 @@
                 on:change={() => {
                   if (document.querySelector("#g").checked) {
                     jikbunArray = [...jikbunArray, "서리집사"]
-                    // jikbunList.set(jikbunArray)
                   } else {
                     jikbunArray = [
                       ...jikbunArray.filter((value) => value !== "서리집사"),
                     ]
-                    // jikbunList.set(jikbunArray)
                   }
                 }}
               />
@@ -259,12 +245,10 @@
                 on:change={() => {
                   if (document.querySelector("#h").checked) {
                     jikbunArray = [...jikbunArray, "은퇴집사"]
-                    // jikbunList.set(jikbunArray)
                   } else {
                     jikbunArray = [
                       ...jikbunArray.filter((value) => value !== "은퇴집사"),
                     ]
-                    // jikbunList.set(jikbunArray)
                   }
                 }}
               />
@@ -279,12 +263,10 @@
                 on:change={() => {
                   if (document.querySelector("#i").checked) {
                     jikbunArray = [...jikbunArray, "무임집사"]
-                    // jikbunList.set(jikbunArray)
                   } else {
                     jikbunArray = [
                       ...jikbunArray.filter((value) => value !== "무임집사"),
                     ]
-                    // jikbunList.set(jikbunArray)
                   }
                 }}
               />
@@ -300,14 +282,12 @@
                 on:change={() => {
                   if (document.querySelector("#j").checked) {
                     jikbunArray = [...jikbunArray, "무임은퇴집사"]
-                    // jikbunList.set(jikbunArray)
                   } else {
                     jikbunArray = [
                       ...jikbunArray.filter(
                         (value) => value !== "무임은퇴집사"
                       ),
                     ]
-                    // jikbunList.set(jikbunArray)
                   }
                 }}
               />
@@ -322,12 +302,10 @@
                 on:change={() => {
                   if (document.querySelector("#k").checked) {
                     jikbunArray = [...jikbunArray, "권찰"]
-                    // jikbunList.set(jikbunArray)
                   } else {
                     jikbunArray = [
                       ...jikbunArray.filter((value) => value !== "권찰"),
                     ]
-                    // jikbunList.set(jikbunArray)
                   }
                 }}
               />
@@ -342,12 +320,10 @@
                 on:change={() => {
                   if (document.querySelector("#l").checked) {
                     jikbunArray = [...jikbunArray, "성도"]
-                    // jikbunList.set(jikbunArray)
                   } else {
                     jikbunArray = [
                       ...jikbunArray.filter((value) => value !== "성도"),
                     ]
-                    // jikbunList.set(jikbunArray)
                   }
                 }}
               />

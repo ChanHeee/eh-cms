@@ -3,6 +3,7 @@ import type { LayoutServerLoad } from "../$types"
 import { SelectList } from "$lib/models/SelectList"
 import jwt from "jsonwebtoken"
 import { JWT_SECRET } from "$lib/env"
+import { getGroupList } from "$lib/utils"
 
 export const load: LayoutServerLoad = async ({ url, locals }) => {
   if (url.pathname == "/") {
@@ -17,5 +18,6 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
     path: url.pathname.split("/")[1],
     selectList: JSON.stringify(selectList),
     allowedGroup,
+    groupList: getGroupList(allowedGroup),
   }
 }
