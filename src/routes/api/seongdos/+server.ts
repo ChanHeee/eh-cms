@@ -75,6 +75,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
         aggregateSort = {
           "services.order": -1,
           updatedAt: -1,
+          _id: 1,
         }
       } else {
         aggregateSort = { updatedAt: -1, _id: 1 }
