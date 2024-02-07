@@ -58,10 +58,19 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       aggregateSort = { hasAge: -1, age: -1, _id: 1 }
       break
     case "groupAsc":
-      aggregateSort = { group1: 1, group2: 1, "services.order": -1, _id: 1 }
+      if (group1 == "교회학교") {
+        aggregateSort = { groupWithService: 1, "services.order": -1, _id: 1 }
+      } else {
+        aggregateSort = { group1: 1, group2: 1, "services.order": -1, _id: 1 }
+      }
       break
     case "groupDesc":
-      aggregateSort = { group1: -1, group2: -1, "services.order": -1, _id: 1 }
+      if (group1 == "교회학교") {
+        aggregateSort = { groupWithService: -1, "services.order": -1, _id: 1 }
+      } else {
+        aggregateSort = { group1: -1, group2: -1, "services.order": -1, _id: 1 }
+      }
+
       break
     default:
       if (group1 == "장년부") {
@@ -195,6 +204,113 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
           }
         : {}
     )
+    .addFields(
+      order?.startsWith("group") && group1 == "교회학교"
+        ? {
+            // groupWithService: "$group1",
+
+            groupWithService: {
+              $cond: {
+                if: { $ne: ["$group1", "교회학교"] },
+
+                then: {
+                  $switch: {
+                    branches: [
+                      {
+                        case: { $eq: [{ $min: "$services.group2" }, "영아부"] },
+                        then: 1,
+                      },
+                      {
+                        case: { $eq: [{ $min: "$services.group2" }, "유치부"] },
+                        then: 2,
+                      },
+                      {
+                        case: { $eq: [{ $min: "$services.group2" }, "유년부"] },
+                        then: 3,
+                      },
+                      {
+                        case: { $eq: [{ $min: "$services.group2" }, "초등부"] },
+                        then: 4,
+                      },
+                      {
+                        case: { $eq: [{ $min: "$services.group2" }, "중등부"] },
+                        then: 5,
+                      },
+                      {
+                        case: { $eq: [{ $min: "$services.group2" }, "고등부"] },
+                        then: 6,
+                      },
+                      {
+                        case: {
+                          $eq: [{ $min: "$services.group2" }, "은혜브릿지"],
+                        },
+                        then: 7,
+                      },
+                      {
+                        case: {
+                          $eq: [{ $min: "$services.group2" }, "늘푸른부"],
+                        },
+                        then: 8,
+                      },
+                    ],
+                    default: 0,
+                  },
+                },
+                else: {
+                  $switch: {
+                    branches: [
+                      {
+                        case: { $eq: ["$group2", "영아부"] },
+                        then: 1,
+                      },
+                      {
+                        case: { $eq: ["$group2", "유치부"] },
+                        then: 2,
+                      },
+                      {
+                        case: { $eq: ["$group2", "유년부"] },
+                        then: 3,
+                      },
+                      {
+                        case: { $eq: ["$group2", "초등부"] },
+                        then: 4,
+                      },
+                      {
+                        case: { $eq: ["$group2", "중등부"] },
+                        then: 5,
+                      },
+                      {
+                        case: { $eq: ["$group2", "고등부"] },
+                        then: 6,
+                      },
+                      {
+                        case: {
+                          $eq: ["$group2", "은혜브릿지"],
+                        },
+                        then: 7,
+                      },
+                      {
+                        case: {
+                          $eq: ["$group2", "늘푸른부"],
+                        },
+                        then: 8,
+                      },
+                    ],
+                    default: 0,
+                  },
+                },
+              },
+            },
+
+            // groupWithService: {$switch: {
+            //   branches: [
+            //     {case: {$ne: ["group1", "교회학교"]}}
+            //   ]
+            // }}
+          }
+        : {}
+    )
+
     .match(seongdoMatch)
     .sort(aggregateSort)
     .collation({ locale: "en_US", numericOrdering: true })
