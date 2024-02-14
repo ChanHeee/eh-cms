@@ -61,6 +61,12 @@ export const GET: RequestHandler = async ({ request, url }) => {
     case "simbangjaDesc":
       aggregateSort = { simbangja: -1, _id: 1 }
       break
+    case "dateAsc":
+      aggregateSort = { date: 1, _id: 1 }
+      break
+    case "dateDesc":
+      aggregateSort = { date: -1, _id: 1 }
+      break
     case "groupAsc":
       aggregateSort = { "seongdoId.group1": 1, "seongdoId.group2": 1, _id: 1 }
       break

@@ -195,7 +195,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
               $cond: [{ $eq: ["$birth", ""] }, false, true],
             },
           }
-        : {}
+        : { undefined }
     )
     .addFields(
       order?.startsWith("group") && group1 == "교회학교"
@@ -301,7 +301,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
             //   ]
             // }}
           }
-        : {}
+        : { undefined }
     )
 
     .match(seongdoMatch)

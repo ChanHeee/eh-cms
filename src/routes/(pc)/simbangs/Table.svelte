@@ -212,15 +212,66 @@
   </div>
 
   <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
-    <div
-      class="flex gap-2 px-3 bg-[#D9D9D8] font-bold items-center w-full text-center h-10"
+    <button
+      id="simbangjaField"
+      class=" flex justify-between px-3 font-bold items-center h-10 hover:bg-[#B0B1B0]"
+      class:bg-[#B0B1B0]={order == "dateAsc" || order == "dateDesc"
+        ? true
+        : false}
+      class:bg-[#D9D9D8]={order == "dateAsc" || order == "dateDesc"
+        ? false
+        : true}
+      on:mouseover={(e) => {
+        if (order != "dateAsc" && order != "dateDesc") {
+          document.getElementById("dateDefault")?.classList.remove("invisible")
+        }
+      }}
+      on:mouseleave={(e) => {
+        if (order != "dateAsc" && order != "dateDesc") {
+          document.getElementById("dateDefault")?.classList.add("invisible")
+        }
+      }}
+      on:focus={null}
+      on:click={() => {
+        const { order, take, ...rest } = searchParams
+        let newOrder
+        if (order == "dateAsc") {
+          newOrder = "dateDesc"
+        } else if (order == "dateDesc") {
+          newOrder = ""
+        } else {
+          newOrder = "dateAsc"
+        }
+        goto(
+          `/simbangs/${getSearchParams({
+            ...rest,
+            order: newOrder,
+            page: 1,
+          })}`
+        )
+      }}
     >
       심방 날짜
-    </div>
+      {#if order == "dateAsc"}
+        <ArrowsVertical id="dateDefault" class="ml-3 hidden" />
+        <ArrowUp id="dateAsc" class="ml-3 " />
+        <ArrowDown id="dateDesc" class="ml-3 hidden " />
+      {:else if order == "dateDesc"}
+        <ArrowsVertical id="dateDefault" class="ml-3 hidden" />
+        <ArrowUp id="dateAsc" class="ml-3 hidden" />
+        <ArrowDown id="dateDesc" class="ml-3  " />
+      {:else}
+        <ArrowsVertical id="dateDefault" class="ml-3 invisible" />
+        <ArrowUp id="dateAsc" class="ml-3 hidden" />
+        <ArrowDown id="dateDesc" class="ml-3 hidden " />
+      {/if}
+    </button>
     {#each simbangs as item}
-      <div class="flex px-3 items-center h-10">
-        {item.date}
-      </div>
+      <button class="flex px-3 items-center h-10">
+        <p class="whitespace-nowrap truncate">
+          {item.date}
+        </p>
+      </button>
     {/each}
   </div>
 
