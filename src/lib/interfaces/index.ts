@@ -126,12 +126,34 @@ export interface INonSeongdoMember {}
 
 export interface ISimbang {
   _id?: string
-  seongdoId?: string
+  seongdoId?: ISeongdo
   date: string
   hymn?: string
   bible?: string
   simbangja: string
+  companion?: string
   detail?: string
+}
+
+export interface ISimbangResponse {
+  simbangs: ISimbang[]
+  total: number
+  take: number
+  skip: number
+}
+export interface ISimbangPage {
+  totalSize: number
+  totalPage: number
+  requestPage: number
+  requestSize: number
+  requestParams: {
+    take?: number
+    order?: string
+    name?: string
+    jikbun?: string[]
+    group1?: string
+    group2?: string
+  }
 }
 
 export interface ISelectList {
@@ -166,6 +188,7 @@ export interface ISeongdoSearchParams {
   className?: string
   birthStart?: string
   birthEnd?: string
+  simbangja?: string
 }
 
 export interface ISeongdoEduSearchParams {

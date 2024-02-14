@@ -1,13 +1,122 @@
 import { Family } from "$lib/models/Family"
 import { Simbang } from "$lib/models/Simbang"
 import { json, type RequestHandler } from "@sveltejs/kit"
+import { Types } from "mongoose"
 
 export const GET: RequestHandler = async ({ request, url }) => {
-  const id = url.searchParams.get("seongdoId")
+  const name = url.searchParams.get("name")
+  const jikbun =
+    url.searchParams.get("jikbun") != null
+      ? JSON.parse(url.searchParams.get("jikbun"))
+      : []
+  const simbangja =
+    url.searchParams.get("simbangja") != null
+      ? JSON.parse(url.searchParams.get("simbangja"))
+      : []
+  const order = url.searchParams.get("order")
+  const group1 = url.searchParams.get("group1")
+  const group2 = url.searchParams.get("group2")
+  const page =
+    url.searchParams.get("page") != null
+      ? parseInt(url.searchParams.get("page"))
+      : 1
+  const take = 12
+  const seongdoId = url.searchParams.get("seongdoId")
 
-  const simbangs = await Simbang.find({ seongdoId: id }).sort("-date")
+  let simbangMatch: any = {}
+  if (seongdoId) {
+    const ObjectId = Types.ObjectId
+    simbangMatch.seongdoId = new ObjectId(seongdoId)
+  }
+  if (simbangja?.length > 0) {
+    simbangMatch.simbangja = { $in: simbangja }
+  }
 
-  return json({ simbangs })
+  let seongdoMatch: any = {}
+  if (name) {
+    seongdoMatch.name = { $regex: name }
+  }
+  if (jikbun?.length > 0) {
+    seongdoMatch.jikbun = { $in: jikbun }
+  }
+
+  if (group1) {
+    seongdoMatch.group1 = group1
+  }
+  if (group2) {
+    seongdoMatch.group2 = { $regex: group2 }
+  }
+
+  let aggregateSort: any = {}
+  switch (order) {
+    case "nameAsc":
+      aggregateSort = { "seongdoId.name": 1, _id: 1 }
+      break
+    case "nameDesc":
+      aggregateSort = { "seongdoId.name": -1, _id: 1 }
+      break
+    case "simbangjaAsc":
+      aggregateSort = { simbangja: 1, _id: 1 }
+      break
+    case "simbangjaDesc":
+      aggregateSort = { simbangja: -1, _id: 1 }
+      break
+    case "groupAsc":
+      aggregateSort = { "seongdoId.group1": 1, "seongdoId.group2": 1, _id: 1 }
+      break
+    case "groupDesc":
+      aggregateSort = { "seongdoId.group1": -1, "seongdoId.group2": -1, _id: 1 }
+      break
+    default:
+      aggregateSort = { date: -1 }
+      break
+  }
+  const simbangs = await Simbang.aggregate()
+    .match(simbangMatch)
+    .lookup({
+      from: "seongdos",
+      localField: "seongdoId",
+      foreignField: "_id",
+      as: "seongdoId",
+      pipeline: [{ $match: seongdoMatch }],
+    })
+    .unwind("seongdoId")
+    .sort(aggregateSort)
+    .skip((page - 1) * take)
+    .limit(take)
+
+  const totalArray = await Simbang.aggregate()
+    .match(simbangMatch)
+    .lookup({
+      from: "seongdos",
+      localField: "seongdoId",
+      foreignField: "_id",
+      as: "seongdoId",
+      pipeline: [{ $match: seongdoMatch }],
+    })
+    .unwind("seongdoId")
+    .count("total")
+
+  let total = totalArray.length > 0 ? totalArray[0].total : 0
+
+  return json({
+    simbangs,
+    page: {
+      totalSize: total,
+      totalPage: Math.ceil(total / take),
+      requestPage: page,
+      requestSize: simbangs.length,
+      requestParams: {
+        name,
+        jikbun,
+        order,
+        group1,
+        group2,
+        take,
+        simbangja,
+      },
+    },
+  })
 }
 
 export const POST: RequestHandler = async ({ request, url }) => {

@@ -5,6 +5,7 @@ import { loadFlash } from "sveltekit-flash-message/server"
 
 export const load = loadFlash(async ({ url, fetch, locals, cookies }) => {
   const name = decodeURIComponent(url.pathname.split("/")[2])
+  const simbangId = url.searchParams.get("simbangId")
 
   let seongdo, family, simbangs
   let response = await fetch(`/api/seongdos/${name}`, {
@@ -95,5 +96,6 @@ export const load = loadFlash(async ({ url, fetch, locals, cookies }) => {
     family,
     simbangs,
     groupList,
+    simbangId,
   }
 })

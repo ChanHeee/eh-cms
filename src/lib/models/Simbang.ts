@@ -11,6 +11,7 @@ const simbangSchema = new Schema<ISimbang>({
   hymn: { type: String, required: false },
   bible: { type: String, required: false },
   simbangja: { type: String, required: false },
+  companion: { type: String, required: false },
   detail: { type: String, required: false },
 })
 simbangSchema.set("timestamps", { createdAt: true, updatedAt: true })

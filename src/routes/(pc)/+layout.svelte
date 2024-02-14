@@ -30,6 +30,7 @@
     class="flex w-full sm:px-16 items-center text-white bg-[#4C5153] border-b-[4px]"
     class:border-[#F46055]={path == "seongdos" ? true : false}
     class:border-[#FBA244]={path == "educations" ? true : false}
+    class:border-[#41B8AF]={path == "simbangs" ? true : false}
   >
     <div class="flex w-full flex-col">
       <div class="flex justify-between items-center px-7 sm:px-0 items-center">
@@ -57,7 +58,7 @@
                 <p class="text-sm">교육관리</p>
               </button>
             </a>
-            <!-- <a href="/simbangs">
+            <a href="/simbangs">
               <button
                 class="flex flex-col items-center px-4 pt-3 pb-1 gap-1 hover:bg-[#41B8AF]"
                 class:bg-[#41B8AF]={path == "simbangs" ? true : false}
@@ -67,7 +68,7 @@
                 </div>
                 <p class="text-sm">심방관리</p>
               </button>
-            </a> -->
+            </a>
           </div>
         </div>
         <div class="nav_right">
@@ -104,7 +105,6 @@
           class="flex w-full items-center text-start px-4 py-2"
           class:bg-[#F46055]={path == "seongdos" ? true : false}
           on:click={() => {
-            // document.getElementById("menu")?.classList.add("hidden")
             hideMenu = true
             goto("/seongdos")
           }}
@@ -116,13 +116,24 @@
           class="flex w-full items-center text-start px-4 py-2"
           class:bg-[#FBA244]={path == "educations" ? true : false}
           on:click={() => {
-            // document.getElementById("menu")?.classList.add("hidden")
             hideMenu = true
             goto("/educations")
           }}
         >
           <GraduationCap color="#ffffff" width="16px" classString="mr-1" />
           <p>교육관리</p>
+        </button>
+
+        <button
+          class="flex w-full items-center text-start px-4 py-2"
+          class:bg-[#41B8AF]={path == "simbangs" ? true : false}
+          on:click={() => {
+            hideMenu = true
+            goto("/simbangs")
+          }}
+        >
+          <Briefcase color="#ffffff" width="14px" classString="mr-1" />
+          <p>심방관리</p>
         </button>
 
         <form class="" method="post" action="/login?/logout" use:enhance>

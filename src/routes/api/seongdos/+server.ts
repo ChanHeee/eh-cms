@@ -131,6 +131,8 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
             $project: {
               name: 1,
               avatar: 1,
+              gender: 1,
+              singeup: 1,
               jikbun: 1,
               birth: 1,
               age: 1,

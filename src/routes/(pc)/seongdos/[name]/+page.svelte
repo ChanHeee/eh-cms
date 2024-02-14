@@ -23,12 +23,26 @@
   } from "$lib/store"
   import type { IFamily, ISeongdo, ISimbang } from "$lib/interfaces"
   import toast from "svelte-french-toast"
+  import { onMount } from "svelte"
   export let data: {
     seongdo: ISeongdo
     family: IFamily
     simbangs: ISimbang[]
+    simbangId: string
     groupList: string[]
   }
+
+  onMount(() => {
+    selectedSimbang = data.simbangs.filter(
+      (simbang) => simbang._id == data.simbangId
+    )[0]
+    date = selectedSimbang?.date
+    hymn = selectedSimbang?.hymn
+    bible = selectedSimbang?.bible
+    simbangja = selectedSimbang?.simbangja
+    companion = selectedSimbang?.companion
+    detail = selectedSimbang?.detail
+  })
 
   $: groupList = data.groupList
   // value for senogdo detail
@@ -95,15 +109,16 @@
 
   // value for simbang
   $: simbangs = data.simbangs
-
   $: date = ""
   $: hymn = ""
   $: bible = ""
   $: simbangja = ""
+  $: companion = ""
   $: detail = ""
   $: teacherList = JSON.parse(data.selectList).teacherList
   let selectedSimbang: ISimbang | null
-  $: selectedSimbang = selectedSimbang
+
+  $: selectedSimbang
 
   let service: {
     group1: string
@@ -120,7 +135,7 @@
 
   $: isServiceModalHidden = true
   $: isFamilyModalHidden = true
-  $: isSimbangModalHidden = true
+  $: isSimbangModalHidden = selectedSimbang ? false : true
 
   var loadFile = function (event) {
     var input = event.target
@@ -325,6 +340,7 @@
             hymn,
             bible,
             simbangja,
+            companion,
             detail,
           }),
           headers: {
@@ -341,6 +357,7 @@
             hymn,
             bible,
             simbangja,
+            companion,
             detail,
           }),
           headers: {
@@ -1423,6 +1440,7 @@
                   hymn = simbang.hymn
                   bible = simbang.bible
                   simbangja = simbang.simbangja
+                  companion = simbang.companion
                   detail = simbang.detail
                   isSimbangModalHidden = !isSimbangModalHidden
                 }}
@@ -2214,6 +2232,21 @@
                     <option value={teacher}>{teacher}</option>
                   {/each}
                 </select>
+              </div>
+            </div>
+            <div class="flex w-full h-8 border-gray-300 border-x border-y">
+              <label
+                for="simbangCompanion"
+                class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                >동행자</label
+              >
+              <div class="flex flex-col flex-auto justify-start bg-gray-50">
+                <input
+                  id="simbangCompanion"
+                  type="text"
+                  bind:value={companion}
+                  class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                />
               </div>
             </div>
             <div class="flex w-full h-8 border-gray-300 border-x border-y">
