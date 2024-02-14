@@ -65,6 +65,7 @@ export async function POST({ request }) {
   //   }
   // }
 
-  const count = await Seongdo.countDocuments(query)
+  const count = await Seongdo.count(query)
+
   return json({ count })
 }

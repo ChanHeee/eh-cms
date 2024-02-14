@@ -52,10 +52,10 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       aggregateSort = { hasBirth: -1, birth: -1, _id: 1 }
       break
     case "ageAsc":
-      aggregateSort = { hasAge: -1, age: 1, _id: 1 }
+      aggregateSort = { hasBirth: -1, birth: -1, _id: 1 }
       break
     case "ageDesc":
-      aggregateSort = { hasAge: -1, age: -1, _id: 1 }
+      aggregateSort = { hasBirth: -1, birth: 1, _id: 1 }
       break
     case "groupAsc":
       if (group1 == "교회학교") {
@@ -187,19 +187,10 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       },
     })
     .addFields(
-      order?.startsWith("birth")
+      order?.startsWith("birth") || order?.startsWith("age")
         ? {
             hasBirth: {
               $cond: [{ $eq: ["$birth", ""] }, false, true],
-            },
-          }
-        : {}
-    )
-    .addFields(
-      order?.startsWith("age")
-        ? {
-            hasAge: {
-              $eq: [{ $type: "$age" }, "int"],
             },
           }
         : {}
