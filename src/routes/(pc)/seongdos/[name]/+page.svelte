@@ -36,12 +36,14 @@
     selectedSimbang = data.simbangs.filter(
       (simbang) => simbang._id == data.simbangId
     )[0]
-    date = selectedSimbang?.date
-    hymn = selectedSimbang?.hymn
-    bible = selectedSimbang?.bible
-    simbangja = selectedSimbang?.simbangja
-    companion = selectedSimbang?.companion
-    detail = selectedSimbang?.detail
+    if (selectedSimbang) {
+      date = selectedSimbang?.date
+      hymn = selectedSimbang?.hymn
+      bible = selectedSimbang?.bible
+      simbangja = selectedSimbang?.simbangja
+      companion = selectedSimbang?.companion
+      detail = selectedSimbang?.detail
+    }
   })
 
   $: groupList = data.groupList
@@ -119,6 +121,8 @@
   let selectedSimbang: ISimbang | null
 
   $: selectedSimbang
+  $: temp = ""
+  $: console.log(temp)
 
   let service: {
     group1: string
@@ -349,6 +353,15 @@
         })
         return response.ok
       } else {
+        console.log({
+          id: seongdo._id,
+          date,
+          hymn,
+          bible,
+          simbangja,
+          companion,
+          detail,
+        })
         const response = await fetch(`/api/simbangs`, {
           method: "POST",
           body: JSON.stringify({
