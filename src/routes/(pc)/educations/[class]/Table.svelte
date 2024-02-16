@@ -242,7 +242,8 @@
               item.education.name,
               item.education.semester,
               item.education.startDate,
-              item.education.day
+              item.education.day,
+              item.education.time
             )}`
           )
         }}
