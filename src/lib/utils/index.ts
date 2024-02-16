@@ -125,9 +125,11 @@ export const getSearchParams = (params: {}) => {
 export const getEduSlug = (
   name: string,
   semester: string,
-  startDate: string
+  startDate: string,
+  day: string,
+  time: string
 ) => {
-  return `${name}-${semester}-${startDate}`
+  return `${name}-${semester}-${startDate}-${day}-${time}`
 }
 
 export const isNullable = (input: any) => {

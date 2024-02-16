@@ -6,6 +6,8 @@ export const GET: RequestHandler = async ({ request, url }) => {
   const name = url.searchParams.get("name")
   const semester = url.searchParams.get("semester")
   const startDate = url.searchParams.get("startDate")
+  const day = url.searchParams.get("day")
+  const time = url.searchParams.get("time")
   const order = url.searchParams.get("order")
   const page =
     url.searchParams.get("page") != null
@@ -27,6 +29,12 @@ export const GET: RequestHandler = async ({ request, url }) => {
     query = query.find({ startDate })
   }
 
+  if (day) {
+    query = query.find({ day })
+  }
+  if (time) {
+    query = query.find({ time })
+  }
   switch (order) {
     case "nameAsc":
       query.sort({ name: 1, startDate: -1, _id: 1 })

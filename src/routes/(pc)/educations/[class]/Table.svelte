@@ -241,7 +241,8 @@
             `/educations/detail/${getEduSlug(
               item.education.name,
               item.education.semester,
-              item.education.startDate
+              item.education.startDate,
+              item.education.day
             )}`
           )
         }}

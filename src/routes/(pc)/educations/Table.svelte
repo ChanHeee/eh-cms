@@ -81,7 +81,9 @@
             `/educations/detail/${getEduSlug(
               item.name,
               item.semester,
-              item.startDate
+              item.startDate,
+              item.day,
+              item.time
             )}`
           )
         }}

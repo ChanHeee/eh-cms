@@ -6,18 +6,8 @@
     SeongdoEduPageStore,
     SeongdoEdusStore,
   } from "$lib/store"
-  import {
-    getEduSlug,
-    getGroupString,
-    getSearchParams,
-    isAllowGroup,
-  } from "$lib/utils"
-  import {
-    ArrowDown,
-    ArrowUp,
-    ArrowsVertical,
-    TrashCan,
-  } from "carbon-icons-svelte"
+  import { getGroupString, getSearchParams, isAllowGroup } from "$lib/utils"
+  import { TrashCan } from "carbon-icons-svelte"
   import toast from "svelte-french-toast"
 
   $: seongdoEdus = $SeongdoEdusStore

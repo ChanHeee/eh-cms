@@ -7,9 +7,11 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
   const name = slugArray[0]
   const semester = slugArray[1]
   const startDate = `${slugArray[2]}-${slugArray[3]}-${slugArray[4]}`
+  const day = slugArray[5]
+  const time = slugArray[6]
 
   let response = await fetch(
-    `/api/educations?name=${name}&semester=${semester}&startDate=${startDate}`,
+    `/api/educations?name=${name}&semester=${semester}&startDate=${startDate}&day=${day}&time=${time}`,
     {
       headers: {
         "content-type": "application/json",
