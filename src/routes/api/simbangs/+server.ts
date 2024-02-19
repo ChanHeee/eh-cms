@@ -39,13 +39,14 @@ export const GET: RequestHandler = async ({ request, url }) => {
   if (jikbun?.length > 0) {
     seongdoMatch.jikbun = { $in: jikbun }
   }
-
   if (group1) {
     seongdoMatch.group1 = group1
   }
   if (group2) {
     seongdoMatch.group2 = { $regex: group2 }
   }
+
+  console.log(seongdoMatch)
 
   let aggregateSort: any = {}
   switch (order) {
@@ -77,8 +78,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
       aggregateSort = { date: -1 }
       break
   }
-  const simbangs = await Simbang.aggregate()
-    .match(simbangMatch)
+  let simbangs = await Simbang.aggregate()
     .lookup({
       from: "seongdos",
       localField: "seongdoId",
@@ -87,12 +87,25 @@ export const GET: RequestHandler = async ({ request, url }) => {
       pipeline: [{ $match: seongdoMatch }],
     })
     .unwind("seongdoId")
+    .project({
+      _id: 1,
+      "seongdoId.name": 1,
+      "seongdoId.jikbun": 1,
+      "seongdoId.group1": 1,
+      "seongdoId.group2": 1,
+      date: 1,
+      simbangja: 1,
+      companion: 1,
+      bible: 1,
+      hymn: 1,
+      detail: 1,
+    })
+    .match(simbangMatch)
     .sort(aggregateSort)
     .skip((page - 1) * take)
     .limit(take)
 
   const totalArray = await Simbang.aggregate()
-    .match(simbangMatch)
     .lookup({
       from: "seongdos",
       localField: "seongdoId",
@@ -101,6 +114,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
       pipeline: [{ $match: seongdoMatch }],
     })
     .unwind("seongdoId")
+    .match(simbangMatch)
     .count("total")
 
   let total = totalArray.length > 0 ? totalArray[0].total : 0

@@ -97,7 +97,7 @@
       </div>
     {/each}
   </div>
-  <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
+  <!-- <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
     <div
       class=" flex justify-center px-2 bg-[#D9D9D8] font-bold items-center h-10"
     >
@@ -112,7 +112,7 @@
         />
       </div>
     {/each}
-  </div>
+  </div> -->
   <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
     <button
       id="nameField"

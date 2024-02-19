@@ -200,8 +200,6 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
     .addFields(
       order?.startsWith("group") && group1 == "교회학교"
         ? {
-            // groupWithService: "$group1",
-
             groupWithService: {
               $cond: {
                 if: { $ne: ["$group1", "교회학교"] },
@@ -294,21 +292,27 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
                 },
               },
             },
-
-            // groupWithService: {$switch: {
-            //   branches: [
-            //     {case: {$ne: ["group1", "교회학교"]}}
-            //   ]
-            // }}
           }
         : { undefined }
     )
 
     .match(seongdoMatch)
     .sort(aggregateSort)
-    .collation({ locale: "en_US", numericOrdering: true })
     .skip((page - 1) * take)
     .limit(take)
+    .collation({ locale: "en_US", numericOrdering: true })
+    .project({
+      _id: 1,
+      name: 1,
+      jikbun: 1,
+      birth: 1,
+      services: 1,
+      age: 1,
+      phone: 1,
+      group1: 1,
+      group2: 1,
+      address: 1,
+    })
 
   const total = await Seongdo.count(seongdoMatch)
 

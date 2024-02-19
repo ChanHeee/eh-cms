@@ -66,6 +66,7 @@ seongdoSchema.pre("deleteOne", async function (next) {
   }
 
   await SeongdoEdu.deleteMany({ seongdo: _id })
+  await Simbang.deleteMany({ seongdoId: _id })
 
   next()
 })

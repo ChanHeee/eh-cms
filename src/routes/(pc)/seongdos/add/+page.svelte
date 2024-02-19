@@ -3,6 +3,7 @@
   import { getAgeFromBirth, getGroupItem } from "$lib/utils"
   import toast from "svelte-french-toast"
   import { Checkmark, Close } from "carbon-icons-svelte"
+  import Cropper from "cropperjs"
 
   export let data
   $: groupList = data.groupList
@@ -56,7 +57,19 @@
       reader.onload = (result) => {
         avatar = result.target.result
       }
-      //reader.readAsText(event.target.files[0])
+
+      const cropper = new Cropper(preview, {
+        aspectRatio: 16 / 9,
+        crop(event) {
+          console.log(event.detail.x)
+          console.log(event.detail.y)
+          console.log(event.detail.width)
+          console.log(event.detail.height)
+          console.log(event.detail.rotate)
+          console.log(event.detail.scaleX)
+          console.log(event.detail.scaleY)
+        },
+      })
       reader.readAsDataURL(event.target.files[0])
     } catch (err) {
       console.log("err", err)

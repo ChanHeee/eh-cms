@@ -1,7 +1,7 @@
 import type { ISeongdoEduSearchParams } from "$lib/interfaces"
 import { SeongdoEdu } from "$lib/models/SeongdoEdu"
 import { json, type RequestHandler } from "@sveltejs/kit"
-import { Aggregate } from "mongoose"
+import { Aggregate, Types } from "mongoose"
 
 export const GET: RequestHandler = async ({ request, url }) => {
   let page =
@@ -27,7 +27,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
   const educationId = url.searchParams.get("educationId")
   const seongdoId = url.searchParams.get("seongdoId")
 
-  let aggregateSort
+  let aggregateSort: any
   switch (order) {
     case "nameAsc":
       aggregateSort = { "seongdo.name": 1, _id: 1 }
@@ -53,7 +53,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
   }
 
   let seongdoMatch: any = {},
-    educationMatch: ISeongdoEduSearchParams = {}
+    educationMatch: any = {}
 
   if (name) {
     seongdoMatch.name = { $regex: name }
@@ -77,64 +77,178 @@ export const GET: RequestHandler = async ({ request, url }) => {
   if (className && className != "전체") {
     educationMatch.name = className
   }
+  if (educationId) {
+    educationMatch._id = new Types.ObjectId(educationId)
+  }
 
   let seongdoEdus, total
 
-  if (educationId) {
-    let query = SeongdoEdu.find({ education: educationId })
-    if (seongdoId) {
-      query = query.find({ seongdo: seongdoId })
-    }
-    seongdoEdus = await SeongdoEdu.find(query)
-      .skip((page - 1) * take)
-      .limit(take)
-      .populate("seongdo")
-      .populate("education")
-    total = await SeongdoEdu.count(query)
-  } else {
-    seongdoEdus = await SeongdoEdu.aggregate()
-      .lookup({
-        from: "seongdos",
-        localField: "seongdo",
-        foreignField: "_id",
-        as: "seongdo",
-        pipeline: [{ $match: seongdoMatch }],
-      })
-      .unwind("seongdo")
-      .lookup({
-        from: "educations",
-        localField: "education",
-        foreignField: "_id",
-        as: "education",
-        pipeline: [{ $match: educationMatch }],
-      })
-      .unwind("education")
-      .sort(aggregateSort)
-      .skip((page - 1) * take)
-      .limit(take)
+  // if (educationId) {
+  //   // let query = SeongdoEdu.find({ education: educationId })
+  //   // if (seongdoId) {
+  //   //   query = query.find({ seongdo: seongdoId })
+  //   // }
+  //   // seongdoEdus = await SeongdoEdu.find(query)
+  //   //   .skip((page - 1) * take)
+  //   //   .limit(take)
+  //   //   .populate("seongdo")
+  //   //   .populate("education")
+  //   let seongdoEduMatch: any = {}
+  //   seongdoEduMatch.education = educationId
+  //   if (seongdoId) {
+  //     seongdoEduMatch.seongdo = seongdoId
+  //   }
+  //   console.log(educationId)
 
-    const totalArray = await SeongdoEdu.aggregate()
+  //   seongdoEdus = await SeongdoEdu.aggregate()
+  //     .match({ _id: "65ceb29ee667a01ec89f3112" })
+  //     .exec()
 
-      .lookup({
-        from: "seongdos",
-        localField: "seongdo",
-        foreignField: "_id",
-        as: "seongdo",
-        pipeline: [{ $match: seongdoMatch }],
-      })
-      .unwind("seongdo")
-      .lookup({
-        from: "educations",
-        localField: "education",
-        foreignField: "_id",
-        as: "education",
-        pipeline: [{ $match: educationMatch }],
-      })
-      .unwind("education")
-      .count("total")
+  //   const totalArray = await SeongdoEdu.aggregate()
+  //     .match(seongdoEduMatch)
+  //     .lookup({
+  //       from: "seongdos",
+  //       localField: "seongdo",
+  //       foreignField: "_id",
+  //       as: "seongdo",
+  //     })
+  //     .unwind("seongdo")
+  //     .lookup({
+  //       from: "educations",
+  //       localField: "education",
+  //       foreignField: "_id",
+  //       as: "education",
+  //     })
+  //     .unwind("education")
+  //     .count("total")
 
-    total = totalArray.length > 0 ? totalArray[0].total : 0
-  }
+  //   total = totalArray.length > 0 ? totalArray[0].total : 0
+
+  //   // total = await SeongdoEdu.count(query)
+  // } else {
+  //   seongdoEdus = await SeongdoEdu.aggregate()
+  //     .sort(aggregateSort)
+  //     .skip((page - 1) * take)
+  //     .limit(take)
+  //     .lookup({
+  //       from: "seongdos",
+  //       localField: "seongdo",
+  //       foreignField: "_id",
+  //       as: "seongdo",
+  //       pipeline: [{ $match: seongdoMatch }],
+  //     })
+  //     .unwind("seongdo")
+  //     .lookup({
+  //       from: "educations",
+  //       localField: "education",
+  //       foreignField: "_id",
+  //       as: "education",
+  //       pipeline: [{ $match: educationMatch }],
+  //     })
+  //     .unwind("education")
+  //     .project({
+  //       _id: 1,
+  //       seongdo: {
+  //         _id: 1,
+  //         name: 1,
+  //         jikbun: 1,
+  //         birth: 1,
+  //         age: 1,
+  //         group1: 1,
+  //         group2: 1,
+  //       },
+  //       education: {
+  //         name: 1,
+  //         semester: 1,
+  //         startDate: 1,
+  //         endDate: 1,
+  //       },
+  //     })
+
+  //   const totalArray = await SeongdoEdu.aggregate()
+  //     .lookup({
+  //       from: "seongdos",
+  //       localField: "seongdo",
+  //       foreignField: "_id",
+  //       as: "seongdo",
+  //       pipeline: [{ $match: seongdoMatch }],
+  //     })
+  //     .unwind("seongdo")
+  //     .lookup({
+  //       from: "educations",
+  //       localField: "education",
+  //       foreignField: "_id",
+  //       as: "education",
+  //       pipeline: [{ $match: educationMatch }],
+  //     })
+  //     .unwind("education")
+  //     .count("total")
+
+  //   total = totalArray.length > 0 ? totalArray[0].total : 0
+  // }
+
+  seongdoEdus = await SeongdoEdu.aggregate()
+
+    .lookup({
+      from: "seongdos",
+      localField: "seongdo",
+      foreignField: "_id",
+      as: "seongdo",
+      pipeline: [{ $match: seongdoMatch }],
+    })
+    .unwind("seongdo")
+    .lookup({
+      from: "educations",
+      localField: "education",
+      foreignField: "_id",
+      as: "education",
+      pipeline: [{ $match: educationMatch }],
+    })
+    .unwind("education")
+    .project({
+      _id: 1,
+      seongdo: {
+        _id: 1,
+        name: 1,
+        jikbun: 1,
+        birth: 1,
+        phone: 1,
+        age: 1,
+        group1: 1,
+        group2: 1,
+      },
+      education: {
+        _id: 1,
+        name: 1,
+        semester: 1,
+        startDate: 1,
+        endDate: 1,
+      },
+    })
+    .sort(aggregateSort)
+    .skip((page - 1) * take)
+    .limit(take)
+
+  const totalArray = await SeongdoEdu.aggregate()
+    .lookup({
+      from: "seongdos",
+      localField: "seongdo",
+      foreignField: "_id",
+      as: "seongdo",
+      pipeline: [{ $match: seongdoMatch }],
+    })
+    .unwind("seongdo")
+    .lookup({
+      from: "educations",
+      localField: "education",
+      foreignField: "_id",
+      as: "education",
+      pipeline: [{ $match: educationMatch }],
+    })
+    .unwind("education")
+    .count("total")
+
+  total = totalArray.length > 0 ? totalArray[0].total : 0
 
   return json({
     seongdoEdus,

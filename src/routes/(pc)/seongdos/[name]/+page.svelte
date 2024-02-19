@@ -119,10 +119,7 @@
   $: detail = ""
   $: teacherList = JSON.parse(data.selectList).teacherList
   let selectedSimbang: ISimbang | null
-
   $: selectedSimbang
-  $: temp = ""
-  $: console.log(temp)
 
   let service: {
     group1: string
