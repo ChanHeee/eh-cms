@@ -220,6 +220,10 @@ export const GET: RequestHandler = async ({ request, url }) => {
       education: {
         _id: 1,
         name: 1,
+        teacher: 1,
+        day: 1,
+        time: 1,
+        place: 1,
         semester: 1,
         startDate: 1,
         endDate: 1,

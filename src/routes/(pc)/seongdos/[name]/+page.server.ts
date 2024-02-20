@@ -7,7 +7,7 @@ export const load = loadFlash(async ({ url, fetch, locals, cookies }) => {
   const name = decodeURIComponent(url.pathname.split("/")[2])
   const simbangId = url.searchParams.get("simbangId")
 
-  let seongdo, family, simbangs
+  let seongdo, family, simbangs, seongdoEdus
   let response = await fetch(`/api/seongdos/${name}`, {
     method: "GET",
     headers: {
@@ -91,7 +91,19 @@ export const load = loadFlash(async ({ url, fetch, locals, cookies }) => {
     simbangs = (await response.json()).simbangs
   }
 
-  console.log(simbangs)
+  response = await fetch(
+    `/api/seongdoEdus?class=${"전체"}&name=${seongdo.name}`,
+    {
+      method: "GET",
+      headers: {
+        "content-type": "application/json",
+      },
+    }
+  )
+
+  if (response.ok) {
+    seongdoEdus = (await response.json()).seongdoEdus
+  }
 
   return {
     seongdo,
@@ -99,5 +111,6 @@ export const load = loadFlash(async ({ url, fetch, locals, cookies }) => {
     simbangs,
     groupList,
     simbangId,
+    seongdoEdus,
   }
 })

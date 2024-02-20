@@ -3,6 +3,7 @@
   import { goto, invalidateAll } from "$app/navigation"
   import {
     getAgeFromBirth,
+    getEduSlug,
     getGroupItem,
     getGroupString,
     getSearchParams,
@@ -21,7 +22,12 @@
     SeongdoPageStore,
     SeongdosStore,
   } from "$lib/store"
-  import type { IFamily, ISeongdo, ISimbang } from "$lib/interfaces"
+  import type {
+    IFamily,
+    ISeongdo,
+    ISeongdoEduPopulate,
+    ISimbang,
+  } from "$lib/interfaces"
   import toast from "svelte-french-toast"
   import { onMount } from "svelte"
   export let data: {
@@ -30,7 +36,10 @@
     simbangs: ISimbang[]
     simbangId: string
     groupList: string[]
+    seongdoEdus: ISeongdoEduPopulate[]
   }
+
+  console.log(data.seongdoEdus, "in seongdos name page")
 
   onMount(() => {
     selectedSimbang = data.simbangs.filter(
@@ -80,7 +89,6 @@
   }
 
   // value for family
-
   const familyAddHandler = (seongdo: ISeongdo) => {
     selectedSeongdo = seongdo
   }
@@ -121,6 +129,7 @@
   let selectedSimbang: ISimbang | null
   $: selectedSimbang
 
+  // for service
   let service: {
     group1: string
     group2: string
@@ -134,6 +143,8 @@
   $: groupItemForService = getGroupItem(service?.group1, service?.group2)
   $: group2AddForService = ""
 
+  // for seongdoEdus
+  $: seongdoEdus = data.seongdoEdus
   $: isServiceModalHidden = true
   $: isFamilyModalHidden = true
   $: isSimbangModalHidden = selectedSimbang ? false : true
@@ -386,6 +397,7 @@
   class="sm:px-16 px-6 flex flex-col w-full bg-white overflow-scroll"
 >
   <div class="flex flex-col w-full-if-mobile mb-3">
+    <!-- 신상 정보 -->
     <div class="신상 flex flex-col">
       <div
         class="sticky top-0 pt-8 bg-white flex justify-between items-start pb-2"
@@ -1209,6 +1221,7 @@
         </div>
       </div>
     </div>
+    <!-- 가족 관계 -->
     <div class="가족관계 flex flex-col">
       <div
         class="sticky top-0 pt-8 bg-white flex justify-between items-start pb-2"
@@ -1407,7 +1420,8 @@
         </div>
       </div>
     </div>
-    <div class="심방내역 flex flex-col mb-8">
+    <!-- 심방 내역 -->
+    <div class="심방내역 flex flex-col">
       <div
         class="sticky top-0 pt-8 bg-white flex justify-between items-start pb-2"
       >
@@ -1534,6 +1548,103 @@
                 >
                   <TrashCan fill="#4a4a4a" size={20} />
                 </button>
+              </div>
+            {/each}
+          {/if}
+        </div>
+      </div>
+    </div>
+    <!-- 수강 내역 -->
+    <div class="수강내역 flex flex-col mb-8">
+      <div
+        class="sticky top-0 pt-8 bg-white flex justify-between items-start pb-2"
+      >
+        <h1 class="text-lg font-medium">수강내역</h1>
+      </div>
+      <div class="flex text-sm border-l overflow-scroll">
+        <div
+          class="flex flex-col flex-auto sm:flex-none whitespace-nowrap border-r divide-y border-b"
+        >
+          <div
+            class="flex justify-center items-center px-3 font-bold h-10 bg-[#D9D9D8]"
+          >
+            교육 이름
+          </div>
+
+          {#if seongdoEdus.length > 0}
+            <!-- content here -->
+            {#each seongdoEdus as seongdoEdu}
+              <button
+                class="flex justify-center px-3 items-center h-10"
+                on:click={() => {
+                  goto(
+                    `/educations/detail/${getEduSlug(
+                      seongdoEdu.education.name,
+                      seongdoEdu.education.semester,
+                      seongdoEdu.education.startDate,
+                      seongdoEdu.education.day,
+                      seongdoEdu.education.time
+                    )}`
+                  )
+                }}
+              >
+                {seongdoEdu.education.name}
+              </button>
+            {/each}
+          {/if}
+        </div>
+
+        <div
+          class="flex flex-col flex-auto sm:flex-none whitespace-nowrap border-r divide-y border-b"
+        >
+          <div
+            class="flex justify-center items-center px-3 font-bold h-10 bg-[#D9D9D8]"
+          >
+            학기
+          </div>
+          {#if seongdoEdus.length > 0}
+            <!-- content here -->
+            {#each seongdoEdus as seongdoEdu}
+              <div class="flex justify-center px-3 items-center h-10">
+                {seongdoEdu.education.semester}
+              </div>
+            {/each}
+          {/if}
+        </div>
+
+        <div
+          class="flex flex-col flex-auto sm:flex-none whitespace-nowrap border-r divide-y border-b"
+        >
+          <div
+            class="flex justify-center items-center px-3 font-bold h-10 bg-[#D9D9D8]"
+          >
+            강사
+          </div>
+          {#if seongdoEdus.length > 0}
+            <!-- content here -->
+            {#each seongdoEdus as seongdoEdu}
+              <div class="flex justify-center px-3 items-center h-10">
+                {seongdoEdu.education.teacher}
+              </div>
+            {/each}
+          {/if}
+        </div>
+
+        <div
+          class="flex flex-col flex-auto sm:flex-auto whitespace-nowrap divide-y border-r border-b"
+        >
+          <div
+            class="flex justify-center items-center px-3 font-bold h-10 bg-[#D9D9D8]"
+          >
+            교육 기간
+          </div>
+          {#if seongdoEdus.length > 0}
+            <!-- content here -->
+            {#each seongdoEdus as seongdoEdu}
+              <div class="flex justify-center px-3 items-center h-10">
+                <p class="whitespace-nowrap truncate">
+                  {`${seongdoEdu.education.startDate} ~ ${seongdoEdu.education.endDate}`}
+                </p>
               </div>
             {/each}
           {/if}
