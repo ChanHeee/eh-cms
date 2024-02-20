@@ -14,7 +14,6 @@
 
   export let simbangs: ISimbang[]
   export let page: ISimbangPage
-  console.log(page)
 
   $: searchParams = page.requestParams
   $: order = page.requestParams.order

@@ -350,15 +350,6 @@
         })
         return response.ok
       } else {
-        console.log({
-          id: seongdo._id,
-          date,
-          hymn,
-          bible,
-          simbangja,
-          companion,
-          detail,
-        })
         const response = await fetch(`/api/simbangs`, {
           method: "POST",
           body: JSON.stringify({
@@ -2196,7 +2187,7 @@
         class="sm:h-2/3 h-3/4 sm:max-md:w-2/3 md:w-1/3 w-full relative transform rounded-md bg-white shadow-xl transition-all"
       >
         <div
-          class="w-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
+          class="w-full h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
         >
           {#if selectedSimbang}
             <h1 class="text-left text-lg font-medium mb-2">심방 내용</h1>
@@ -2204,7 +2195,7 @@
             <h1 class="text-left text-lg font-medium mb-2">심방 생성</h1>
           {/if}
 
-          <div class="flex flex-col h-full text-sm gap-3">
+          <div class="flex flex-col h-[calc(100%-30px)] text-sm gap-3">
             <div class="flex w-full h-8 border-gray-300 border-x border-y">
               <label
                 for="simbangDate"
@@ -2292,7 +2283,7 @@
             </div>
 
             <div
-              class="flex w-full sm:h-80 h-40 border-gray-300 border-x border-y"
+              class="flex w-full flex-auto items-stretch border-gray-300 border-x border-y"
             >
               <label
                 for="simbangDetail"

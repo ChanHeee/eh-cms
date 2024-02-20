@@ -91,6 +91,8 @@ export const load = loadFlash(async ({ url, fetch, locals, cookies }) => {
     simbangs = (await response.json()).simbangs
   }
 
+  console.log(simbangs)
+
   return {
     seongdo,
     family,

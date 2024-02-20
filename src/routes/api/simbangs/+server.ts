@@ -46,8 +46,6 @@ export const GET: RequestHandler = async ({ request, url }) => {
     seongdoMatch.group2 = { $regex: group2 }
   }
 
-  console.log(seongdoMatch)
-
   let aggregateSort: any = {}
   switch (order) {
     case "nameAsc":
@@ -78,7 +76,9 @@ export const GET: RequestHandler = async ({ request, url }) => {
       aggregateSort = { date: -1 }
       break
   }
+
   let simbangs = await Simbang.aggregate()
+    .match(simbangMatch)
     .lookup({
       from: "seongdos",
       localField: "seongdoId",
@@ -100,7 +100,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
       hymn: 1,
       detail: 1,
     })
-    .match(simbangMatch)
+
     .sort(aggregateSort)
     .skip((page - 1) * take)
     .limit(take)
