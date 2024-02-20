@@ -3,7 +3,6 @@
   import { getAgeFromBirth, getGroupItem } from "$lib/utils"
   import toast from "svelte-french-toast"
   import { Checkmark, Close } from "carbon-icons-svelte"
-  import Cropper from "cropperjs"
 
   export let data
   $: groupList = data.groupList
@@ -37,30 +36,6 @@
       return address + ", " + detailAddress
     } else {
       return address + ", " + detailAddress + " (" + extraAddress + ")"
-    }
-  }
-
-  var loadFile = function (event) {
-    var input = event.target
-    var file = input.files[0]
-    var type = file.type
-
-    var output = document.getElementById("preview")
-
-    output.src = URL.createObjectURL(event.target.files[0])
-    output.onload = function () {
-      URL.revokeObjectURL(output.src) // free memory
-    }
-    avatar = event.target.files[0]
-    var reader = new FileReader()
-    try {
-      reader.onload = (result) => {
-        avatar = result.target.result
-      }
-
-      reader.readAsDataURL(event.target.files[0])
-    } catch (err) {
-      console.log("err", err)
     }
   }
 
@@ -155,635 +130,32 @@
       },
     }).open()
   }
+
+  import Cropper from "svelte-easy-crop"
+  import getCroppedImg from "$lib/utils/canvasUtils.js"
+
+  let crop = { x: 0, y: 0 }
+  let zoom = 1
+  let image, fileinput, pixelCrop, croppedImage
+  function onFileSelected(e) {
+    let imageFile = e.target.files[0]
+    let reader = new FileReader()
+    reader.onload = (e) => {
+      image = e.target.result
+    }
+    reader.readAsDataURL(imageFile)
+  }
+
+  function reset() {
+    croppedImage = null
+    image = null
+  }
 </script>
 
 <div
   id="content"
   class="sm:px-16 px-6 flex flex-col w-full bg-white overflow-x-scroll"
 >
-  <!-- <form class="flex flex-col w-full-if-mobile">
-    <div class="flex justify-between items-start mb-2">
-      <h1 class="text-lg font-medium">새 성도 추가</h1>
-      <div class="flex ml-auto gap-2">
-        <button
-          type="submit"
-          class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-          on:click={submitHandler}
-        >
-          <Checkmark scale={16} />
-          <span>저장</span>
-        </button>
-
-        <button
-          type="button"
-          class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
-          on:click={async () => {
-            history.back()
-          }}
-        >
-          <span class="flex items-center">
-            <Close class="text-[#F46055]" />
-            <p>닫기</p>
-          </span>
-        </button>
-      </div>
-    </div>
-
-    <div class="flex flex-col text-sm gap-3">
-      <div class="hidden md:flex gap-3">
-        <div class="flex flex-none">
-          <label for="photo-dropbox">
-            <img
-              alt=""
-              id="preview"
-              src={"/avatar.png"}
-              class="border-gray-300 border w-[7.5rem] min-w-[7.5rem] h-[7.5rem] object-cover hover:opacity-75"
-            />
-          </label>
-          <input
-            id="photo-dropbox"
-            type="file"
-            accept="image/*"
-            class="sr-only"
-            on:change={(e) => {
-              loadFile(e)
-            }}
-          />
-        </div>
-        <div class="flex flex-col gap-3 w-full">
-          <div class="flex flex-col w-full md:flex-row gap-3">
-            <div class="flex w-full h-8 border-gray-300 border">
-              <label
-                for="name"
-                class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                >이름 / 성별</label
-              >
-              <div class="flex w-full justify-center gap-1 pr-1 bg-gray-50">
-                <input
-                  id="name"
-                  type="text"
-                  bind:value={name}
-                  required
-                  class="flex w-full bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 p-2"
-                />
-                <div class="border-l border-gray-300" />
-                <select
-                  id="gender"
-                  value={gender}
-                  on:change={() => {
-                    gender = document.querySelector(
-                      "#gender > option:checked"
-                    ).value
-                  }}
-                  class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                >
-                  <option value="none" class="hidden" />
-                  <option value="남자">남자</option>
-                  <option value="여자">여자</option>
-                </select>
-              </div>
-            </div>
-            <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
-              <div class="flex w-full gap-1">
-                <label
-                  for="enrolled"
-                  class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                  >등록일자</label
-                >
-                <input
-                  id="enrolled"
-                  type="date"
-                  on:change={(e) => {
-                    enrolled_at = e.target.value
-                  }}
-                  class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 pl-1 pr-2 border-gray-300"
-                  min="1900-01-01"
-                  max="2024-12-31"
-                  value={enrolled_at}
-                />
-              </div>
-            </div>
-          </div>
-          <div class="flex flex-col w-full md:flex-row gap-3">
-            <div class="flex w-full h-8 border-gray-300 border bg-gray-50">
-              <div class="flex w-full gap-1">
-                <label
-                  for="name"
-                  class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                  >생일 / 나이</label
-                >
-                <input
-                  id="date"
-                  type="date"
-                  on:change={(e) => {
-                    birth = e.target.value
-                    age = getAgeFromBirth(birth)
-                  }}
-                  class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 pl-1 pr-2 border-gray-300 border-r"
-                  min="1900-01-01"
-                  max="2023-12-31"
-                  value={birth}
-                />
-                <input
-                  id="age"
-                  type="text"
-                  value={ageWithString}
-                  disabled
-                  class="flex flex-none w-[2.8rem] text-center bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0"
-                />
-              </div>
-            </div>
-            <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
-              <div class="flex w-full gap-1">
-                <label
-                  for="name"
-                  class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                  >직분 / 신급</label
-                >
-                <div class="flex w-full justify-center gap-1 pr-1">
-                  <select
-                    id="jikbun"
-                    on:change={() => {
-                      jikbun = document.querySelector(
-                        "#jikbun > option:checked"
-                      ).value
-                    }}
-                    class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                  >
-                    <option value="none" class="hidden" />
-                    <option value="장로">장로</option>
-                    <option value="안수집사">안수집사</option>
-                    <option value="권사">권사</option>
-                    <option value="은퇴권사">은퇴권사</option>
-                    <option value="무임권사">무임권사</option>
-                    <option value="무임은퇴권사">무임은퇴권사</option>
-                    <option value="서리집사">서리집사</option>
-                    <option value="은퇴집사">은퇴집사</option>
-                    <option value="무임집사">무임집사</option>
-                    <option value="무임은퇴집사">무임은퇴집사</option>
-                    <option value="권찰">권찰</option>
-                    <option value="성도">성도</option>
-                  </select>
-                  <div class="border-l border-gray-300" />
-                  <select
-                    id="singeup"
-                    on:change={() => {
-                      singeup = document.querySelector(
-                        "#singeup > option:checked"
-                      ).value
-                    }}
-                    class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                  >
-                    <option value="none" class="hidden" />
-                    <option value="세례">세례</option>
-                    <option value="입교">입교</option>
-                    <option value="학습">학습</option>
-                    <option value="유아세례">유아세례</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="flex flex-col w-full md:flex-row gap-3">
-            <div class="flex w-full h-8 border-gray-300 border">
-              <label
-                for="phone"
-                class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                >휴대전화</label
-              >
-              <div class="flex w-full bg-gray-50">
-                <input
-                  id="phone"
-                  type="text"
-                  placeholder="010-0000-0000"
-                  bind:value={phone}
-                  class="flex w-full px-2 bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                />
-              </div>
-            </div>
-            <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
-              <div class="flex w-full gap-1">
-                <label
-                  for="name"
-                  class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                  >소속</label
-                >
-                <div class="flex w-full justify-center gap-1 pr-1">
-                  <select
-                    id="group1"
-                    on:change={() => {
-                      group1 = document.querySelector(
-                        "#group1 > option:checked"
-                      ).value
-                      group2 = ""
-                    }}
-                    class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                  >
-                    <option value="none" class="hidden" />
-                    {#each Object.keys(groupList) as group1}
-                      <option value={group1}>{group1}</option>
-                    {/each}
-                    <option value="교역자">교역자</option>
-                  </select>
-                  <div class="border-l border-gray-300" />
-
-                  <select
-                    id="group2"
-                    required
-                    on:change={() => {
-                      group2 = document.querySelector("#group2").value
-                    }}
-                    class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                  >
-                    <option value="none" class="hidden" />
-                    {#if group1 == "장년부"}
-                      {#each groupList["장년부"] as item}
-                        <option value={item}>{item}</option>
-                      {/each}
-                    {:else if group1 == "청년부"}
-                      {#each groupList["청년부"] as item}
-                        <option value={item}>{item}</option>
-                      {/each}
-                    {:else if group1 == "교회학교"}
-                      {#each groupList["교회학교"] as item}
-                        <option value={item}>{item}</option>
-                      {/each}
-                    {/if}
-                  </select>
-                  <div
-                    class="border-l border-gray-300"
-                    class:hidden={group1 == "장년부" && group2 != ""
-                      ? false
-                      : true}
-                  />
-                  <select
-                    id="group2Add"
-                    required
-                    on:change={() => {
-                      group2Add = document.querySelector("#group2Add").value
-                    }}
-                    class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                    class:hidden={group1 == "장년부" && group2 != ""
-                      ? false
-                      : true}
-                  >
-                    <option value="none" class="hidden" />
-                    <option value="1구역">1구역</option>
-                    <option value="2구역">2구역</option>
-                    <option value="3구역">3구역</option>
-                    <option value="4구역">4구역</option>
-                    <option value="5구역">5구역</option>
-                    <option value="6구역">6구역</option>
-                    <option value="7구역">7구역</option>
-                    <option value="8구역">8구역</option>
-                    <option value="9구역">9구역</option>
-                    <option value="10구역">10구역</option>
-                    <option value="11구역">11구역</option>
-                    <option value="12구역">12구역</option>
-                    <option value="13구역">13구역</option>
-                    <option value="14구역">14구역</option>
-                    <option value="15구역">15구역</option>
-                    <option value="16구역">16구역</option>
-                    <option value="17구역">17구역</option>
-                    <option value="18구역">18구역</option>
-                    <option value="19구역">19구역</option>
-                    <option value="20구역">20구역</option>
-                    <option value="21구역">21구역</option>
-                    <option value="22구역">22구역</option>
-                    <option value="23구역">23구역</option>
-                    <option value="24구역">24구역</option>
-                    <option value="25구역">25구역</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="md:hidden flex flex-col gap-3">
-        <div class="flex gap-3">
-          <div class="flex flex-none">
-            <label for="photo-dropbox">
-              <img
-                alt=""
-                id="previewM"
-                src={"/avatar.png"}
-                class="border-gray-300 border w-[7.5rem] min-w-[7.5rem] h-[7.5rem] object-cover hover:opacity-75"
-              />
-            </label>
-            <input
-              id="photo-dropbox"
-              type="file"
-              accept="image/*"
-              class="sr-only"
-              on:change={(e) => {
-                loadFile(e)
-              }}
-            />
-          </div>
-          <div class="flex flex-col gap-3 w-full">
-            <div class="flex w-full h-8 border-gray-300 border">
-              <label
-                for="name"
-                class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                >이름</label
-              >
-              <input
-                id="name"
-                type="text"
-                bind:value={name}
-                required
-                class="flex w-full bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 p-2"
-              />
-            </div>
-            <div class="flex w-full h-8 border-gray-300 border">
-              <label
-                for="genderM"
-                class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                >성별</label
-              >
-              <div class="flex w-full bg-gray-50 px-1">
-                <select
-                  id="genderM"
-                  on:change={() => {
-                    gender = document.querySelector(
-                      "#genderM > option:checked"
-                    ).value
-                  }}
-                  class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                >
-                  <option value="none" class="hidden" />
-                  <option value="남자">남자</option>
-                  <option value="여자">여자</option>
-                </select>
-              </div>
-            </div>
-            <div class="flex w-full h-8 border-gray-300 border">
-              <label
-                for="age"
-                class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                >나이</label
-              >
-              <div class="flex w-full bg-gray-50 px-1">
-                <input
-                  id="age"
-                  type="text"
-                  value={ageWithString}
-                  disabled
-                  class="flex flex-none w-[2.8rem] text-center bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex flex-col w-full gap-3">
-          <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
-            <div class="flex w-full gap-1">
-              <label
-                for="birthM"
-                class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                >생일</label
-              >
-              <input
-                id="birthM"
-                type="date"
-                on:change={(e) => {
-                  birth = e.target.value
-                  age = getAgeFromBirth(birth)
-                }}
-                class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 px-1 border-gray-300"
-                min="1900-01-01"
-                max="2023-12-31"
-                value={birth}
-              />
-            </div>
-          </div>
-        </div>
-        <div class="flex flex-col w-full gap-3">
-          <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
-            <div class="flex w-full gap-1">
-              <label
-                for="erolledM"
-                class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                >등록일자</label
-              >
-              <input
-                id="erolledM"
-                type="date"
-                on:change={(e) => {
-                  enrolled_at = e.target.value
-                }}
-                class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 border-gray-300 px-1"
-                min="1900-01-01"
-                max="2023-12-31"
-                value={enrolled_at}
-              />
-            </div>
-          </div>
-        </div>
-        <div class="flex flex-col w-full gap-3">
-          <div class="flex w-full h-8 border-gray-300 border">
-            <label
-              for="phoneM"
-              class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-              >휴대전화</label
-            >
-            <div class="flex w-full bg-gray-50">
-              <input
-                id="phoneM"
-                type="text"
-                bind:value={phone}
-                class="flex w-full px-2 bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                placeholder="010-0000-0000"
-              />
-            </div>
-          </div>
-
-          <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
-            <div class="flex w-full gap-1">
-              <label
-                for="jikbunM"
-                class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                >직분 / 신급</label
-              >
-              <div class="flex w-full justify-center gap-1 pr-1">
-                <select
-                  id="jikbunM"
-                  on:change={() => {
-                    jikbun = document.querySelector(
-                      "#jikbunM > option:checked"
-                    ).value
-                  }}
-                  class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                >
-                  <option value="none" class="hidden" />
-                  <option value="장로">장로</option>
-                  <option value="안수집사">안수집사</option>
-                  <option value="권사">권사</option>
-                  <option value="은퇴권사">은퇴권사</option>
-                  <option value="무임권사">무임권사</option>
-                  <option value="무임은퇴권사">무임은퇴권사</option>
-                  <option value="서리집사">서리집사</option>
-                  <option value="은퇴집사">은퇴집사</option>
-                  <option value="무임집사">무임집사</option>
-                  <option value="무임은퇴집사">무임은퇴집사</option>
-                  <option value="권찰">권찰</option>
-                  <option value="성도">성도</option>
-                </select>
-                <div class="border-l border-gray-300" />
-                <select
-                  id="singeupM"
-                  on:change={() => {
-                    singeup = document.querySelector(
-                      "#singeupM > option:checked"
-                    ).value
-                  }}
-                  class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                >
-                  <option value="none" class="hidden" />
-                  <option value="세례">세례</option>
-                  <option value="입교">입교</option>
-                  <option value="학습">학습</option>
-                  <option value="유아세례">유아세례</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
-            <div class="flex w-full gap-1">
-              <label
-                for="group1M"
-                class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                >소속</label
-              >
-              <div class="flex w-full justify-center gap-1 pr-1">
-                <select
-                  id="group1M"
-                  on:change={() => {
-                    group1 = document.querySelector(
-                      "#group1M > option:checked"
-                    ).value
-                    group2 = ""
-                  }}
-                  class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                >
-                  <option value="none" class="hidden" />
-                  {#each Object.keys(groupList) as group1}
-                    <option value={group1}>{group1}</option>
-                  {/each}
-                </select>
-                <div class="border-l border-gray-300" />
-
-                <select
-                  id="group2M"
-                  required
-                  on:change={() => {
-                    group2 = document.querySelector("#group2M").value
-                  }}
-                  class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                >
-                  <option value="none" class="hidden" />
-                  {#if group1 == "장년부"}
-                    {#each groupList["장년부"] as item}
-                      <option value={item}>{item}</option>
-                    {/each}
-                  {:else if group1 == "청년부"}
-                    {#each groupList["청년부"] as item}
-                      <option value={item}>{item}</option>
-                    {/each}
-                  {:else if group1 == "교회학교"}
-                    {#each groupList["교회학교"] as item}
-                      <option value={item}>{item}</option>
-                    {/each}
-                  {/if}
-                </select>
-                <div
-                  class="border-l border-gray-300"
-                  class:hidden={group1 == "장년부" && group2 != ""
-                    ? false
-                    : true}
-                />
-                <select
-                  id="group2MAdd"
-                  required
-                  on:change={() => {
-                    group2Add = document.querySelector("#group2MAdd").value
-                  }}
-                  class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                  class:hidden={group1 == "장년부" && group2 != ""
-                    ? false
-                    : true}
-                >
-                  <option value="none" class="hidden" />
-                  <option value="1구역">1구역</option>
-                  <option value="2구역">2구역</option>
-                  <option value="3구역">3구역</option>
-                  <option value="4구역">4구역</option>
-                  <option value="5구역">5구역</option>
-                  <option value="6구역">6구역</option>
-                  <option value="7구역">7구역</option>
-                  <option value="8구역">8구역</option>
-                  <option value="9구역">9구역</option>
-                  <option value="10구역">10구역</option>
-                  <option value="11구역">11구역</option>
-                  <option value="12구역">12구역</option>
-                  <option value="13구역">13구역</option>
-                  <option value="14구역">14구역</option>
-                  <option value="15구역">15구역</option>
-                  <option value="16구역">16구역</option>
-                  <option value="17구역">17구역</option>
-                  <option value="18구역">18구역</option>
-                  <option value="19구역">19구역</option>
-                  <option value="20구역">20구역</option>
-                  <option value="21구역">21구역</option>
-                  <option value="22구역">22구역</option>
-                  <option value="23구역">23구역</option>
-                  <option value="24구역">24구역</option>
-                  <option value="25구역">25구역</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex flex-auto h-8 border-gray-300 border-x border-y">
-        <div
-          class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0]"
-        >
-          주소
-        </div>
-
-        <input
-          id="address"
-          autocomplete="off"
-          bind:value={addressWithExtraAddress}
-          class="flex w-full justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
-          on:click={searchAddress}
-        />
-      </div>
-      <div
-        class="relative flex h-8 flex-auto border-gray-300 border-x border-y"
-      >
-        <div
-          class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0]"
-        >
-          상세주소
-        </div>
-
-        <input
-          id="detailAddress"
-          autocomplete="off"
-          bind:value={detailAddress}
-          type="text"
-          class="flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
-        />
-      </div>
-    </div>
-  </form> -->
   <div class="flex flex-col w-full-if-mobile mb-3">
     <div class="신상 flex flex-col">
       <div
@@ -831,8 +203,9 @@
               accept="image/*"
               class="sr-only"
               on:change={(e) => {
-                loadFile(e)
+                onFileSelected(e)
               }}
+              bind:this={fileinput}
             />
           </div>
           <div class="flex flex-col gap-3 w-full">
@@ -1120,8 +493,9 @@
                 accept="image/*"
                 class="sr-only"
                 on:change={(e) => {
-                  loadFile(e)
+                  onFileSelected(e)
                 }}
+                bind:this={fileinput}
               />
             </div>
             <div class="flex flex-col gap-3 w-full">
@@ -1448,6 +822,69 @@
           />
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<div
+  class="relative z-10 h-full"
+  class:hidden={image ? false : true}
+  aria-labelledby="modal-title"
+  role="dialog"
+  aria-modal="true"
+>
+  <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" />
+  <div class="w-full fixed inset-0 z-10 w-screen">
+    <div
+      class="h-full flex min-h-full items-end justify-center p-4 text-center items-center"
+    >
+      <div
+        class="sm:h-2/3 h-3/4 sm:max-md:w-2/3 md:w-1/3 w-full relative transform rounded-md bg-white shadow-xl transition-all"
+      >
+        <div
+          class="w-full overflow-scroll h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
+        >
+          <Cropper
+            {image}
+            bind:crop
+            bind:zoom
+            aspect={1}
+            on:cropcomplete={(e) => {
+              pixelCrop = e.detail.pixels
+            }}
+          />
+        </div>
+        <div
+          class="bg-gray-50 h-[55px] px-4 py-3 flex flex-row-reverse px-6 gap-2"
+        >
+          <button
+            type="button"
+            class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
+            on:click={reset}
+          >
+            <span class="flex items-center">
+              <Close class="text-[#F46055]" />
+              <p>닫기</p>
+            </span>
+          </button>
+          <button
+            type="submit"
+            class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+            on:click={async () => {
+              croppedImage = await getCroppedImg(image, pixelCrop)
+              const preview = document.getElementById("preview")
+              const previewM = document.getElementById("previewM")
+              avatar = croppedImage
+              preview.src = croppedImage
+              previewM.src = croppedImage
+              reset()
+            }}
+          >
+            <Checkmark scale={16} />
+            <span>저장</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

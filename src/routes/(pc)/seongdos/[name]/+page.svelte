@@ -39,8 +39,6 @@
     seongdoEdus: ISeongdoEduPopulate[]
   }
 
-  console.log(data.seongdoEdus, "in seongdos name page")
-
   onMount(() => {
     selectedSimbang = data.simbangs.filter(
       (simbang) => simbang._id == data.simbangId
@@ -87,6 +85,7 @@
       return address + ", " + detailAddress + " (" + extraAddress + ")"
     }
   }
+  $: hoverOnAvatar = false
 
   // value for family
   const familyAddHandler = (seongdo: ISeongdo) => {
@@ -149,46 +148,25 @@
   $: isFamilyModalHidden = true
   $: isSimbangModalHidden = selectedSimbang ? false : true
 
-  var loadFile = function (event) {
-    var input = event.target
-    var file = input.files[0]
-    var type = file.type
+  //for crop profile
+  import Cropper from "svelte-easy-crop"
+  import getCroppedImg from "$lib/utils/canvasUtils.js"
 
-    var output = document.getElementById("preview")
+  let crop = { x: 0, y: 0 }
+  let zoom = 1
+  let image, fileinput, pixelCrop, croppedImage
+  function onFileSelected(e) {
+    let imageFile = e.target.files[0]
+    let reader = new FileReader()
+    reader.onload = (e) => {
+      image = e.target.result
+    }
+    reader.readAsDataURL(imageFile)
+  }
 
-    output.src = URL.createObjectURL(event.target.files[0])
-    output.onload = function () {
-      URL.revokeObjectURL(output.src) // free memory
-    }
-    seongdo.avatar = event.target.files[0]
-    var reader = new FileReader()
-    try {
-      reader.onload = (result) => {
-        seongdo.avatar = result.target.result
-      }
-      //reader.readAsText(event.target.files[0])
-      reader.readAsDataURL(event.target.files[0])
-    } catch (err) {
-      console.log("err", err)
-    }
-
-    var outputM = document.getElementById("previewM")
-
-    outputM.src = URL.createObjectURL(event.target.files[0])
-    outputM.onload = function () {
-      URL.revokeObjectURL(outputM.src) // free memory
-    }
-    seongdo.avatar = event.target.files[0]
-    var reader = new FileReader()
-    try {
-      reader.onload = (result) => {
-        seongdo.avatar = result.target.result
-      }
-      //reader.readAsText(event.target.files[0])
-      reader.readAsDataURL(event.target.files[0])
-    } catch (err) {
-      console.log("err", err)
-    }
+  function reset() {
+    croppedImage = null
+    image = null
   }
 
   const submitHandler = async () => {
@@ -452,14 +430,33 @@
       </div>
       <div class="flex flex-col text-sm gap-3">
         <div class="hidden md:flex gap-3">
-          <div class="flex flex-none">
+          <button
+            class="flex flex-none relative"
+            on:mouseleave={() => {
+              hoverOnAvatar = false
+            }}
+            on:focus={undefined}
+          >
             <label for="photo-dropbox">
               <img
                 alt=""
                 id="preview"
                 src={seongdo.avatar || "/avatar.png"}
                 class="border-gray-300 border w-[7.5rem] min-w-[7.5rem] h-[7.5rem] object-cover hover:opacity-75"
+                on:mouseover={() => {
+                  hoverOnAvatar = true
+                }}
+                on:focus={undefined}
               />
+              <button
+                class="absolute right-1.5 bottom-1.5 flex justify-center items-center rounded-full bg-[#F46055] w-7 h-7"
+                class:hidden={!hoverOnAvatar || !seongdo.avatar}
+                on:click={() => {
+                  seongdo.avatar = ""
+                }}
+              >
+                <TrashCan scale={16} color="white" />
+              </button>
             </label>
             <input
               id="photo-dropbox"
@@ -467,10 +464,11 @@
               accept="image/*"
               class="sr-only"
               on:change={(e) => {
-                loadFile(e)
+                onFileSelected(e)
               }}
+              bind:this={fileinput}
             />
-          </div>
+          </button>
           <div class="flex flex-col gap-3 w-full">
             <div class="flex flex-col w-full md:flex-row gap-3">
               <div class="flex w-full h-8 border-gray-300 border">
@@ -764,7 +762,7 @@
                 <img
                   alt=""
                   id="previewM"
-                  src={seongdo.avatar || "/avatar.png"}
+                  src={"/avatar.png"}
                   class="border-gray-300 border w-[7.5rem] min-w-[7.5rem] h-[7.5rem] object-cover hover:opacity-75"
                 />
               </label>
@@ -774,8 +772,9 @@
                 accept="image/*"
                 class="sr-only"
                 on:change={(e) => {
-                  loadFile(e)
+                  onFileSelected(e)
                 }}
+                bind:this={fileinput}
               />
             </div>
             <div class="flex flex-col gap-3 w-full">
@@ -2708,6 +2707,69 @@
                 service.classification = ""
                 group2AddForService = ""
               }
+            }}
+          >
+            <Checkmark scale={16} />
+            <span>저장</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- modal for crop image -->
+<div
+  class="relative z-10 h-full"
+  class:hidden={image ? false : true}
+  aria-labelledby="modal-title"
+  role="dialog"
+  aria-modal="true"
+>
+  <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" />
+  <div class="w-full fixed inset-0 z-10 w-screen">
+    <div
+      class="h-full flex min-h-full items-end justify-center p-4 text-center items-center"
+    >
+      <div
+        class="sm:h-2/3 h-3/4 sm:max-md:w-2/3 md:w-1/3 w-full relative transform rounded-md bg-white shadow-xl transition-all"
+      >
+        <div
+          class="w-full overflow-scroll h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
+        >
+          <Cropper
+            {image}
+            bind:crop
+            bind:zoom
+            aspect={1}
+            on:cropcomplete={(e) => {
+              pixelCrop = e.detail.pixels
+            }}
+          />
+        </div>
+        <div
+          class="bg-gray-50 h-[55px] px-4 py-3 flex flex-row-reverse px-6 gap-2"
+        >
+          <button
+            type="button"
+            class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
+            on:click={reset}
+          >
+            <span class="flex items-center">
+              <Close class="text-[#F46055]" />
+              <p>닫기</p>
+            </span>
+          </button>
+          <button
+            type="submit"
+            class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+            on:click={async () => {
+              croppedImage = await getCroppedImg(image, pixelCrop)
+              const preview = document.getElementById("preview")
+              const previewM = document.getElementById("previewM")
+              seongdo.avatar = croppedImage
+              preview.src = croppedImage
+              previewM.src = croppedImage
+              reset()
             }}
           >
             <Checkmark scale={16} />
