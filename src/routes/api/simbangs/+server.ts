@@ -22,11 +22,21 @@ export const GET: RequestHandler = async ({ request, url }) => {
       : 1
   const take = 12
   const seongdoId = url.searchParams.get("seongdoId")
+  const memberIds =
+    url.searchParams.get("memberIds") != null
+      ? JSON.parse(url.searchParams.get("memberIds"))
+      : []
 
   let simbangMatch: any = {}
   if (seongdoId) {
     const ObjectId = Types.ObjectId
-    simbangMatch.seongdoId = new ObjectId(seongdoId)
+    if (memberIds.length > 0) {
+      simbangMatch.seongdoId = {
+        $in: memberIds.map((item) => new ObjectId(item)),
+      }
+    } else {
+      simbangMatch.seongdoId = new ObjectId(seongdoId)
+    }
   }
   if (simbangja?.length > 0) {
     simbangMatch.simbangja = { $in: simbangja }

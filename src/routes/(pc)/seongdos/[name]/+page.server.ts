@@ -80,12 +80,26 @@ export const load = loadFlash(async ({ url, fetch, locals, cookies }) => {
     family = (await response.json()).family
   }
 
-  response = await fetch(`/api/simbangs?seongdoId=${seongdo._id}`, {
-    method: "GET",
-    headers: {
-      "content-type": "application/json",
-    },
-  })
+  if (family) {
+    response = await fetch(
+      `/api/simbangs?seongdoId=${seongdo._id}&memberIds=${JSON.stringify(
+        family.memberIds
+      )}`,
+      {
+        method: "GET",
+        headers: {
+          "content-type": "application/json",
+        },
+      }
+    )
+  } else {
+    response = await fetch(`/api/simbangs?seongdoId=${seongdo._id}`, {
+      method: "GET",
+      headers: {
+        "content-type": "application/json",
+      },
+    })
+  }
 
   if (response.ok) {
     simbangs = (await response.json()).simbangs

@@ -337,7 +337,16 @@
             "content-type": "application/json",
           },
         })
-        return response.ok
+        // return response.ok
+        isSimbangModalHidden = true
+        date = ""
+        hymn = ""
+        bible = ""
+        simbangja = ""
+        companion = ""
+        detail = ""
+        toast.success("수정되었습니다.")
+        return await invalidateAll()
       } else {
         const response = await fetch(`/api/simbangs`, {
           method: "POST",
@@ -354,7 +363,15 @@
             "content-type": "application/json",
           },
         })
-        return response.ok
+        isSimbangModalHidden = true
+        date = ""
+        hymn = ""
+        bible = ""
+        simbangja = ""
+        companion = ""
+        detail = ""
+        toast.success("저장되었습니다.")
+        return await invalidateAll()
       }
     }
   }
@@ -378,7 +395,7 @@
     <!-- 신상 정보 -->
     <div class="신상 flex flex-col">
       <div
-        class="sticky top-0 pt-8 bg-white flex justify-between items-start pb-2"
+        class="sticky top-0 pt-8 bg-white flex justify-between items-start pb-2 z-10"
       >
         <h1 class="text-lg font-medium">
           {seongdo.name}
@@ -762,7 +779,7 @@
                 <img
                   alt=""
                   id="previewM"
-                  src={"/avatar.png"}
+                  src={seongdo.avatar || "/avatar.png"}
                   class="border-gray-300 border w-[7.5rem] min-w-[7.5rem] h-[7.5rem] object-cover hover:opacity-75"
                 />
               </label>
@@ -2422,6 +2439,7 @@
               date = ""
               hymn = ""
               bible = ""
+              companion = ""
               simbangja = ""
               detail = ""
             }}
@@ -2437,38 +2455,8 @@
             on:click={async () => {
               if (selectedSimbang) {
                 const result = await simbangHandler()
-                if (result) {
-                  const response = await fetch(
-                    `/api/simbangs?seongdoId=${seongdo._id}`
-                  )
-                  const responseJson = await response.json()
-                  simbangs = responseJson.simbangs
-                  isSimbangModalHidden = !isSimbangModalHidden
-                  selectedSimbang = null
-                  date = ""
-                  hymn = ""
-                  bible = ""
-                  simbangja = ""
-                  detail = ""
-                  toast.success("수정되었습니다.")
-                }
               } else {
                 const result = await simbangHandler()
-                if (result) {
-                  const response = await fetch(
-                    `/api/simbangs?seongdoId=${seongdo._id}`
-                  )
-                  const responseJson = await response.json()
-                  simbangs = responseJson.simbangs
-                  isSimbangModalHidden = !isSimbangModalHidden
-                  selectedSimbang = null
-                  date = ""
-                  hymn = ""
-                  bible = ""
-                  simbangja = ""
-                  detail = ""
-                  toast.success("저장되었습니다.")
-                }
               }
             }}
           >

@@ -8,5 +8,6 @@ export const load = async ({ request, fetch, url }) => {
   })
 
   const { simbangs, page } = await response.json()
+
   return { simbangs, page }
 }
