@@ -16,6 +16,8 @@ export const GET: RequestHandler = async ({ request, url }) => {
   const order = url.searchParams.get("order")
   const group1 = url.searchParams.get("group1")
   const group2 = url.searchParams.get("group2")
+  const dateStart = url.searchParams.get("dateStart")
+  const dateEnd = url.searchParams.get("dateEnd")
   const page =
     url.searchParams.get("page") != null
       ? parseInt(url.searchParams.get("page"))
@@ -26,6 +28,20 @@ export const GET: RequestHandler = async ({ request, url }) => {
     url.searchParams.get("memberIds") != null
       ? JSON.parse(url.searchParams.get("memberIds"))
       : []
+  const ids =
+    url.searchParams.get("ids") != null
+      ? JSON.parse(url.searchParams.get("ids"))
+      : []
+
+  if (ids.length > 0) {
+    const simbangs = await Simbang.find({ _id: { $in: ids } })
+      .sort({
+        date: -1,
+        _id: 1,
+      })
+      .populate("seongdoId")
+    return json(simbangs)
+  }
 
   let simbangMatch: any = {}
   if (seongdoId) {
@@ -40,6 +56,15 @@ export const GET: RequestHandler = async ({ request, url }) => {
   }
   if (simbangja?.length > 0) {
     simbangMatch.simbangja = { $in: simbangja }
+  }
+  if (dateStart) {
+    if (dateEnd) {
+      simbangMatch.date = { $gte: dateStart, $lte: dateEnd }
+    } else {
+      simbangMatch.date = { $gte: dateStart }
+    }
+  } else if (dateEnd) {
+    simbangMatch.date = { $lte: dateEnd }
   }
 
   let seongdoMatch: any = {}
@@ -142,6 +167,8 @@ export const GET: RequestHandler = async ({ request, url }) => {
         order,
         group1,
         group2,
+        dateStart,
+        dateEnd,
         take,
         simbangja,
       },

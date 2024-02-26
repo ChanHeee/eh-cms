@@ -8,6 +8,8 @@
   $: name = searchParams.name
   $: jikbunArray = searchParams.jikbun ?? []
   $: simbangjaArray = searchParams.simbangja ?? []
+  $: dateStart = searchParams.dateStart
+  $: dateEnd = searchParams.dateEnd
 
   const searchHandler = () => {
     const params = getSearchParams({
@@ -15,6 +17,8 @@
       name,
       jikbun: jikbunArray,
       simbangja: simbangjaArray,
+      dateStart,
+      dateEnd,
     })
 
     const url = params ? `/simbangs${params}` : "/simbangs"
@@ -200,7 +204,7 @@
   </div>
 
   <!-- 직분 검색 -->
-  <div class="flex flex-col w-full justify-center items-center">
+  <!-- <div class="flex flex-col w-full justify-center items-center">
     <div class="flex w-full items-center mx-auto">
       <div
         class="flex w-full bg-gray-50 border-y border-x border-gray-300 focus:outline-0"
@@ -468,6 +472,70 @@
               />
               <label for="l">성도</label>
             </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+  <!-- 심방날짜 검색 -->
+  <div class="flex flex-col w-full justify-center items-center">
+    <div class="flex w-full items-center mx-auto text-sm">
+      <div
+        class="flex w-full bg-gray-50 border-y border-x border-gray-300 focus:outline-0"
+      >
+        <div class="flex flex-col w-full">
+          <input
+            id="birth-dropdown"
+            type="checkbox"
+            class="hidden"
+            checked
+            on:change={(e) => {
+              if (e.target.checked) {
+                document.getElementById("birthBox")?.classList.remove("hidden")
+
+                document.getElementById("birth-down")?.classList.add("hidden")
+                document.getElementById("birth-up")?.classList.remove("hidden")
+              } else {
+                const checkboxes = document.querySelectorAll("#birthBox input")
+                document.getElementById("birthBox")?.classList.add("hidden")
+                document
+                  .getElementById("birth-down")
+                  ?.classList.remove("hidden")
+                document.getElementById("birth-up")?.classList.add("hidden")
+                checkboxes.forEach((checkbox) => {
+                  checkbox.checked = false
+                })
+              }
+            }}
+          />
+          <label class="flex w-full justify-between p-2" for="birth-dropdown">
+            <p class="select-none text-gray-400">심방날짜</p>
+            <ChevronDown id="birth-down" class="hidden cursor-pointer" />
+            <ChevronUp id="birth-up" class="cursor-pointer" />
+          </label>
+
+          <div
+            id="birthBox"
+            class="flex justify-between text-gray-600 border-t border-gray-300 focus:outline-0 px-5 py-2"
+          >
+            <input
+              type="date"
+              class="bg-gray-50 w-[40%] focus:outline-0"
+              value={dateStart}
+              on:input={(e) => {
+                dateStart = e.target.value
+              }}
+            />
+            <span>~</span>
+            <input
+              type="date"
+              class="bg-gray-50 w-[40%] focus:outline-0"
+              value={dateEnd}
+              on:input={(e) => {
+                dateEnd = e.target.value
+              }}
+            />
           </div>
         </div>
       </div>

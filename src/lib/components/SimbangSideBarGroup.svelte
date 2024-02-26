@@ -14,16 +14,17 @@
   $: group2 = searchParams.group2
   $: name = searchParams.name
   $: jikbunArray = searchParams.jikbun ?? []
-  $: birthStart = searchParams.birthStart
-  $: birthEnd = searchParams.birthEnd
+  $: simbangjaArray = searchParams.simbangja ?? []
+  $: dateStart = searchParams.dateStart
+  $: dateEnd = searchParams.dateEnd
 
   const searchHandler = () => {
     const params = getSearchParams({
       page: 1,
       name,
       jikbun: jikbunArray,
-      birthStart,
-      birthEnd,
+      dateStart,
+      dateEnd,
       group1,
       group2,
     })
@@ -71,8 +72,148 @@
     </form>
   </div>
 
-  <!-- 직분 검색 -->
+  <!-- 심방자 검색 -->
   <div class="flex flex-col w-full justify-center items-center">
+    <div class="flex w-full items-center mx-auto">
+      <div
+        class="flex w-full bg-gray-50 border-y border-x border-gray-300 focus:outline-0"
+      >
+        <div class="flex flex-col w-full">
+          <input
+            type="checkbox"
+            id="dropdown"
+            class="simbangja-input hidden"
+            on:change={(e) => {
+              if (e.target.checked) {
+                document
+                  .getElementById("simbangja-dropdown")
+                  ?.classList.remove("hidden")
+
+                document
+                  .getElementById("simbangja-down")
+                  ?.classList.add("hidden")
+                document
+                  .getElementById("simbangja-up")
+                  ?.classList.remove("hidden")
+              } else {
+                const checkboxes = document.querySelectorAll(
+                  "#simbangja-dropdown input"
+                )
+                document
+                  .getElementById("simbangja-dropdown")
+                  ?.classList.add("hidden")
+                document
+                  .getElementById("simbangja-down")
+                  ?.classList.remove("hidden")
+                document.getElementById("simbangja-up")?.classList.add("hidden")
+                checkboxes.forEach((checkbox) => {
+                  checkbox.checked = false
+                })
+              }
+            }}
+          />
+          <label class="flex w-full justify-between p-2" for="dropdown">
+            <p class="text-gray-400 text-sm select-none">심방자</p>
+            <ChevronDown id="simbangja-down" class="cursor-pointer" />
+            <ChevronUp id="simbangja-up" class="hidden cursor-pointer" />
+          </label>
+
+          <div
+            id="simbangja-dropdown"
+            class="hidden grid grid-cols-2 gap-[5px] border-t border-gray-300 focus:outline-0 px-3 py-2"
+          >
+            <p class="flex text-gray-600 text-sm gap-2 px-3">
+              <input
+                type="checkbox"
+                id="simbanga"
+                checked={simbangjaArray.find(
+                  (element) => element == "고재국 담임목사"
+                ) != undefined}
+                on:change={() => {
+                  if (document.querySelector("#simbanga").checked) {
+                    simbangjaArray = [...simbangjaArray, "고재국 담임목사"]
+                  } else {
+                    simbangjaArray = [
+                      ...simbangjaArray.filter(
+                        (value) => value !== "고재국 담임목사"
+                      ),
+                    ]
+                  }
+                }}
+              />
+              <label for="simbanga">고재국 담임목사</label>
+            </p>
+            <p class="flex text-gray-600 text-sm gap-2 px-3">
+              <input
+                type="checkbox"
+                id="simbangb"
+                checked={simbangjaArray.find(
+                  (element) => element == "김성태 목사"
+                ) != undefined}
+                on:change={() => {
+                  if (document.querySelector("#simbangb").checked) {
+                    simbangjaArray = [...simbangjaArray, "김성태 목사"]
+                  } else {
+                    simbangjaArray = [
+                      ...simbangjaArray.filter(
+                        (value) => value !== "김성태 목사"
+                      ),
+                    ]
+                  }
+                }}
+              />
+              <label for="simbangb">김성태 목사</label>
+            </p>
+            <p class="flex text-gray-600 text-sm gap-2 px-3">
+              <input
+                type="checkbox"
+                id="simbangc"
+                checked={simbangjaArray.find(
+                  (element) => element == "함정훈 강도사"
+                ) != undefined}
+                on:change={() => {
+                  if (document.querySelector("#simbangc").checked) {
+                    simbangjaArray = [...simbangjaArray, "함정훈 강도사"]
+                  } else {
+                    simbangjaArray = [
+                      ...simbangjaArray.filter(
+                        (value) => value !== "함정훈 강도사"
+                      ),
+                    ]
+                  }
+                }}
+              />
+              <label for="simbangc">함정훈 강도사</label>
+            </p>
+            <p class="flex text-gray-600 text-sm gap-2 px-3">
+              <input
+                type="checkbox"
+                id="simbangd"
+                checked={simbangjaArray.find(
+                  (element) => element == "진권 전도사"
+                ) != undefined}
+                on:change={() => {
+                  if (document.querySelector("#simbangd").checked) {
+                    simbangjaArray = [...simbangjaArray, "진권 전도사"]
+                  } else {
+                    simbangjaArray = [
+                      ...simbangjaArray.filter(
+                        (value) => value !== "진권 전도사"
+                      ),
+                    ]
+                  }
+                }}
+              />
+              <label for="simbangd">진권 전도사</label>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 직분 검색 -->
+  <!-- <div class="flex flex-col w-full justify-center items-center">
     <div class="flex w-full items-center mx-auto">
       <div
         class="flex w-full bg-gray-50 border-y border-x border-gray-300 focus:outline-0"
@@ -367,9 +508,9 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 
-  <!-- 생년월일 검색 -->
+  <!-- 심방날짜 검색 -->
   <div class="flex flex-col w-full justify-center items-center">
     <div class="flex w-full items-center mx-auto text-sm">
       <div
@@ -400,7 +541,7 @@
             }}
           />
           <label class="flex w-full justify-between p-2" for="birth-dropdown">
-            <p class="select-none text-gray-400">생년월일</p>
+            <p class="select-none text-gray-400">심방날짜</p>
             <ChevronDown id="birth-down" class="cursor-pointer" />
             <ChevronUp id="birth-up" class="hidden cursor-pointer" />
           </label>
@@ -412,18 +553,18 @@
             <input
               type="date"
               class="bg-gray-50 w-[40%] focus:outline-0"
-              value={birthStart}
+              value={dateStart}
               on:input={(e) => {
-                birthStart = e.target.value
+                dateStart = e.target.value
               }}
             />
             <span>~</span>
             <input
               type="date"
               class="bg-gray-50 w-[40%] focus:outline-0"
-              value={birthEnd}
+              value={dateEnd}
               on:input={(e) => {
-                birthEnd = e.target.value
+                dateEnd = e.target.value
               }}
             />
           </div>

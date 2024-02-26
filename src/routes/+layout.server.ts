@@ -13,6 +13,7 @@ export const load = async ({ cookies, url }) => {
     jwt.verify(token, JWT_SECRET, (err, decoded) => {
       if (err) {
         cookies.delete("token")
+        throw redirect(302, "/login")
       }
     })
   }

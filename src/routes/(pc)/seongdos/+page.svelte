@@ -341,7 +341,7 @@
             type="button"
             class="flex h-fit items-center gap-1 rounded-sm text-xs px-2 py-[0.335rem] border-gray-300 border"
             on:click={async () => {
-              deleteMany = false
+              goto("/seongdos")
             }}
           >
             <span class="flex items-center">
@@ -373,7 +373,7 @@
             type="button"
             class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
             on:click={() => {
-              deleteMany = true
+              goto("/seongdos?deleteMany=true")
             }}
           >
             <TrashCan scale={16} />
@@ -385,7 +385,6 @@
     {#if deleteMany}
       <TableForDelete {seongdos} {page} {allowedGroup} />
     {:else}
-      <!-- else content here -->
       <Table {seongdos} {page} />
     {/if}
     <!-- <Table />

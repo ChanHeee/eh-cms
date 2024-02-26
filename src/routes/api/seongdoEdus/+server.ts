@@ -35,11 +35,31 @@ export const GET: RequestHandler = async ({ request, url }) => {
     case "nameDesc":
       aggregateSort = { "seongdo.name": -1, _id: 1 }
       break
+    // case "birthAsc":
+    //   aggregateSort = { "seongdo.birth": 1, _id: 1 }
+    //   break
+    // case "birthDesc":
+    //   aggregateSort = { "seongdo.birth": -1, _id: 1 }
+    //   break
     case "birthAsc":
-      aggregateSort = { "seongdo.birth": 1, _id: 1 }
+      aggregateSort = { hasBirth: -1, "seongdo.birth": 1, _id: 1 }
       break
     case "birthDesc":
-      aggregateSort = { "seongdo.birth": -1, _id: 1 }
+      aggregateSort = { hasBirth: -1, "seongdo.birth": -1, _id: 1 }
+      break
+    case "ageAsc":
+      aggregateSort = { hasBirth: -1, "seongdo.birth": -1, _id: 1 }
+      break
+    case "ageDesc":
+      aggregateSort = { hasBirth: -1, "seongdo.birth": 1, _id: 1 }
+      break
+    case "groupAsc":
+      aggregateSort = { "seongdo.group1": 1, "seongdo.group2": 1, _id: 1 }
+
+      break
+    case "groupDesc":
+      aggregateSort = { "seongdo.group1": -1, "seongdo.group2": -1, _id: 1 }
+
       break
     case "startDateAsc":
       aggregateSort = { "education.startDate": 1, _id: 1 }
@@ -229,6 +249,15 @@ export const GET: RequestHandler = async ({ request, url }) => {
         endDate: 1,
       },
     })
+    .addFields(
+      order?.startsWith("birth") || order?.startsWith("age")
+        ? {
+            hasBirth: {
+              $cond: [{ $eq: ["$seongdo.birth", ""] }, false, true],
+            },
+          }
+        : { undefined }
+    )
     .sort(aggregateSort)
     .skip((page - 1) * take)
     .limit(take)

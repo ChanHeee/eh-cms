@@ -1,5 +1,6 @@
 export const load = async ({ request, fetch, url }) => {
   let requestUrl = `/api/simbangs${decodeURI(url.search)}`
+  const selectMany = url.searchParams.get("selectMany") || false
 
   const response = await fetch(requestUrl, {
     headers: {
@@ -9,5 +10,5 @@ export const load = async ({ request, fetch, url }) => {
 
   const { simbangs, page } = await response.json()
 
-  return { simbangs, page }
+  return { simbangs, page, selectMany }
 }

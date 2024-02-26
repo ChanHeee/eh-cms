@@ -13,14 +13,12 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
   const order = url.searchParams.get("order")
   const group1 = url.searchParams.get("group1")
   const group2 = url.searchParams.get("group2")
-
   const birthStart = url.searchParams.get("birthStart")
   const birthEnd = url.searchParams.get("birthEnd")
   const page =
     url.searchParams.get("page") != null
       ? parseInt(url.searchParams.get("page"))
       : 1
-
   const take = 12
 
   let seongdoMatch: any = {}
@@ -31,9 +29,12 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
     seongdoMatch.jikbun = { $in: jikbun }
   }
   if (birthStart) {
-    seongdoMatch.birth = { $gte: birthStart }
-  }
-  if (birthEnd) {
+    if (birthEnd) {
+      seongdoMatch.birth = { $gte: birthStart, $lte: birthEnd }
+    } else {
+      seongdoMatch.birth = { $gte: birthStart }
+    }
+  } else if (birthEnd) {
     seongdoMatch.birth = { $lte: birthEnd }
   }
 
@@ -70,7 +71,6 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       } else {
         aggregateSort = { group1: -1, group2: -1, "services.order": -1, _id: 1 }
       }
-
       break
     default:
       if (group1 == "장년부") {

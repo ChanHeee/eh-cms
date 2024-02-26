@@ -153,6 +153,9 @@ export interface ISimbangPage {
     jikbun?: string[]
     group1?: string
     group2?: string
+    dateStart?: string
+    dateEnd?: string
+    simbangja?: string
   }
 }
 
@@ -188,6 +191,8 @@ export interface ISeongdoSearchParams {
   className?: string
   birthStart?: string
   birthEnd?: string
+  dateStart?: string
+  dateEnd?: string
   simbangja?: string
 }
 

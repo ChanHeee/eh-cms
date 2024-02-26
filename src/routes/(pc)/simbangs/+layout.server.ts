@@ -18,8 +18,8 @@ export const load = async ({ url, locals, fetch }) => {
       : 1
   const group1 = url.searchParams.get("group1")
   const group2 = url.searchParams.get("group2")
-  const birthStart = url.searchParams.get("birthStart")
-  const birthEnd = url.searchParams.get("birthEnd")
+  const dateStart = url.searchParams.get("dateStart")
+  const dateEnd = url.searchParams.get("dateEnd")
 
   if (
     (group1 != null &&
@@ -40,8 +40,8 @@ export const load = async ({ url, locals, fetch }) => {
     page,
     group1,
     group2,
-    birthStart,
-    birthEnd,
+    dateStart,
+    dateEnd,
   }
 
   let groupTree: IGroup | null = null
@@ -242,8 +242,8 @@ export const load = async ({ url, locals, fetch }) => {
         page,
         group1,
         group2,
-        birthStart,
-        birthEnd,
+        dateStart,
+        dateEnd,
       },
       groupTree,
     }
@@ -256,8 +256,8 @@ export const load = async ({ url, locals, fetch }) => {
         page,
         group1,
         group2,
-        birthStart,
-        birthEnd,
+        dateStart,
+        dateEnd,
         simbangja,
       },
     }
