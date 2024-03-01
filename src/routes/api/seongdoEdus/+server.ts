@@ -36,12 +36,6 @@ export const GET: RequestHandler = async ({ request, url }) => {
     case "nameDesc":
       aggregateSort = { "seongdo.name": -1, _id: 1 }
       break
-    // case "birthAsc":
-    //   aggregateSort = { "seongdo.birth": 1, _id: 1 }
-    //   break
-    // case "birthDesc":
-    //   aggregateSort = { "seongdo.birth": -1, _id: 1 }
-    //   break
     case "birthAsc":
       aggregateSort = { hasBirth: -1, "seongdo.birth": 1, _id: 1 }
       break
@@ -76,6 +70,9 @@ export const GET: RequestHandler = async ({ request, url }) => {
   let seongdoMatch: any = {},
     educationMatch: any = {}
 
+  if (seongdoId) {
+    seongdoMatch._id = new Types.ObjectId(seongdoId)
+  }
   if (name) {
     seongdoMatch.name = { $regex: name }
   }
@@ -209,7 +206,6 @@ export const GET: RequestHandler = async ({ request, url }) => {
   // }
 
   seongdoEdus = await SeongdoEdu.aggregate()
-
     .lookup({
       from: "seongdos",
       localField: "seongdo",

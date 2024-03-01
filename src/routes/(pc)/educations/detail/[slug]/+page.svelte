@@ -45,6 +45,18 @@
 
   $: isModalHidden = true
 
+  const enrollMany = async (educationId: string, names: string[]) => {
+    const response = await fetch("/api/seongdoEdus", {
+      method: "POST",
+      body: JSON.stringify({ education: educationId, names }),
+      headers: {
+        "content-type": "application/json",
+      },
+    })
+    await invalidateAll()
+    return response.ok
+  }
+
   var loadFile = async function (event) {
     var input = event.target
     var file = input.files[0]
@@ -66,15 +78,13 @@
     })
 
     let names = csv.slice(1).map((item) => item.name)
-    const response = await fetch("/api/seongdoEdus", {
-      method: "POST",
-      body: JSON.stringify({ education: education._id, names }),
-      headers: {
-        "content-type": "application/json",
-      },
+
+    // toast.success("저장되었습니다.")
+    toast.promise(enrollMany(education._id, names), {
+      loading: "저장 중입니다...",
+      success: `저장되었습니다!`,
+      error: "오류가 발생했습니다.",
     })
-    toast.success("저장되었습니다.")
-    await invalidateAll()
   }
 
   const submitHandler = async () => {

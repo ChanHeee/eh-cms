@@ -50,6 +50,7 @@
     )
     if (response.ok) {
       const seongdoEdus = (await response.json()).seongdoEdus
+      console.log(seongdoEdus, educationId, seongdoId)
 
       if (seongdoEdus.length == 0) {
         return false
