@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { goto } from "$app/navigation"
+  import { goto, invalidateAll } from "$app/navigation"
   import type { IPage, ISeongdoEduPopulate } from "$lib/interfaces"
   import {
     AllowedGroupStore,
@@ -31,9 +31,7 @@
         "content-type": "application/json",
       },
     })
-    if (response.ok) {
-      await getEnrolledSeongdoHandler(1)
-    }
+    return response.ok
   }
 
   const getEnrolledSeongdoHandler = async (page: number) => {
@@ -174,7 +172,10 @@
           type="button"
           class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem]"
           on:click={async () => {
-            await deleteHandler(item.seongdo._id, item.education)
+            const result = await deleteHandler(item.seongdo._id, item.education)
+            if (result) {
+              await invalidateAll()
+            }
           }}
         >
           <TrashCan fill="#4a4a4a" size={20} />

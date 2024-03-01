@@ -1,4 +1,5 @@
 import type { ISeongdoEduSearchParams } from "$lib/interfaces"
+import { Seongdo } from "$lib/models/Seongdo"
 import { SeongdoEdu } from "$lib/models/SeongdoEdu"
 import { json, type RequestHandler } from "@sveltejs/kit"
 import { Aggregate, Types } from "mongoose"
@@ -309,12 +310,25 @@ export const GET: RequestHandler = async ({ request, url }) => {
 
 export const POST: RequestHandler = async ({ request, url }) => {
   const body = await request.json()
+  const names = body.names
+  const education = body.education
 
-  const seongdoEdu = await SeongdoEdu.create({ ...body })
-  if (seongdoEdu) {
+  if (names) {
+    let seongdos = await Seongdo.find({ name: { $in: names } })
+
+    Promise.all(
+      seongdos.map(async (seongdo) => {
+        await SeongdoEdu.create({ seongdo: seongdo._id, education })
+      })
+    )
     return json({ success: true })
   } else {
-    return json({ success: false })
+    const seongdoEdu = await SeongdoEdu.create({ ...body })
+    if (seongdoEdu) {
+      return json({ success: true })
+    } else {
+      return json({ success: false })
+    }
   }
 }
 

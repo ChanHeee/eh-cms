@@ -1,13 +1,20 @@
 <script lang="ts">
   import SearchTable from "./SearchTable.svelte"
   import Table from "./Table.svelte"
-  import { goto } from "$app/navigation"
+  import { goto, invalidateAll } from "$app/navigation"
   import type {
     IEducation,
     IPage,
     ISeongdoEduPopulate,
   } from "$lib/interfaces/index.js"
-  import { Save, AddLarge, Search, TrashCan, Close } from "carbon-icons-svelte"
+  import {
+    Save,
+    AddLarge,
+    Search,
+    TrashCan,
+    Close,
+    Document,
+  } from "carbon-icons-svelte"
   import {
     SeongdoEduPageStore,
     SeongdoEdusStore,
@@ -16,6 +23,7 @@
   } from "$lib/store"
   import toast from "svelte-french-toast"
   import { getEduSlug } from "$lib/utils"
+  import { read, utils } from "xlsx"
 
   export let data: {
     education: IEducation
@@ -36,6 +44,38 @@
   $: teacherList = JSON.parse(data.selectList).teacherList
 
   $: isModalHidden = true
+
+  var loadFile = async function (event) {
+    var input = event.target
+    var file = input.files[0]
+
+    const readFile = (file: File) =>
+      new Promise((resolve, reject) => {
+        let reader = new FileReader()
+        reader.onload = () => resolve(reader.result)
+
+        reader.readAsArrayBuffer(file)
+      })
+
+    let csv = await readFile(file)
+    const wb = read(csv)
+    const sheet = wb.Sheets[wb.SheetNames[0]]
+
+    csv = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
+      header: ["name"],
+    })
+
+    let names = csv.slice(1).map((item) => item.name)
+    const response = await fetch("/api/seongdoEdus", {
+      method: "POST",
+      body: JSON.stringify({ education: education._id, names }),
+      headers: {
+        "content-type": "application/json",
+      },
+    })
+    toast.success("저장되었습니다.")
+    await invalidateAll()
+  }
 
   const submitHandler = async () => {
     const response = await fetch("/api/educations", {
@@ -98,7 +138,9 @@
             `/educations/detail/${getEduSlug(
               education.name,
               education.semester,
-              education.startDate
+              education.startDate,
+              education.day,
+              education.time
             )}`
           )
         }
@@ -357,6 +399,23 @@
       </div>
 
       <div class="flex ml-auto gap-2">
+        <label for="file">
+          <div
+            class="cursor-pointer hidden md:flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#237334]"
+          >
+            <Document scale={16} />
+            <span>엑셀로 추가</span>
+          </div>
+        </label>
+        <input
+          id="file"
+          type="file"
+          class="hidden"
+          accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+          on:change={(e) => {
+            loadFile(e)
+          }}
+        />
         <button
           class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#FBA244]"
           on:click={() => {
