@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken"
 import { JWT_SECRET } from "$lib/env"
 import { getGroupList } from "$lib/utils"
 
-export const load: LayoutServerLoad = async ({ url, locals }) => {
+export const load: LayoutServerLoad = async ({ url, fetch, locals }) => {
   if (url.pathname == "/") {
     throw redirect(303, "/seongdos")
   }

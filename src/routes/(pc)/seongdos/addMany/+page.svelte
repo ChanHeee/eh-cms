@@ -44,37 +44,57 @@
         "group1",
         "group2",
         "address",
+        "detailAddress",
       ],
     })
 
     seongdos = csv.slice(1)
 
-    seongdos.map((seongdo) => {
-      const {
-        name,
-        gender,
-        enrolled_at,
-        birth,
-        jikbun,
-        singeup,
-        phone,
-        group1,
-        group2,
-        address,
-      } = seongdo
+    Promise.all(
+      seongdos.map(async (seongdo) => {
+        const {
+          name,
+          gender,
+          enrolled_at,
+          birth,
+          jikbun,
+          singeup,
+          phone,
+          group1,
+          group2,
+          address,
+          detailAddress,
+        } = seongdo
 
-      seongdo.name = name?.trim()
-      seongdo.originalName = name?.trim()
-      seongdo.gender = gender || ""
-      seongdo.enrolled_at = enrolled_at || ""
-      seongdo.birth = birth || ""
-      seongdo.jikbun = jikbun || ""
-      seongdo.singeup = singeup || ""
-      seongdo.phone = phone || ""
-      seongdo.group1 = group1 || ""
-      seongdo.group2 = group2 || ""
-      seongdo.address = address || ""
-    })
+        seongdo.name = name?.trim()
+        seongdo.originalName = name?.trim()
+        seongdo.gender = gender || ""
+        seongdo.enrolled_at = enrolled_at || ""
+        seongdo.birth = birth || ""
+        seongdo.jikbun = jikbun || ""
+        seongdo.singeup = singeup || ""
+        seongdo.phone = phone || ""
+        seongdo.group1 = group1 || ""
+        seongdo.group2 = group2 || ""
+
+        if (detailAddress) {
+          const response = await fetch(`/api/admin/juso?keyword=${address}`, {
+            method: "GET",
+            headers: { "content-type": "application/json" },
+          })
+
+          if (response.ok) {
+            const { roadAddrPart1, roadAddrPart2 } = await response.json()
+
+            if (roadAddrPart1) {
+              seongdo.address = `${roadAddrPart1}, ${detailAddress}${roadAddrPart2}`
+            }
+          }
+        } else {
+          seongdo.address = address || ""
+        }
+      })
+    )
   }
 
   const seongdoAdd = async () => {
