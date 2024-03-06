@@ -77,21 +77,26 @@
         seongdo.group1 = group1 || ""
         seongdo.group2 = group2 || ""
 
-        if (detailAddress) {
-          const response = await fetch(`/api/admin/juso?keyword=${address}`, {
-            method: "GET",
-            headers: { "content-type": "application/json" },
-          })
-
-          if (response.ok) {
-            const { roadAddrPart1, roadAddrPart2 } = await response.json()
-
-            if (roadAddrPart1) {
-              seongdo.address = `${roadAddrPart1}, ${detailAddress}${roadAddrPart2}`
-            }
-          }
-        } else {
+        if (csv[0]["detailAddress"] != "상세주소") {
           seongdo.address = address || ""
+          seongdo.detailAddress = ""
+        } else {
+          if (detailAddress) {
+            const response = await fetch(`/api/admin/juso?keyword=${address}`, {
+              method: "GET",
+              headers: { "content-type": "application/json" },
+            })
+
+            if (response.ok) {
+              const { roadAddrPart1, roadAddrPart2 } = await response.json()
+
+              if (roadAddrPart1) {
+                seongdo.address = `${roadAddrPart1}, ${detailAddress}${roadAddrPart2}`
+              }
+            }
+          } else {
+            seongdo.address = address || ""
+          }
         }
       })
     )

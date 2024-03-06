@@ -25,7 +25,7 @@ export const GET = async ({ request, url, fetch }) => {
 
   return json({
     totalCount,
-    roadAddrPart1: juso[0].roadAddrPart1,
-    roadAddrPart2: juso[0].roadAddrPart2,
+    roadAddrPart1: juso[0]?.roadAddrPart1,
+    roadAddrPart2: juso[0]?.roadAddrPart2,
   })
 }
