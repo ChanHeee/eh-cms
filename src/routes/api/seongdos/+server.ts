@@ -1,8 +1,10 @@
+import { BLOB_READ_WRITE_TOKEN } from "$lib/env"
 import type { ISeongdo } from "$lib/interfaces"
-import { Education } from "$lib/models/Education"
 import { Seongdo } from "$lib/models/Seongdo"
 import { getAgeFromBirth, getGroupItem } from "$lib/utils"
+import { dataURItoBlob } from "$lib/utils/canvasUtils"
 import { json, type RequestHandler } from "@sveltejs/kit"
+import { put, del } from "@vercel/blob"
 
 export const GET: RequestHandler = async ({ request, url, locals }) => {
   const name = url.searchParams.get("name")
@@ -304,6 +306,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
     .project({
       _id: 1,
       name: 1,
+      avatar: 1,
       jikbun: 1,
       birth: 1,
       services: 1,
@@ -383,11 +386,24 @@ export async function POST({ request }) {
 }
 
 export async function PUT({ request }) {
-  const { _id, ...rest } = await request.json()
+  const { _id, name, avatar, croppedImage, ...rest } = await request.json()
+  let url
+
+  if (croppedImage) {
+    await del(avatar, { token: BLOB_READ_WRITE_TOKEN })
+    const blob = dataURItoBlob(croppedImage)
+    const result = await put(`${name}.jpeg`, blob, {
+      access: "public",
+      token: BLOB_READ_WRITE_TOKEN,
+    })
+    url = result.url
+  }
 
   const { upsertedCount, modifiedCount } = await Seongdo.updateOne(
     { _id },
     {
+      name,
+      avatar: url,
       ...rest,
     }
   )

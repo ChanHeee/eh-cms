@@ -10,6 +10,7 @@ const seongdoSchema = new Schema<ISeongdo>({
   name: { type: String, required: true },
   originalName: { type: String, required: false },
   avatar: { type: String, required: false },
+  avatarVercelBlob: { type: String, required: false },
   birth: { type: String, required: false },
   gender: { type: String, required: false },
   phone: { type: String, required: false },

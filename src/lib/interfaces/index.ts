@@ -17,6 +17,7 @@ export interface ISeongdo {
   name: string
   originalName: string
   avatar: string
+  avatarVercelBlob: string
   birth: string
   age?: number
   gender: string

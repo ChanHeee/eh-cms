@@ -150,13 +150,15 @@
 
   //for crop profile
   import Cropper from "svelte-easy-crop"
-  import getCroppedImg from "$lib/utils/canvasUtils.js"
+  import { getCroppedImg, getCroppedImgAsFile } from "$lib/utils/canvasUtils"
+  import type { a } from "@vercel/blob/dist/helpers-nc9XZVs6.cjs"
 
   let crop = { x: 0, y: 0 }
   let zoom = 1
-  let image, fileinput, pixelCrop, croppedImage
+  let image, fileinput, pixelCrop, croppedImage, croppedImageForRequest: any
   function onFileSelected(e) {
     let imageFile = e.target.files[0]
+
     let reader = new FileReader()
     reader.onload = (e) => {
       image = e.target.result
@@ -191,6 +193,7 @@
             ? groupItem.group2 + "," + group2Add
             : groupItem.group2,
           address: fullAddress,
+          croppedImage: croppedImageForRequest,
           ...rest,
         }),
         headers: {
@@ -2752,9 +2755,9 @@
             class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
             on:click={async () => {
               croppedImage = await getCroppedImg(image, pixelCrop)
+              croppedImageForRequest = croppedImage
               const preview = document.getElementById("preview")
               const previewM = document.getElementById("previewM")
-              seongdo.avatar = croppedImage
               preview.src = croppedImage
               previewM.src = croppedImage
               reset()

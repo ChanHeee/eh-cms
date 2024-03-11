@@ -28,7 +28,7 @@ export function rotateSize(width, height, rotation) {
 /**
  * This function was adapted from the one in the ReadMe of https://github.com/DominicTobias/react-image-crop
  */
-export default async function getCroppedImg(
+export async function getCroppedImg(
   imageSrc,
   pixelCrop,
   rotation = 0,
@@ -89,4 +89,87 @@ export default async function getCroppedImg(
   //     resolve(URL.createObjectURL(file))
   //   }, "image/jpeg")
   // })
+}
+
+export async function getCroppedImgAsFile(
+  imageSrc,
+  pixelCrop,
+  rotation = 0,
+  flip = { horizontal: false, vertical: false }
+) {
+  const image = await createImage(imageSrc)
+  const canvas = document.createElement("canvas")
+  const ctx = canvas.getContext("2d")
+
+  if (!ctx) {
+    return null
+  }
+
+  const rotRad = getRadianAngle(rotation)
+
+  // calculate bounding box of the rotated image
+  const { width: bBoxWidth, height: bBoxHeight } = rotateSize(
+    image.width,
+    image.height,
+    rotation
+  )
+
+  // set canvas size to match the bounding box
+  canvas.width = bBoxWidth
+  canvas.height = bBoxHeight
+
+  // translate canvas context to a central location to allow rotating and flipping around the center
+  ctx.translate(bBoxWidth / 2, bBoxHeight / 2)
+  ctx.rotate(rotRad)
+  ctx.scale(flip.horizontal ? -1 : 1, flip.vertical ? -1 : 1)
+  ctx.translate(-image.width / 2, -image.height / 2)
+
+  // draw rotated image
+  ctx.drawImage(image, 0, 0)
+
+  // croppedAreaPixels values are bounding box relative
+  // extract the cropped image using these values
+  const data = ctx.getImageData(
+    pixelCrop.x,
+    pixelCrop.y,
+    pixelCrop.width,
+    pixelCrop.height
+  )
+
+  // set canvas width to final desired crop size - this will clear existing context
+  canvas.width = pixelCrop.width
+  canvas.height = pixelCrop.height
+
+  // paste generated rotate image at the top left corner
+  ctx.putImageData(data, 0, 0)
+
+  // As Base64 string
+  // return canvas.toDataURL("image/jpeg")
+  canvas.toBlob((blob) => {
+    return new File([blob], "temp", { type: "jpeg" })
+  })
+}
+
+export const dataURItoBlob = (dataURI) => {
+  // convert base64 to raw binary data held in a string
+  // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
+  var byteString = atob(dataURI.split(",")[1])
+
+  // separate out the mime component
+  var mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0]
+
+  // write the bytes of the string to an ArrayBuffer
+  var ab = new ArrayBuffer(byteString.length)
+
+  // create a view into the buffer
+  var ia = new Uint8Array(ab)
+
+  // set the bytes of the buffer to the correct values
+  for (var i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i)
+  }
+
+  // write the ArrayBuffer to a blob, and you're done
+  var blob = new Blob([ab], { type: mimeString })
+  return blob
 }
