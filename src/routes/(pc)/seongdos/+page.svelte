@@ -15,12 +15,7 @@
     UserMultiple,
   } from "carbon-icons-svelte"
   import { goto } from "$app/navigation"
-  import {
-    getGroupItem,
-    getSearchParams,
-    isAllowDeleteGroup,
-    isAllowGroup,
-  } from "$lib/utils"
+  import { getGroupItem, getSearchParams } from "$lib/utils"
   import { onMount } from "svelte"
   import toast from "svelte-french-toast"
   import { SeongdoDeleteIdsStore } from "$lib/store"
@@ -82,6 +77,8 @@
       history.back()
     }
   }
+
+  onMount(async () => {})
 </script>
 
 <div

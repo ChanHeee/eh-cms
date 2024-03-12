@@ -5,6 +5,8 @@ import { Simbang } from "./Simbang"
 import { Family } from "./Family"
 import { SeongdoEdu } from "./SeongdoEdu"
 import { getAgeFromBirth } from "$lib/utils"
+import { del } from "@vercel/blob"
+import { BLOB_READ_WRITE_TOKEN } from "$lib/env"
 
 const seongdoSchema = new Schema<ISeongdo>({
   name: { type: String, required: true },
@@ -51,6 +53,12 @@ seongdoSchema.pre("save", async function (next) {
 
 seongdoSchema.pre("deleteOne", async function (next) {
   const { _id } = this.getFilter()
+
+  const seongdo = await Seongdo.findOne({ _id })
+
+  if (seongdo.avatarVercelBlob) {
+    await del(seongdo.avatarVercelBlob, { token: BLOB_READ_WRITE_TOKEN })
+  }
 
   await Simbang.deleteMany({ seongdoId: _id })
   const family = await Family.findOne({ memberIds: { $in: [_id] } })

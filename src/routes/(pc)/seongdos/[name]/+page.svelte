@@ -29,7 +29,7 @@
     ISimbang,
   } from "$lib/interfaces"
   import toast from "svelte-french-toast"
-  import { onMount } from "svelte"
+  import { afterUpdate, onMount } from "svelte"
   export let data: {
     seongdo: ISeongdo
     family: IFamily
@@ -39,7 +39,10 @@
     seongdoEdus: ISeongdoEduPopulate[]
   }
 
-  onMount(() => {
+  onMount(async () => {
+    // const temp = document.getElementById("preview")
+    // seongdo.avatar = await dataURItoString(temp.src)
+
     selectedSimbang = data.simbangs.filter(
       (simbang) => simbang._id == data.simbangId
     )[0]
@@ -56,6 +59,7 @@
   $: groupList = data.groupList
   // value for senogdo detail
   $: seongdo = data.seongdo
+
   let seongdoName = data.seongdo.name
 
   $: ageWithString = seongdo.age ? seongdo.age + " 세" : ""
@@ -150,8 +154,7 @@
 
   //for crop profile
   import Cropper from "svelte-easy-crop"
-  import { getCroppedImg, getCroppedImgAsFile } from "$lib/utils/canvasUtils"
-  import type { a } from "@vercel/blob/dist/helpers-nc9XZVs6.cjs"
+  import { getCroppedImg, getThumbFile } from "$lib/utils/canvasUtils"
 
   let crop = { x: 0, y: 0 }
   let zoom = 1
@@ -171,8 +174,32 @@
     image = null
   }
 
+  const seongdoUpdate = async () => {
+    const { name, originalName, age, group2, address, ...rest } = seongdo
+    const response = await fetch("/api/seongdos", {
+      method: "PUT",
+      body: JSON.stringify({
+        name: name.trim(),
+        originalName: name.trim(),
+        age: age ? age : getAgeFromBirth(seongdo.birth),
+        group2: group2Add
+          ? groupItem.group2 + "," + group2Add
+          : groupItem.group2,
+        address: fullAddress,
+        thumb: seongdo.avatar ? await getThumbFile(seongdo.avatar) : "",
+        ...rest,
+      }),
+      headers: {
+        "content-type": "application/json",
+      },
+    })
+    if (response.ok) {
+      seongdoName = seongdo.name
+      goto(`/seongdos/${seongdo.name}`)
+    }
+  }
   const submitHandler = async () => {
-    const { name, age, group2, address, service, ...rest } = seongdo
+    const { name } = seongdo
     let response = await fetch(`/api/seongdos/${name}`, {
       headers: {
         "content-type": "application/json",
@@ -183,28 +210,11 @@
     if (name != seongdoName && result.seongdo) {
       toast.error("이미 등록된 이름은 사용할 수 없습니다.")
     } else {
-      response = await fetch("/api/seongdos", {
-        method: "PUT",
-        body: JSON.stringify({
-          name: name.trim(),
-          originalName: name.trim(),
-          age: age ? age : getAgeFromBirth(seongdo.birth),
-          group2: group2Add
-            ? groupItem.group2 + "," + group2Add
-            : groupItem.group2,
-          address: fullAddress,
-          croppedImage: croppedImageForRequest,
-          ...rest,
-        }),
-        headers: {
-          "content-type": "application/json",
-        },
+      toast.promise(seongdoUpdate(), {
+        loading: "저장 중입니다...",
+        success: `저장되었습니다!`,
+        error: "오류가 발생했습니다.",
       })
-      if (response.ok) {
-        toast.success("저장되었습니다.")
-        seongdoName = seongdo.name
-        goto(`/seongdos/${seongdo.name}`)
-      }
     }
   }
 
@@ -2755,9 +2765,10 @@
             class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
             on:click={async () => {
               croppedImage = await getCroppedImg(image, pixelCrop)
-              croppedImageForRequest = croppedImage
+              // croppedImageForRequest = croppedImage
               const preview = document.getElementById("preview")
               const previewM = document.getElementById("previewM")
+              seongdo.avatar = croppedImage
               preview.src = croppedImage
               previewM.src = croppedImage
               reset()

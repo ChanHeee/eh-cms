@@ -59,6 +59,7 @@
           name: name.trim(),
           originalName: name.trim(),
           avatar,
+          croppedImage: croppedImageForRequest,
           birth,
           age,
           gender,
@@ -132,11 +133,11 @@
   }
 
   import Cropper from "svelte-easy-crop"
-  import getCroppedImg from "$lib/utils/canvasUtils.js"
+  import { getCroppedImg } from "$lib/utils/canvasUtils.js"
 
   let crop = { x: 0, y: 0 }
   let zoom = 1
-  let image, fileinput, pixelCrop, croppedImage
+  let image, fileinput, pixelCrop, croppedImage, croppedImageForRequest: any
   function onFileSelected(e) {
     let imageFile = e.target.files[0]
     let reader = new FileReader()
@@ -872,6 +873,7 @@
             class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
             on:click={async () => {
               croppedImage = await getCroppedImg(image, pixelCrop)
+              croppedImageForRequest = croppedImage
               const preview = document.getElementById("preview")
               const previewM = document.getElementById("previewM")
               avatar = croppedImage

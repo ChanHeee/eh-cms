@@ -173,3 +173,41 @@ export const dataURItoBlob = (dataURI) => {
   var blob = new Blob([ab], { type: mimeString })
   return blob
 }
+
+export const getThumbFile = async (imageSrc) => {
+  //canvas에 이미지 객체를 리사이징해서 담는 과정
+  const image = await createImage(imageSrc)
+  var canvas = document.createElement("canvas")
+  const ctx = canvas.getContext("2d")
+
+  if (!ctx) {
+    return null
+  }
+
+  canvas.width = 200 //리사이징하여 그릴 가로 길이
+  canvas.height = 200 //리사이징하여 그릴 세로 길이
+  ctx.drawImage(image, 0, 0, 200, 200)
+
+  //canvas의 dataurl를 blob(file)화 하는 과정
+  const result = canvas.toDataURL("image/png") //png => jpg 등으로 변환 가능
+  return result
+}
+
+export const dataURItoString = async (imageSrc) => {
+  //canvas에 이미지 객체를 리사이징해서 담는 과정
+  const image = await createImage(imageSrc)
+  var canvas = document.createElement("canvas")
+  const ctx = canvas.getContext("2d")
+
+  if (!ctx) {
+    return null
+  }
+
+  canvas.width = image.width //리사이징하여 그릴 가로 길이
+  canvas.height = image.height //리사이징하여 그릴 세로 길이
+  ctx.drawImage(image, 0, 0, image.width, image.height)
+
+  //canvas의 dataurl를 blob(file)화 하는 과정
+  const result = canvas.toDataURL("image/png") //png => jpg 등으로 변환 가능
+  return result
+}
