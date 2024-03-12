@@ -112,6 +112,7 @@
   $: selectedNonSeongdoFamily = selectedNonSeongdoFamily
 
   $: family = data.family
+
   $: familyId = family?._id
   $: members = family?.members || []
   $: memberIds = family?.memberIds || []
@@ -1283,10 +1284,10 @@
 
           {#if members?.length > 0}
             {#each members as member}
-              <div class="flex justify-center px-2 items-center h-10">
+              <div class="flex justify-center items-center h-10">
                 <img
                   class="mx-auto object-cover w-8 h-8"
-                  src={member.seongdo?.avatar || "/avatar.png"}
+                  src={member.seongdo?.avatarVercelBlob || "/avatar.png"}
                   alt=""
                 />
               </div>

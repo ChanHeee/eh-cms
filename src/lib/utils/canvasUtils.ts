@@ -189,7 +189,7 @@ export const getThumbFile = async (imageSrc) => {
   ctx.drawImage(image, 0, 0, 200, 200)
 
   //canvas의 dataurl를 blob(file)화 하는 과정
-  const result = canvas.toDataURL("image/png") //png => jpg 등으로 변환 가능
+  const result = canvas.toDataURL("image/jpeg") //png => jpg 등으로 변환 가능
   return result
 }
 

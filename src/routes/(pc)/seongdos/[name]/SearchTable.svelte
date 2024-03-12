@@ -45,10 +45,10 @@
       사진
     </div>
     {#each seongdos as item}
-      <div class="flex justify-center px-2 items-center h-10">
+      <div class="flex justify-center items-center h-10">
         <img
           class="mx-auto object-cover w-8 h-8"
-          src={item.avatar || "/avatar.png"}
+          src={item.avatarVercelBlob || "/avatar.png"}
           alt=""
         />
       </div>

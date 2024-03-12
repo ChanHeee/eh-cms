@@ -125,6 +125,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
     .project({
       _id: 1,
       "seongdoId.name": 1,
+      "seongdoId.avatarVercelBlob": 1,
       "seongdoId.jikbun": 1,
       "seongdoId.group1": 1,
       "seongdoId.group2": 1,

@@ -8,12 +8,26 @@ import {
   getThumbFile,
 } from "$lib/utils/canvasUtils"
 import { json } from "@sveltejs/kit"
-import { put } from "@vercel/blob"
+
+export const GET = async ({ request, url, fetch }) => {
+  const group2 = url.searchParams.get("group2") as string
+  const seongdos = await Seongdo.aggregate()
+    .match({
+      $and: [
+        { avatar: { $ne: null } },
+        { avatar: { $ne: "" } },
+        { avatarVercelBlob: { $eq: null } },
+      ],
+      // $and: [{ avatar: { $ne: null } }, { avatar: { $ne: "" } }],
+    })
+    .project({ name: 1 })
+  return json({ seongdos })
+}
 
 export const POST = async ({ request, url, fetch }) => {
   const seongdos = await Seongdo.aggregate().match({
     $and: [
-      { name: "박찬희" },
+      { "services.group2": "유년부" },
       { avatar: { $ne: null } },
       { avatar: { $ne: "" } },
     ],

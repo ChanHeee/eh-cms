@@ -398,6 +398,7 @@ export async function POST({ request }) {
 
 export async function PUT({ request }) {
   let { _id, name, avatarVercelBlob, thumb, ...rest } = await request.json()
+  console.log(thumb, name, "here")
 
   if (thumb) {
     if (avatarVercelBlob) {

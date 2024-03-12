@@ -227,6 +227,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
       seongdo: {
         _id: 1,
         name: 1,
+        avatarVercelBlob: 1,
         jikbun: 1,
         birth: 1,
         phone: 1,
