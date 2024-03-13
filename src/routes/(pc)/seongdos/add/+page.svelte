@@ -39,6 +39,37 @@
     }
   }
 
+  const seongdoAdd = async () => {
+    const response = await fetch("/api/seongdos", {
+      method: "POST",
+      body: JSON.stringify({
+        name: name.trim(),
+        originalName: name.trim(),
+        avatar,
+        thumb: avatar ? await getThumbFile(avatar) : "",
+        birth,
+        age,
+        gender,
+        phone,
+        jikbun,
+        group1,
+        group2: group2Add ? group2 + "," + group2Add : group2,
+        singeup,
+        address: fullAddress,
+        enrolled_at,
+      }),
+      headers: {
+        "content-type": "application/json",
+      },
+    })
+    if (response.ok) {
+      const {
+        seongdo: { name: newName },
+      } = await response.json()
+      goto(`/seongdos/${newName}?create=true`)
+    }
+  }
+
   const submitHandler = async () => {
     if (name == "") {
       toast.error("이름을 입력해주세요.")
@@ -53,35 +84,11 @@
     if (seongdo) {
       toast.error("이미 등록된 이름은 사용할 수 없습니다.")
     } else {
-      response = await fetch("/api/seongdos", {
-        method: "POST",
-        body: JSON.stringify({
-          name: name.trim(),
-          originalName: name.trim(),
-          avatar,
-          thumb: avatar ? await getThumbFile(avatar) : "",
-          birth,
-          age,
-          gender,
-          phone,
-          jikbun,
-          group1,
-          group2: group2Add ? group2 + "," + group2Add : group2,
-          singeup,
-          address: fullAddress,
-          enrolled_at,
-        }),
-        headers: {
-          "content-type": "application/json",
-        },
+      toast.promise(seongdoAdd(), {
+        loading: "저장 중입니다...",
+        success: `저장되었습니다!`,
+        error: "오류가 발생했습니다.",
       })
-      if (response.ok) {
-        const {
-          seongdo: { name: newName },
-        } = await response.json()
-        toast.success("저장되었습니다.")
-        goto(`/seongdos/${newName}?create=true`)
-      }
     }
   }
 

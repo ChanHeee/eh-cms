@@ -183,10 +183,17 @@ export const getThumbFile = async (imageSrc) => {
   if (!ctx) {
     return null
   }
+  console.log(image.width, image.height)
 
-  canvas.width = 200 //리사이징하여 그릴 가로 길이
-  canvas.height = 200 //리사이징하여 그릴 세로 길이
-  ctx.drawImage(image, 0, 0, 200, 200)
+  if (image.width > 200) {
+    canvas.width = 200 //리사이징하여 그릴 가로 길이
+    canvas.height = 200 //리사이징하여 그릴 세로 길이
+    ctx.drawImage(image, 0, 0, 200, 200)
+  } else {
+    canvas.width = image.width //리사이징하여 그릴 가로 길이
+    canvas.height = image.height //리사이징하여 그릴 세로 길이
+    ctx.drawImage(image, 0, 0, image.width, image.height)
+  }
 
   //canvas의 dataurl를 blob(file)화 하는 과정
   const result = canvas.toDataURL("image/jpeg") //png => jpg 등으로 변환 가능
