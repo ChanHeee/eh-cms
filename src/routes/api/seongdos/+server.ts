@@ -343,7 +343,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
 }
 
 export async function POST({ request }) {
-  const { seongdos, update, croppedImage, ...rest } = await request.json()
+  const { seongdos, update, thumb, ...rest } = await request.json()
   let url
   if (seongdos) {
     if (update) {
@@ -379,8 +379,8 @@ export async function POST({ request }) {
       return json({ seongdos: result })
     }
   } else {
-    if (croppedImage) {
-      const blob = dataURItoBlob(croppedImage)
+    if (thumb) {
+      const blob = dataURItoBlob(thumb)
       const result = await put(`${rest.name}.jpeg`, blob, {
         access: "public",
         token: BLOB_READ_WRITE_TOKEN,
@@ -398,7 +398,6 @@ export async function POST({ request }) {
 
 export async function PUT({ request }) {
   let { _id, name, avatarVercelBlob, thumb, ...rest } = await request.json()
-  console.log(thumb, name, "here")
 
   if (thumb) {
     if (avatarVercelBlob) {

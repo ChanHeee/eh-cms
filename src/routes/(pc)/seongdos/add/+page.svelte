@@ -59,7 +59,7 @@
           name: name.trim(),
           originalName: name.trim(),
           avatar,
-          croppedImage: croppedImageForRequest,
+          thumb: avatar ? await getThumbFile(avatar) : "",
           birth,
           age,
           gender,
@@ -133,7 +133,7 @@
   }
 
   import Cropper from "svelte-easy-crop"
-  import { getCroppedImg } from "$lib/utils/canvasUtils.js"
+  import { getCroppedImg, getThumbFile } from "$lib/utils/canvasUtils.js"
 
   let crop = { x: 0, y: 0 }
   let zoom = 1
