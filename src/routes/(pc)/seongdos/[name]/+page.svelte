@@ -29,7 +29,7 @@
     ISimbang,
   } from "$lib/interfaces"
   import toast from "svelte-french-toast"
-  import { afterUpdate, onMount } from "svelte"
+  import { onMount } from "svelte"
   export let data: {
     seongdo: ISeongdo
     family: IFamily
@@ -187,7 +187,7 @@
           ? groupItem.group2 + "," + group2Add
           : groupItem.group2,
         address: fullAddress,
-        thumb: seongdo.avatar ? await getThumbFile(seongdo.avatar) : "",
+        // thumb: seongdo.avatar ? await getThumbFile(seongdo.avatar) : "",
         ...rest,
       }),
       headers: {
@@ -1275,7 +1275,7 @@
         </div>
       </div>
       <div class="flex text-sm border-l overflow-scroll">
-        <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
+        <!-- <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
           <div
             class="flex justify-center px-2 bg-[#D9D9D8] font-bold items-center h-10"
           >
@@ -1293,7 +1293,7 @@
               </div>
             {/each}
           {/if}
-        </div>
+        </div> -->
 
         <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
           <div

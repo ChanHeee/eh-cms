@@ -133,7 +133,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
             $project: {
               name: 1,
               // avatar: 1,
-              avatarVercelBlob: 1,
+              // avatarVercelBlob: 1,
               gender: 1,
               singeup: 1,
               jikbun: 1,
@@ -379,16 +379,16 @@ export async function POST({ request }) {
       return json({ seongdos: result })
     }
   } else {
-    if (thumb) {
-      const blob = dataURItoBlob(thumb)
-      const result = await put(`${rest.name}.jpeg`, blob, {
-        access: "public",
-        token: BLOB_READ_WRITE_TOKEN,
-      })
-      url = result.url
-    }
+    // if (thumb) {
+    //   const blob = dataURItoBlob(thumb)
+    //   const result = await put(`${rest.name}.jpeg`, blob, {
+    //     access: "public",
+    //     token: BLOB_READ_WRITE_TOKEN,
+    //   })
+    //   url = result.url
+    // }
     const seongdo = await Seongdo.create({
-      avatarVercelBlob: url,
+      // avatarVercelBlob: url,
       ...rest,
     })
 
@@ -399,28 +399,28 @@ export async function POST({ request }) {
 export async function PUT({ request }) {
   let { _id, name, avatarVercelBlob, thumb, ...rest } = await request.json()
 
-  if (thumb) {
-    if (avatarVercelBlob) {
-      await del(avatarVercelBlob, { token: BLOB_READ_WRITE_TOKEN })
-    }
-    const blob = dataURItoBlob(thumb)
-    const result = await put(`${name}.jpeg`, blob, {
-      access: "public",
-      token: BLOB_READ_WRITE_TOKEN,
-    })
-    avatarVercelBlob = result.url
-  } else {
-    if (avatarVercelBlob) {
-      await del(avatarVercelBlob, { token: BLOB_READ_WRITE_TOKEN })
-    }
-    avatarVercelBlob = ""
-  }
+  // if (thumb) {
+  //   if (avatarVercelBlob) {
+  //     await del(avatarVercelBlob, { token: BLOB_READ_WRITE_TOKEN })
+  //   }
+  //   const blob = dataURItoBlob(thumb)
+  //   const result = await put(`${name}.jpeg`, blob, {
+  //     access: "public",
+  //     token: BLOB_READ_WRITE_TOKEN,
+  //   })
+  //   avatarVercelBlob = result.url
+  // } else {
+  //   if (avatarVercelBlob) {
+  //     await del(avatarVercelBlob, { token: BLOB_READ_WRITE_TOKEN })
+  //   }
+  //   avatarVercelBlob = ""
+  // }
 
   const { upsertedCount, modifiedCount } = await Seongdo.updateOne(
     { _id },
     {
       name,
-      avatarVercelBlob,
+      // avatarVercelBlob,
       ...rest,
     }
   )

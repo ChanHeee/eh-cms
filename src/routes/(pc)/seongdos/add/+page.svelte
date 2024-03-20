@@ -46,7 +46,7 @@
         name: name.trim(),
         originalName: name.trim(),
         avatar,
-        thumb: avatar ? await getThumbFile(avatar) : "",
+        // thumb: avatar ? await getThumbFile(avatar) : "",
         birth,
         age,
         gender,

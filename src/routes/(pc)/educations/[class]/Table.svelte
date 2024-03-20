@@ -32,7 +32,7 @@
 </script>
 
 <div class="overflow-scroll flex text-sm mb-7 border-l bg-white">
-  <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
+  <!-- <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
     <div class=" flex justify-center bg-[#D9D9D8] font-bold items-center h-10">
       사진
     </div>
@@ -45,7 +45,7 @@
         />
       </div>
     {/each}
-  </div>
+  </div> -->
   <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
     <button
       id="nameField"

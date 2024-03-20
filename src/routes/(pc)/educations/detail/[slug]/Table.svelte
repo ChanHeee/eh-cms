@@ -56,7 +56,7 @@
 </script>
 
 <div class="overflow-scroll flex text-sm mb-7 border-l bg-white">
-  <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
+  <!-- <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
     <div
       class=" flex justify-center px-2 bg-[#D9D9D8] font-bold items-center h-10"
     >
@@ -71,7 +71,7 @@
         />
       </div>
     {/each}
-  </div>
+  </div> -->
   <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
     <div class=" flex px-3 bg-[#D9D9D8] font-bold items-center h-10">이름</div>
 
