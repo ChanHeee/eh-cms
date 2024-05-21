@@ -224,7 +224,12 @@ export const load = async ({ url, locals, fetch }) => {
           name: "늘푸른부",
           count: await Seongdo.count().where({
             $or: [
-              { birth: { $lte: targetBirth } },
+              {
+                $and: [
+                  { birth: { $ne: "" } },
+                  { birth: { $lte: targetBirth } },
+                ],
+              },
               { "services.group1": "교회학교", "services.group2": "늘푸른부" },
             ],
           }),

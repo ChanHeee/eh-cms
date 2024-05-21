@@ -120,10 +120,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
           const targetBirth = `${new Date().getFullYear() - 70}-12-31`
           seongdoMatch["$or"] = [
             {
-              $and: [
-                { birth: { $ne: null } },
-                { birth: { $lte: targetBirth } },
-              ],
+              $and: [{ birth: { $ne: "" } }, { birth: { $lte: targetBirth } }],
             },
             { "services.group1": group1, "services.group2": group2 },
           ]
