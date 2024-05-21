@@ -110,6 +110,7 @@ export interface IFamily {
   _id?: string
   memberIds?: string[]
   members?: IMember[]
+  detail?: string
 }
 
 export interface IMember {

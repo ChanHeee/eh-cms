@@ -277,19 +277,16 @@
             )
             if (response.ok) {
               seongdos = (await response.json()).seongdos
+              console.log(seongdos)
             }
 
             let seongdosForSheet
             seongdosForSheet = seongdos.map((item) => {
               return {
                 이름: item.name,
+                직분: item.jikbun,
                 생년월일: item.birth,
                 나이: item.age,
-                성별: item.gender,
-                직분: item.jikbun,
-                신급: item.singeup,
-                소속1: item.group1,
-                소속2: item.group2,
                 핸드폰: item.phone,
                 주소: item.address,
               }

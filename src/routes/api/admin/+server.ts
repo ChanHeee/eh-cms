@@ -11,16 +11,15 @@ import { json } from "@sveltejs/kit"
 
 export const GET = async ({ request, url, fetch }) => {
   const group2 = url.searchParams.get("group2") as string
-  const seongdos = await Seongdo.aggregate()
-    .match({
-      $and: [
-        { avatar: { $ne: null } },
-        { avatar: { $ne: "" } },
-        { avatarVercelBlob: { $eq: null } },
-      ],
-      // $and: [{ avatar: { $ne: null } }, { avatar: { $ne: "" } }],
-    })
-    .project({ name: 1 })
+  const seongdos = await Seongdo.aggregate().match({
+    $and: [
+      { avatar: { $ne: null } },
+      { avatar: { $ne: "" } },
+      { group2: { $regex: "3교구" } },
+      // { avatarVercelBlob: { $eq: null } },
+    ],
+    // $and: [{ avatar: { $ne: null } }, { avatar: { $ne: "" } }],
+  })
   return json({ seongdos })
 }
 

@@ -182,7 +182,7 @@
       body: JSON.stringify({
         name: name.trim(),
         originalName: name.trim(),
-        age: age ? age : getAgeFromBirth(seongdo.birth),
+        age: getAgeFromBirth(seongdo.birth),
         group2: group2Add
           ? groupItem.group2 + "," + group2Add
           : groupItem.group2,

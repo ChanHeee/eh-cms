@@ -1,6 +1,7 @@
 import { JWT_SECRET } from "$lib/env"
 import type { IGroup } from "$lib/interfaces"
 import { Seongdo } from "$lib/models/Seongdo"
+import { getAgeFromBirth } from "$lib/utils"
 import { redirect } from "@sveltejs/kit"
 import jwt from "jsonwebtoken"
 
@@ -20,6 +21,7 @@ export const load = async ({ url, locals, fetch }) => {
   const birthStart = url.searchParams.get("birthStart")
   const birthEnd = url.searchParams.get("birthEnd")
 
+  const targetBirth = `${new Date().getFullYear() - 70}-12-31`
   if (
     (group1 != null &&
       group1 != "장년부" &&
@@ -222,7 +224,7 @@ export const load = async ({ url, locals, fetch }) => {
           name: "늘푸른부",
           count: await Seongdo.count().where({
             $or: [
-              { group1: "교회학교", group2: "늘푸른부" },
+              { birth: { $lte: targetBirth } },
               { "services.group1": "교회학교", "services.group2": "늘푸른부" },
             ],
           }),

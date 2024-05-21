@@ -21,6 +21,7 @@ const familySchema = new Schema<IFamily>({
     },
   ],
   members: [{ type: memberSchema, default: [] }],
+  detail: { type: String },
 })
 
 export const Family = conn.model<IFamily>("family", familySchema)

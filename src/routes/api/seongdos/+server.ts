@@ -21,7 +21,11 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
     url.searchParams.get("page") != null
       ? parseInt(url.searchParams.get("page"))
       : 1
-  const take = 12
+  // const take = 12
+  const take =
+    url.searchParams.get("take") != null
+      ? parseInt(url.searchParams.get("take"))
+      : 12
 
   let seongdoMatch: any = {}
   if (name) {
@@ -112,10 +116,23 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
         seongdoMatch.group1 = group1
         seongdoMatch.group2 = { $regex: group2 }
       } else {
-        seongdoMatch["$or"] = [
-          { group1, group2 },
-          { "services.group1": group1, "services.group2": group2 },
-        ]
+        if (group2 == "늘푸른부") {
+          const targetBirth = `${new Date().getFullYear() - 70}-12-31`
+          seongdoMatch["$or"] = [
+            {
+              $and: [
+                { birth: { $ne: null } },
+                { birth: { $lte: targetBirth } },
+              ],
+            },
+            { "services.group1": group1, "services.group2": group2 },
+          ]
+        } else {
+          seongdoMatch["$or"] = [
+            { group1, group2 },
+            { "services.group1": group1, "services.group2": group2 },
+          ]
+        }
       }
     } else if (group1) {
       if (group1 == "장년부") {
