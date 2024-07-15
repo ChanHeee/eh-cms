@@ -97,6 +97,7 @@
   }
   let selectedSeongdo: ISeongdo | null
   $: selectedSeongdo = selectedSeongdo
+
   $: addNonSeongdo = false
   $: addedName = ""
   $: addedGender = ""
@@ -112,10 +113,11 @@
   $: selectedNonSeongdoFamily = selectedNonSeongdoFamily
 
   $: family = data.family
-
   $: familyId = family?._id
   $: members = family?.members || []
   $: memberIds = family?.memberIds || []
+  $: familyDetail = family?.detail
+
   $: searchName = ""
   $: classificationValue = ""
   $: classification = ""
@@ -211,6 +213,20 @@
     if (name != seongdoName && result.seongdo) {
       toast.error("이미 등록된 이름은 사용할 수 없습니다.")
     } else {
+      if (family) {
+        response = await fetch(`/api/families/${familyId}`, {
+          method: "PUT",
+          body: JSON.stringify({
+            members,
+            memberIds,
+            detail: family.detail,
+          }),
+          headers: {
+            "content-type": "application/json",
+          },
+        })
+      }
+
       toast.promise(seongdoUpdate(), {
         loading: "저장 중입니다...",
         success: `저장되었습니다!`,
@@ -303,6 +319,7 @@
         body: JSON.stringify({
           memberIds,
           members,
+          detail: familyDetail,
         }),
         headers: {
           "content-type": "application/json",
@@ -319,6 +336,7 @@
         body: JSON.stringify({
           memberIds,
           members,
+          detail: familyDetail,
         }),
         headers: {
           "content-type": "application/json",
@@ -1159,9 +1177,17 @@
           </div>
 
           <textarea
-            value={seongdo.remarks || ""}
+            value={family
+              ? family.detail
+              : seongdo.remarks
+                ? seongdo.remarks
+                : ""}
             on:input={(e) => {
-              seongdo.remarks = e.target.value
+              if (family) {
+                family.detail = e.target.value
+              } else {
+                seongdo.remarks = e.target.value
+              }
             }}
             class="resize-none flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
           />
@@ -1811,6 +1837,12 @@
                   },
                 ]
                 memberIds = [...memberIds, selectedSeongdo?._id]
+                familyDetail = familyDetail
+                  ? familyDetail + "\n\n" + selectedSeongdo?.remarks
+                  : selectedSeongdo?.remarks
+                    ? selectedSeongdo?.remarks
+                    : ""
+
                 const result = await familyHandler()
                 if (result) {
                   selectedSeongdo = null
@@ -2195,6 +2227,7 @@
                   classification = ""
                   classificationValue = ""
                   addNonSeongdo = !addNonSeongdo
+                  searchName = ""
                   addedName = ""
                   addedGender = ""
                   addedBirth = ""

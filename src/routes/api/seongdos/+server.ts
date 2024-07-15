@@ -157,6 +157,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
               group1: 1,
               group2: 1,
               address: 1,
+              remarks: 1,
               services: {
                 $filter: {
                   input: {
@@ -331,6 +332,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       group1: 1,
       group2: 1,
       address: 1,
+      remarks: 1,
     })
 
   const total = await Seongdo.count(seongdoMatch)

@@ -12,9 +12,9 @@ export const GET: RequestHandler = async ({ request, url }) => {
 }
 
 export const POST: RequestHandler = async ({ request, url }) => {
-  const { members, memberIds } = await request.json()
+  const { members, memberIds, detail } = await request.json()
 
-  const family = await Family.create({ memberIds, members })
+  const family = await Family.create({ memberIds, members, detail })
 
   const familyWithPopulate = await family.populate("members.seongdo")
 

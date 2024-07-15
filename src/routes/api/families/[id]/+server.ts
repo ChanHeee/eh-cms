@@ -4,7 +4,7 @@ import { json, type RequestHandler } from "@sveltejs/kit"
 export const PUT: RequestHandler = async ({ request, url }) => {
   const _id = decodeURI(url.pathname).split("/")[3]
 
-  const { members, memberIds } = await request.json()
+  const { members, memberIds, detail } = await request.json()
 
   if (memberIds.length == 0) {
     await Family.deleteOne({ _id })
@@ -16,6 +16,7 @@ export const PUT: RequestHandler = async ({ request, url }) => {
     {
       members,
       memberIds,
+      detail,
     },
     { new: true }
   ).populate("members.seongdo")
