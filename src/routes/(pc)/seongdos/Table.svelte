@@ -399,8 +399,6 @@
 </div>
 
 {#if pagination.length > 0}
-  <!-- content here -->
-
   <div class="w-fit mx-auto flex items-center mb-8">
     <button
       on:click={async () => {

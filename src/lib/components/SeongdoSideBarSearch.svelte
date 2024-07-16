@@ -6,14 +6,19 @@
 
   export let searchParams: ISeongdoSearchParams
   $: name = searchParams.name
+  $: phone = searchParams.phone
   $: jikbunArray = searchParams.jikbun ?? []
   $: birthStart = searchParams.birthStart
   $: birthEnd = searchParams.birthEnd
 
   const searchHandler = () => {
+    if (phone) {
+      name = ""
+    }
     const params = getSearchParams({
       page: 1,
       name,
+      phone,
       jikbun: jikbunArray,
       birthStart,
       birthEnd,
@@ -41,15 +46,17 @@
       <input
         id="name"
         type="text"
-        value={name}
+        value={name || phone}
         on:focus={() => {
           name = ""
+          phone = ""
         }}
         on:input={(e) => {
           name = e.target.value
+          phone = Number(name) ? name : ""
         }}
         class="w-full bg-gray-50 border-y border-l border-gray-300 text-gray-900 text-sm focus:outline-0 p-2"
-        placeholder="이름"
+        placeholder="이름 or 전화번호"
       />
       <button
         type="submit"

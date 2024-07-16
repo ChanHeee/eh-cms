@@ -2,6 +2,7 @@ import type { ISeongdoSearchParams } from "$lib/interfaces"
 
 export const getSeongdosSearchParams = ({
   name,
+  phone,
   jikbun,
   order,
   eduName,
@@ -10,7 +11,11 @@ export const getSeongdosSearchParams = ({
   group2,
 }: ISeongdoSearchParams) => {
   let searchParams = []
-  if (name) searchParams.push(`name=${name}`)
+  if (phone) {
+    searchParams.push(`phone=${phone}`)
+  } else if (name) {
+    searchParams.push(`name=${name}`)
+  }
   if (jikbun && jikbun.length > 0)
     searchParams.push(`jikbun=${JSON.stringify(jikbun)}`)
   if (order) searchParams.push(`order=${order}`)

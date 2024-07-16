@@ -1,13 +1,11 @@
-import { JWT_SECRET } from "$lib/env"
 import type { IGroup } from "$lib/interfaces"
 import { Seongdo } from "$lib/models/Seongdo"
-import { getAgeFromBirth } from "$lib/utils"
 import { redirect } from "@sveltejs/kit"
-import jwt from "jsonwebtoken"
 
 /** @type {import('@sveltejs/kit').Load} */
 export const load = async ({ url, locals, fetch }) => {
   const name = url.searchParams.get("name")
+  const phone = url.searchParams.get("phone")
   const jikbun = JSON.parse(url.searchParams.get("jikbun"))
   const order = url.searchParams.get("order")
   const page =
@@ -36,6 +34,7 @@ export const load = async ({ url, locals, fetch }) => {
 
   locals.searchParams = {
     name,
+    phone,
     jikbun,
     order,
     page,
@@ -317,6 +316,7 @@ export const load = async ({ url, locals, fetch }) => {
     return {
       searchParams: {
         name,
+        phone,
         jikbun,
         order,
         page,
@@ -331,6 +331,7 @@ export const load = async ({ url, locals, fetch }) => {
     return {
       searchParams: {
         name,
+        phone,
         jikbun,
         order,
         page,

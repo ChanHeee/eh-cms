@@ -8,6 +8,7 @@ import { put, del } from "@vercel/blob"
 
 export const GET: RequestHandler = async ({ request, url, locals }) => {
   const name = url.searchParams.get("name")
+  const phone = url.searchParams.get("phone")
   const jikbun =
     url.searchParams.get("jikbun") != null
       ? JSON.parse(url.searchParams.get("jikbun"))
@@ -30,6 +31,9 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
   let seongdoMatch: any = {}
   if (name) {
     seongdoMatch.name = { $regex: name }
+  }
+  if (phone) {
+    seongdoMatch.phoneWithoutDash = { $regex: phone }
   }
   if (jikbun?.length > 0) {
     seongdoMatch.jikbun = { $in: jikbun }
@@ -191,7 +195,11 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
         ]
       : []
   )
-
+    .addFields({
+      phoneWithoutDash: {
+        $replaceAll: { input: "$phone", find: "-", replacement: "" },
+      },
+    })
     .addFields({
       temp: { $max: "$services.order" },
     })
@@ -335,7 +343,24 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       remarks: 1,
     })
 
-  const total = await Seongdo.count(seongdoMatch)
+  // const total = await Seongdo.count(seongdoMatch)
+
+  let total: any
+
+  if (phone) {
+    total = await Seongdo.aggregate()
+      .addFields({
+        phoneWithoutDash: {
+          $replaceAll: { input: "$phone", find: "-", replacement: "" },
+        },
+      })
+      .match(seongdoMatch)
+      .count("total")
+
+    total = total.length > 0 ? total[0].total : 0
+  } else {
+    total = await Seongdo.count(seongdoMatch)
+  }
 
   return json({
     seongdos,
@@ -346,6 +371,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       requestSize: seongdos.length,
       requestParams: {
         name,
+        phone,
         jikbun,
         order,
         group1,

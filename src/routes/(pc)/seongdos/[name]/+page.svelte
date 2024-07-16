@@ -2074,7 +2074,7 @@
                 </div>
                 <div class="flex w-full h-8 border-gray-300 border">
                   <div
-                    class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
                   >
                     구분
                   </div>

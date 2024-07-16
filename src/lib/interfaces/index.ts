@@ -88,6 +88,7 @@ export interface IPage {
   requestSize: number
   requestParams: {
     name?: string
+    phone?: string
     jikbun?: string[]
     order?: string
     className?: string
@@ -184,6 +185,7 @@ export interface ISeongdoSearchBody {
 
 export interface ISeongdoSearchParams {
   name?: string
+  phone?: string
   jikbun?: string[]
   order?: string
   eduName?: string
