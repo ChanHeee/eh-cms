@@ -2776,7 +2776,7 @@
               }}
             />
           {:else}
-            <label for="photo-dropboxInModal">
+            <label for="photo-dropboxInModal" class="w-full">
               <img
                 alt=""
                 id="previewInModal"
