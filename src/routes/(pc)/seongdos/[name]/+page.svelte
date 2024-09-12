@@ -154,7 +154,7 @@
   $: isServiceModalHidden = true
   $: isFamilyModalHidden = true
   $: isSimbangModalHidden = selectedSimbang ? false : true
-
+  $: isAvatarModalHidden = true
   //for crop profile
   import Cropper from "svelte-easy-crop"
   import { getCroppedImg, getThumbFile } from "$lib/utils/canvasUtils"
@@ -479,44 +479,19 @@
       </div>
       <div class="flex flex-col text-sm gap-3">
         <div class="hidden md:flex gap-3">
-          <button
-            class="flex flex-none relative"
-            on:mouseleave={() => {
-              hoverOnAvatar = false
-            }}
-            on:focus={undefined}
-          >
-            <label for="photo-dropbox">
+          <button class="flex flex-none relative">
+            <button
+              on:click={() => {
+                isAvatarModalHidden = false
+              }}
+            >
               <img
                 alt=""
                 id="preview"
                 src={seongdo.avatar || "/avatar.png"}
-                class="border-gray-300 border w-[7.5rem] min-w-[7.5rem] h-[7.5rem] object-cover hover:opacity-75"
-                on:mouseover={() => {
-                  hoverOnAvatar = true
-                }}
-                on:focus={undefined}
+                class="border-gray-300 border w-[7.5rem] min-w-[7.5rem] h-[7.5rem] object-cover"
               />
-              <button
-                class="absolute right-1.5 bottom-1.5 flex justify-center items-center rounded-full bg-[#F46055] w-7 h-7"
-                class:hidden={!hoverOnAvatar || !seongdo.avatar}
-                on:click={() => {
-                  seongdo.avatar = ""
-                }}
-              >
-                <TrashCan scale={16} color="white" />
-              </button>
-            </label>
-            <input
-              id="photo-dropbox"
-              type="file"
-              accept="image/*"
-              class="sr-only"
-              on:change={(e) => {
-                onFileSelected(e)
-              }}
-              bind:this={fileinput}
-            />
+            </button>
           </button>
           <div class="flex flex-col gap-3 w-full">
             <div class="flex flex-col w-full md:flex-row gap-3">
@@ -807,7 +782,19 @@
         <div class="md:hidden flex flex-col gap-3">
           <div class="flex gap-3">
             <div class="flex flex-none">
-              <label for="photo-dropbox">
+              <button
+                on:click={() => {
+                  isAvatarModalHidden = false
+                }}
+              >
+                <img
+                  alt=""
+                  id="previewM"
+                  src={seongdo.avatar || "/avatar.png"}
+                  class="border-gray-300 border w-[7.5rem] min-w-[7.5rem] h-[7.5rem] object-cover"
+                />
+              </button>
+              <!-- <label for="photo-dropboxM">
                 <img
                   alt=""
                   id="previewM"
@@ -816,7 +803,7 @@
                 />
               </label>
               <input
-                id="photo-dropbox"
+                id="photo-dropboxM"
                 type="file"
                 accept="image/*"
                 class="sr-only"
@@ -824,7 +811,7 @@
                   onFileSelected(e)
                 }}
                 bind:this={fileinput}
-              />
+              /> -->
             </div>
             <div class="flex flex-col gap-3 w-full">
               <div class="flex w-full h-8 border-gray-300 border">
@@ -1169,29 +1156,40 @@
             class="flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
           />
         </div>
-        <div class="flex h-24 flex-auto border-gray-300 border-x border-y">
+        <div class="flex flex-auto border-gray-300 border-x border-y">
           <div
             class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0]"
           >
-            특이사항
+            개인사항
           </div>
 
           <textarea
-            value={family
-              ? family.detail
-              : seongdo.remarks
-                ? seongdo.remarks
-                : ""}
+            rows={3}
+            value={seongdo.remarks || ""}
             on:input={(e) => {
-              if (family) {
-                family.detail = e.target.value
-              } else {
-                seongdo.remarks = e.target.value
-              }
+              seongdo.remarks = e.target.value
             }}
-            class="resize-none flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
+            class="flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
           />
         </div>
+        {#if family}
+          <div class="flex flex-auto border-gray-300 border-x border-y">
+            <div
+              class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0]"
+            >
+              가족사항
+            </div>
+
+            <textarea
+              rows={5}
+              value={family.detail || ""}
+              on:input={(e) => {
+                family.detail = e.target.value
+              }}
+              class="flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
+            />
+          </div>
+        {/if}
       </div>
     </div>
     <!-- 봉사 내용 -->
@@ -1837,11 +1835,7 @@
                   },
                 ]
                 memberIds = [...memberIds, selectedSeongdo?._id]
-                familyDetail = familyDetail
-                  ? familyDetail + "\n\n" + selectedSeongdo?.remarks
-                  : selectedSeongdo?.remarks
-                    ? selectedSeongdo?.remarks
-                    : ""
+                familyDetail = family.detail
 
                 const result = await familyHandler()
                 if (result) {
@@ -2755,7 +2749,7 @@
 <!-- modal for crop image -->
 <div
   class="relative z-10 h-full"
-  class:hidden={image ? false : true}
+  class:hidden={isAvatarModalHidden}
   aria-labelledby="modal-title"
   role="dialog"
   aria-modal="true"
@@ -2769,17 +2763,38 @@
         class="sm:h-2/3 h-3/4 sm:max-md:w-2/3 md:w-1/3 w-full relative transform rounded-md bg-white shadow-xl transition-all"
       >
         <div
-          class="w-full overflow-scroll h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
+          class="flex justify-center items-center w-full overflow-scroll h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
         >
-          <Cropper
-            {image}
-            bind:crop
-            bind:zoom
-            aspect={1}
-            on:cropcomplete={(e) => {
-              pixelCrop = e.detail.pixels
-            }}
-          />
+          {#if image}
+            <Cropper
+              {image}
+              bind:crop
+              bind:zoom
+              aspect={1}
+              on:cropcomplete={(e) => {
+                pixelCrop = e.detail.pixels
+              }}
+            />
+          {:else}
+            <label for="photo-dropboxInModal">
+              <img
+                alt=""
+                id="previewInModal"
+                src={seongdo.avatar || "/avatar.png"}
+                class="border-gray-300 w-full p-12 object-cover"
+              />
+            </label>
+            <input
+              id="photo-dropboxInModal"
+              type="file"
+              accept="image/*"
+              class="sr-only"
+              on:change={(e) => {
+                onFileSelected(e)
+              }}
+              bind:this={fileinput}
+            />
+          {/if}
         </div>
         <div
           class="bg-gray-50 h-[55px] px-4 py-3 flex flex-row-reverse px-6 gap-2"
@@ -2787,7 +2802,10 @@
           <button
             type="button"
             class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
-            on:click={reset}
+            on:click={() => {
+              reset()
+              isAvatarModalHidden = true
+            }}
           >
             <span class="flex items-center">
               <Close class="text-[#F46055]" />
@@ -2798,14 +2816,16 @@
             type="submit"
             class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
             on:click={async () => {
-              croppedImage = await getCroppedImg(image, pixelCrop)
-              // croppedImageForRequest = croppedImage
-              const preview = document.getElementById("preview")
-              const previewM = document.getElementById("previewM")
-              seongdo.avatar = croppedImage
-              preview.src = croppedImage
-              previewM.src = croppedImage
+              if (image) {
+                croppedImage = await getCroppedImg(image, pixelCrop)
+                const preview = document.getElementById("preview")
+                const previewM = document.getElementById("previewM")
+                seongdo.avatar = croppedImage
+                preview.src = croppedImage
+                previewM.src = croppedImage
+              }
               reset()
+              isAvatarModalHidden = true
             }}
           >
             <Checkmark scale={16} />
