@@ -383,11 +383,62 @@
     </div>
   {/if}
   <div class="flex flex-col flex-auto border-r divide-y border-b">
-    <div
-      class=" flex justify-center px-3 bg-[#D9D9D8] font-bold items-center h-10 whitespace-nowrap truncate"
+    <button
+      id="addressField"
+      class=" flex justify-center px-3 font-bold items-center h-10 hover:bg-[#B0B1B0]"
+      class:bg-[#B0B1B0]={order == "addressAsc" || order == "addressDesc"
+        ? true
+        : false}
+      class:bg-[#D9D9D8]={order == "addressAsc" || order == "addressDesc"
+        ? false
+        : true}
+      on:mouseover={(e) => {
+        if (order != "addressAsc" && order != "addressDesc") {
+          document
+            .getElementById("addressDefault")
+            ?.classList.remove("invisible")
+        }
+      }}
+      on:mouseleave={(e) => {
+        if (order != "addressAsc" && order != "addressDesc") {
+          document.getElementById("addressDefault")?.classList.add("invisible")
+        }
+      }}
+      on:focus={null}
+      on:click={() => {
+        const { order, take, ...rest } = searchParams
+        let newOrder
+        if (order == "addressAsc") {
+          newOrder = "addressDesc"
+        } else if (order == "addressDesc") {
+          newOrder = ""
+        } else {
+          newOrder = "addressAsc"
+        }
+        goto(
+          `/seongdos/${getSearchParams({
+            ...rest,
+            order: newOrder,
+            page: 1,
+          })}`
+        )
+      }}
     >
       주소
-    </div>
+      {#if order == "addressAsc"}
+        <ArrowsVertical id="addressDefault" class="ml-3 hidden" />
+        <ArrowUp id="addressAsc" class="ml-3 " />
+        <ArrowDown id="addressDesc" class="ml-3 hidden " />
+      {:else if order == "addressDesc"}
+        <ArrowsVertical id="addressDefault" class="ml-3 hidden" />
+        <ArrowUp id="addressAsc" class="ml-3 hidden" />
+        <ArrowDown id="addressDesc" class="ml-3  " />
+      {:else}
+        <ArrowsVertical id="addressDefault" class="ml-3 invisible" />
+        <ArrowUp id="addressAsc" class="ml-3 hidden" />
+        <ArrowDown id="addressDesc" class="ml-3 hidden " />
+      {/if}
+    </button>
     {#each seongdos as item}
       <div class="flex px-3 items-center h-10">
         <p class="whitespace-nowrap truncate">

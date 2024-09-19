@@ -11,6 +11,8 @@
     textShortenWithEllipsis,
   } from "$lib/utils"
   import {
+    ArrowUp,
+    ArrowDown,
     AddLarge,
     Checkmark,
     Close,
@@ -1438,8 +1440,62 @@
             class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
           />
           {#if members?.length > 0}
-            {#each members as member}
+            {#each members as member, idx}
               <div class="flex items-center px-3 h-10">
+                <button
+                  type="button"
+                  class="flex items-center gap-1 rounded-sm text-white text-xs px-1 py-[0.4rem]"
+                  on:click={async () => {
+                    if (idx > 0) {
+                      let tempMembers = [...members]
+
+                      tempMembers.splice(
+                        idx - 1,
+                        2,
+                        tempMembers[idx],
+                        tempMembers[idx - 1]
+                      )
+                      members = [...tempMembers]
+
+                      const newMemberIds = members
+                        .map((member) => member.seongdo?._id)
+                        .filter((item) => item != undefined)
+
+                      memberIds = newMemberIds
+
+                      await familyHandler()
+                    }
+                  }}
+                >
+                  <ArrowUp fill="#4a4a4a" size={16} />
+                </button>
+                <button
+                  type="button"
+                  class="flex items-center gap-1 rounded-sm text-white text-xs px-1 py-[0.4rem]"
+                  on:click={async () => {
+                    if (idx + 1 < members.length) {
+                      let tempMembers = [...members]
+
+                      tempMembers.splice(
+                        idx,
+                        2,
+                        tempMembers[idx + 1],
+                        tempMembers[idx]
+                      )
+                      members = [...tempMembers]
+
+                      const newMemberIds = members
+                        .map((member) => member.seongdo?._id)
+                        .filter((item) => item != undefined)
+
+                      memberIds = newMemberIds
+
+                      await familyHandler()
+                    }
+                  }}
+                >
+                  <ArrowDown fill="#4a4a4a" size={16} />
+                </button>
                 <button
                   type="button"
                   class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem]"

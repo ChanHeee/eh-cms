@@ -36,8 +36,28 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
     seongdoMatch.phoneWithoutDash = { $regex: phone }
   }
   if (jikbun?.length > 0) {
-    seongdoMatch.jikbun = { $in: jikbun }
+    const jikbunTemp = [...jikbun]
+    if (jikbun.includes("장로")) {
+      jikbunTemp.push(
+        "시무장로",
+        "무임장로",
+        "협동장로",
+        "원로장로",
+        "은퇴장로"
+      )
+    }
+    if (jikbun.includes("권사")) {
+      jikbunTemp.push(
+        "시무권사",
+        "무임권사",
+        "협동권사",
+        "원로권사",
+        "은퇴권사"
+      )
+    }
+    seongdoMatch.jikbun = { $in: jikbunTemp }
   }
+
   if (birthStart) {
     if (birthEnd) {
       seongdoMatch.birth = { $gte: birthStart, $lte: birthEnd }
@@ -81,6 +101,12 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       } else {
         aggregateSort = { group1: -1, group2: -1, "services.order": -1, _id: 1 }
       }
+      break
+    case "addressAsc":
+      aggregateSort = { hasAddress: -1, address: 1, _id: 1 }
+      break
+    case "addressDesc":
+      aggregateSort = { hasAddress: -1, address: -1, _id: 1 }
       break
     default:
       if (group1 == "장년부") {
@@ -317,6 +343,15 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
                   },
                 },
               },
+            },
+          }
+        : { undefined }
+    )
+    .addFields(
+      order?.startsWith("address")
+        ? {
+            hasAddress: {
+              $cond: [{ $eq: ["$address", ""] }, false, true],
             },
           }
         : { undefined }
