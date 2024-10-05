@@ -16,7 +16,7 @@ export const load = loadFlash(async ({ url, fetch, locals, cookies }) => {
   })
 
   const { allowedGroup } = locals
-  let groupList = {}
+  let groupList: any = {}
   allowedGroup?.map((item) => {
     const child = item.split("_")[1]
     if (!child) {
@@ -37,7 +37,14 @@ export const load = loadFlash(async ({ url, fetch, locals, cookies }) => {
         ]
       }
     } else {
-      groupList[item.split("_")[0]] = [child]
+      if (groupList[item.split("_")[0]]) {
+        groupList[item.split("_")[0]] = [
+          ...groupList[item.split("_")[0]],
+          child,
+        ]
+      } else {
+        groupList[item.split("_")[0]] = [child]
+      }
     }
   })
   if (allowedGroup.includes("전체")) {
