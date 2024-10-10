@@ -338,7 +338,7 @@
         body: JSON.stringify({
           memberIds,
           members,
-          detail: familyDetail,
+          detail: "",
         }),
         headers: {
           "content-type": "application/json",
@@ -596,21 +596,47 @@
                       }}
                       class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                     >
-                      <option value="" class="" />
-                      <option value="장로">장로</option>
-                      <option value="안수집사">안수집사</option>
-                      <option value="권사">권사</option>
-                      <option value="은퇴권사">은퇴권사</option>
-                      <option value="무임권사">무임권사</option>
-                      <option value="무임은퇴권사">무임은퇴권사</option>
-                      <option value="서리집사">서리집사</option>
-                      <option value="은퇴집사">은퇴집사</option>
-                      <option value="무임집사">무임집사</option>
-                      <option value="무임은퇴집사">무임은퇴집사</option>
-                      <option value="권찰">권찰</option>
-                      <option value="성도">성도</option>
+                      <option value="none" class="hidden" />
+                      <optgroup label="장로">
+                        <option value="시무장로">시무장로</option>
+                        <option value="무임장로">무임장로</option>
+                        <option value="협동장로">협동장로</option>
+                        <option value="은퇴장로">은퇴장로</option>
+                        <option value="무임은퇴장로">무임은퇴장로</option>
+                      </optgroup>
+                      <hr />
+
+                      <optgroup label="권사">
+                        <option value="시무권사">시무권사</option>
+                        <option value="무임권사">무임권사</option>
+                        <option value="은퇴권사">은퇴권사</option>
+                        <option value="무임은퇴권사">무임은퇴권사</option>
+                      </optgroup>
+                      <hr />
+                      <optgroup label="장립집사">
+                        <option value="장립집사">장립집사</option>
+                        <option value="무임장립집사">무임장립집사</option>
+                        <option value="은퇴장립집사">은퇴장립집사</option>
+                        <option value="무임은퇴장립집사"
+                          >무임은퇴장립집사</option
+                        >
+                      </optgroup>
+                      <hr />
+                      <optgroup label="서리집사">
+                        <option value="서리집사">서리집사</option>
+                        <option value="명예서리집사">명예서리집사</option>
+                      </optgroup>
+                      <hr />
+                      <optgroup label="권찰">
+                        <option value="권찰">권찰</option>
+                      </optgroup>
+                      <hr />
+                      <optgroup label="성도">
+                        <option value="성도">성도</option>
+                      </optgroup>
                     </select>
                     <div class="border-l border-gray-300" />
+
                     <select
                       id="singeup"
                       value={seongdo.singeup}
@@ -956,18 +982,41 @@
                     class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                   >
                     <option value="none" class="hidden" />
-                    <option value="장로">장로</option>
-                    <option value="안수집사">안수집사</option>
-                    <option value="권사">권사</option>
-                    <option value="은퇴권사">은퇴권사</option>
-                    <option value="무임권사">무임권사</option>
-                    <option value="무임은퇴권사">무임은퇴권사</option>
-                    <option value="서리집사">서리집사</option>
-                    <option value="은퇴집사">은퇴집사</option>
-                    <option value="무임집사">무임집사</option>
-                    <option value="무임은퇴집사">무임은퇴집사</option>
-                    <option value="권찰">권찰</option>
-                    <option value="성도">성도</option>
+                    <optgroup label="장로">
+                      <option value="시무장로">시무장로</option>
+                      <option value="무임장로">무임장로</option>
+                      <option value="협동장로">협동장로</option>
+                      <option value="은퇴장로">은퇴장로</option>
+                      <option value="무임은퇴장로">무임은퇴장로</option>
+                    </optgroup>
+                    <hr />
+
+                    <optgroup label="권사">
+                      <option value="시무권사">시무권사</option>
+                      <option value="무임권사">무임권사</option>
+                      <option value="은퇴권사">은퇴권사</option>
+                      <option value="무임은퇴권사">무임은퇴권사</option>
+                    </optgroup>
+                    <hr />
+                    <optgroup label="장립집사">
+                      <option value="장립집사">장립집사</option>
+                      <option value="무임장립집사">무임장립집사</option>
+                      <option value="은퇴장립집사">은퇴장립집사</option>
+                      <option value="무임은퇴장립집사">무임은퇴장립집사</option>
+                    </optgroup>
+                    <hr />
+                    <optgroup label="서리집사">
+                      <option value="서리집사">서리집사</option>
+                      <option value="명예서리집사">명예서리집사</option>
+                    </optgroup>
+                    <hr />
+                    <optgroup label="권찰">
+                      <option value="권찰">권찰</option>
+                    </optgroup>
+                    <hr />
+                    <optgroup label="성도">
+                      <option value="성도">성도</option>
+                    </optgroup>
                   </select>
                   <div class="border-l border-gray-300" />
                   <select
@@ -1199,7 +1248,7 @@
       <div
         class="sticky top-0 pt-8 bg-white flex justify-between items-start pb-2"
       >
-        <h1 class="text-lg font-medium">섬김 사역</h1>
+        <h1 class="text-lg font-medium">상세 소속</h1>
         <div class="flex ml-auto gap-2">
           <button
             type="submit"
@@ -1384,6 +1433,21 @@
             {#each members as member}
               <div class="flex px-3 justify-center items-center h-10">
                 {member.isSeongdo ? member.seongdo.jikbun : ""}
+              </div>
+            {/each}
+          {/if}
+        </div>
+        <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
+          <button
+            class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
+          >
+            신급
+          </button>
+          {#if members?.length > 0}
+            <!-- content here -->
+            {#each members as member}
+              <div class="flex px-3 justify-center items-center h-10">
+                {member.isSeongdo ? member.seongdo.singeup : ""}
               </div>
             {/each}
           {/if}
@@ -1891,7 +1955,6 @@
                   },
                 ]
                 memberIds = [...memberIds, selectedSeongdo?._id]
-                familyDetail = family.detail
 
                 const result = await familyHandler()
                 if (result) {
@@ -2738,8 +2801,8 @@
             on:click={async () => {
               if (!service.group1) {
                 toast.error("소속을 입력해주세요.")
-              } else if (!service.classification) {
-                toast.error("구분을 입력해주세요.")
+                // } else if (!service.classification) {
+                // toast.error("구분을 입력해주세요.")
               } else {
                 let order
                 switch (service.classification) {
