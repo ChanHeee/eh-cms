@@ -369,6 +369,28 @@
               <p>닫기</p>
             </span>
           </button>
+        {:else if searchParams.group2 == "은혜브릿지" || searchParams.group2 == "늘푸른부"}
+          <button
+            class="hidden md:flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+            on:click={() => {
+              goto(
+                `/seongdos/addMany?group1=${searchParams.group1}&group2=${searchParams.group2}`
+              )
+            }}
+          >
+            <UserMultiple scale={16} />
+            <span>{`${searchParams.group2} 등록`}</span>
+          </button>
+          <button
+            type="button"
+            class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+            on:click={() => {
+              goto("/seongdos?deleteMany=true")
+            }}
+          >
+            <TrashCan scale={16} />
+            <span>여러명 삭제</span>
+          </button>
         {:else}
           <button
             class="flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
@@ -513,15 +535,15 @@
                     class="flex w-[50%] bg-gray-50 text-gray-600 text-sm focus:outline-0 py-2"
                   >
                     <option value="none" class="hidden" />
-                    {#if group1 == "장년부"}
+                    {#if group1 == "장년부" && groupList["장년부"]}
                       {#each groupList["장년부"] as item}
                         <option value={item}>{item}</option>
                       {/each}
-                    {:else if group1 == "청년부"}
+                    {:else if group1 == "청년부" && groupList["청년부"]}
                       {#each groupList["청년부"] as item}
                         <option value={item}>{item}</option>
                       {/each}
-                    {:else if group1 == "교회학교"}
+                    {:else if group1 == "교회학교" && groupList["교회학교"]}
                       {#each groupList["교회학교"] as item}
                         <option value={item}>{item}</option>
                       {/each}

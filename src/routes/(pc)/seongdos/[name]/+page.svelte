@@ -42,9 +42,6 @@
   }
 
   onMount(async () => {
-    // const temp = document.getElementById("preview")
-    // seongdo.avatar = await dataURItoString(temp.src)
-
     selectedSimbang = data.simbangs.filter(
       (simbang) => simbang._id == data.simbangId
     )[0]
@@ -91,7 +88,6 @@
       return address + ", " + detailAddress + " (" + extraAddress + ")"
     }
   }
-  $: hoverOnAvatar = false
 
   // value for family
   const familyAddHandler = (seongdo: ISeongdo) => {
@@ -2647,7 +2643,7 @@
         <div
           class="w-full overflow-scroll h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
         >
-          <h1 class="text-left text-lg font-medium mb-2">사역 추가</h1>
+          <h1 class="text-left text-lg font-medium mb-2">소속 추가</h1>
 
           <form class="flex flex-col">
             <div class="flex flex-col text-sm gap-3">
@@ -2955,3 +2951,32 @@
     </div>
   </div>
 </div>
+
+<!-- <div
+  class="relative z-10 h-full"
+  class:hidden={false}
+  aria-labelledby="modal-title"
+  role="dialog"
+  aria-modal="true"
+>
+  <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" />
+  <div class="w-full fixed inset-0 z-10 w-screen">
+    <div
+      class="h-full flex min-h-full items-end justify-center p-4 text-center items-center"
+    >
+      <div
+        class="sm:h-2/3 h-3/4 sm:max-md:w-2/3 md:w-1/3 w-full relative transform rounded-md bg-white shadow-xl transition-all"
+      >
+        <div
+          class="w-full overflow-scroll h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
+        >
+          <FamilyTree />
+        </div>
+
+        <div
+          class="bg-gray-50 h-[55px] px-4 py-3 flex flex-row-reverse px-6 gap-2"
+        ></div>
+      </div>
+    </div>
+  </div>
+</div> -->

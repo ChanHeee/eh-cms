@@ -2,11 +2,20 @@ import { getSearchParams, getSeongdosSearchParams } from "$lib/utils"
 import { redirect } from "@sveltejs/kit"
 
 export const load = async ({ request, fetch, url, locals }) => {
-  const { name, jikbun, order, page, birthStart, birthEnd, group1, group2 } =
-    locals.searchParams
+  const {
+    name,
+    jikbun,
+    order,
+    page,
+    birthStart,
+    birthEnd,
+    group1,
+    group2,
+    semester,
+  } = locals.searchParams
   const className = decodeURI(url.pathname).split("/")[2]
 
-  if (!["기초반", "성숙반", "사명자반", "전체"].includes(className)) {
+  if (!["기초반", "성숙반", "사명자반", "전체", "통합"].includes(className)) {
     throw redirect(302, encodeURI(`/educations`))
   }
 
@@ -28,6 +37,7 @@ export const load = async ({ request, fetch, url, locals }) => {
   let response = await fetch(
     `/api/seongdoEdus${getSearchParams({
       class: className,
+      semester,
       name,
       jikbun,
       order,

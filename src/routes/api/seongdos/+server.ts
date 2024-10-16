@@ -42,18 +42,23 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
         "시무장로",
         "무임장로",
         "협동장로",
-        "원로장로",
-        "은퇴장로"
+        "은퇴장로",
+        "무임은퇴장로"
       )
     }
     if (jikbun.includes("권사")) {
+      jikbunTemp.push("시무권사", "무임권사", "은퇴권사", "무임은퇴권사")
+    }
+    if (jikbun.includes("장립집사all")) {
       jikbunTemp.push(
-        "시무권사",
-        "무임권사",
-        "협동권사",
-        "원로권사",
-        "은퇴권사"
+        "안수집사",
+        "무임안수집사",
+        "은퇴안수집사",
+        "은퇴무임안수집사"
       )
+    }
+    if (jikbun.includes("서리집사all")) {
+      jikbunTemp.push("서리집사", "명예서리집사")
     }
     seongdoMatch.jikbun = { $in: jikbunTemp }
   }
@@ -147,13 +152,17 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
         seongdoMatch.group2 = { $regex: group2 }
       } else {
         if (group2 == "늘푸른부") {
-          const targetBirth = `${new Date().getFullYear() - 70}-12-31`
-          seongdoMatch["$or"] = [
-            {
-              $and: [{ birth: { $ne: "" } }, { birth: { $lte: targetBirth } }],
-            },
-            { "services.group1": group1, "services.group2": group2 },
-          ]
+          // const targetBirth = `${new Date().getFullYear() - 70}-12-31`
+          // seongdoMatch["$or"] = [
+          //   {
+          //     $and: [{ birth: { $ne: "" } }, { birth: { $lte: targetBirth } }],
+          //   },
+          //   { "services.group1": group1, "services.group2": group2 },
+          // ]
+          seongdoMatch = {
+            "services.group1": group1,
+            "services.group2": group2,
+          }
         } else {
           seongdoMatch["$or"] = [
             { group1, group2 },

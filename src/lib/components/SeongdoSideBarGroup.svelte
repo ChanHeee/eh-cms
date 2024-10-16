@@ -39,7 +39,7 @@
 </script>
 
 <aside
-  class="hidden-if-modile flex flex-col w-[30rem] px-6 py-8 font-semilight text-gray-600 text-sm overflow-scroll gap-4"
+  class="hidden-if-modile flex flex-col w-[30rem] px-6 py-8 font-semilight text-gray-600 text-sm gap-4"
 >
   <!-- 이름 검색 -->
   <div class="flex gap-2">
@@ -124,7 +124,21 @@
             id="jikbun-dropdown"
             class="hidden grid grid-cols-2 gap-[5px] border-t border-gray-300 focus:outline-0 px-3 py-2"
           >
-            <p class="flex text-gray-600 text-sm gap-2 px-3">
+            <!-- 장로 checkbox -->
+            <button
+              class="relative flex items-center text-gray-600 text-sm gap-2 px-3"
+              on:mouseover={() => {
+                document
+                  .querySelector("#jangro-tooltip")
+                  ?.classList.remove("hidden")
+              }}
+              on:mouseleave={() => {
+                document
+                  .querySelector("#jangro-tooltip")
+                  ?.classList.add("hidden")
+              }}
+              on:focus={null}
+            >
               <input
                 type="checkbox"
                 id="a"
@@ -132,243 +146,625 @@
                   undefined}
                 on:change={() => {
                   if (document.querySelector("#a").checked) {
-                    jikbunArray = [...jikbunArray, "장로"]
-                    // jikbunList.set(jikbunArray)
+                    document.querySelector("#a1").checked = false
+                    document.querySelector("#a2").checked = false
+                    document.querySelector("#a3").checked = false
+                    document.querySelector("#a4").checked = false
+                    document.querySelector("#a5").checked = false
+                    jikbunArray = [
+                      ...jikbunArray.filter((value) => !value.includes("장로")),
+                      "장로",
+                    ]
                   } else {
                     jikbunArray = [
                       ...jikbunArray.filter((value) => value !== "장로"),
                     ]
-                    // jikbunList.set(jikbunArray)
                   }
                 }}
               />
               <label for="a">장로</label>
-            </p>
-            <p class="flex text-gray-600 text-sm gap-2 px-3">
+              <div
+                id="jangro-tooltip"
+                class="hidden flex flex-col gap-2 absolute left-16 top-1/2 z-20 ml-3 -translate-y-1/2 border border-gray-300 whitespace-nowrap rounded-md bg-white py-3 px-4 text-xs text-gray-800 font-medium transition-opacity duration-300 shadow-[-12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
+                role="tooltip"
+              >
+                <span
+                  class="absolute -left-1.5 top-1/2 -z-10 h-3 w-3 border-gray-300 border-b border-l -translate-y-1/2 rotate-45 bg-white"
+                ></span>
+                <div class="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="a1"
+                    class="text-xs mr-2"
+                    checked={jikbunArray.find(
+                      (element) => element == "시무장로"
+                    ) != undefined}
+                    on:change={() => {
+                      if (document.querySelector("#a1").checked) {
+                        document.querySelector("#a").checked = false
+                        jikbunArray = [
+                          ...jikbunArray.filter((item) => item != "장로"),
+                          "시무장로",
+                        ]
+                      } else {
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (value) => value !== "시무장로"
+                          ),
+                        ]
+                      }
+                    }}
+                  />
+                  <label for="a1">시무장로</label>
+                </div>
+                <div class="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="a2"
+                    class="text-xs mr-2"
+                    checked={jikbunArray.find(
+                      (element) => element == "무임장로"
+                    ) != undefined}
+                    on:change={() => {
+                      if (document.querySelector("#a2").checked) {
+                        document.querySelector("#a").checked = false
+                        jikbunArray = [
+                          ...jikbunArray.filter((item) => item != "장로"),
+                          "무임장로",
+                        ]
+                      } else {
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (value) => value !== "무임장로"
+                          ),
+                        ]
+                      }
+                    }}
+                  />
+                  <label for="a2">무임장로</label>
+                </div>
+                <div class="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="a3"
+                    class="text-xs mr-2"
+                    checked={jikbunArray.find(
+                      (element) => element == "협동장로"
+                    ) != undefined}
+                    on:change={() => {
+                      if (document.querySelector("#a3").checked) {
+                        document.querySelector("#a").checked = false
+                        jikbunArray = [
+                          ...jikbunArray.filter((item) => item != "장로"),
+                          "협동장로",
+                        ]
+                      } else {
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (value) => value !== "협동장로"
+                          ),
+                        ]
+                      }
+                    }}
+                  />
+                  <label for="a3">협동장로</label>
+                </div>
+                <div class="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="a4"
+                    class="text-xs mr-2"
+                    checked={jikbunArray.find(
+                      (element) => element == "은퇴장로"
+                    ) != undefined}
+                    on:change={() => {
+                      if (document.querySelector("#a4").checked) {
+                        document.querySelector("#a").checked = false
+                        jikbunArray = [
+                          ...jikbunArray.filter((item) => item != "장로"),
+                          "은퇴장로",
+                        ]
+                      } else {
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (value) => value !== "은퇴장로"
+                          ),
+                        ]
+                      }
+                    }}
+                  />
+                  <label for="a4">은퇴장로</label>
+                </div>
+                <div class="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="a5"
+                    class="text-xs mr-2"
+                    checked={jikbunArray.find(
+                      (element) => element == "무임은퇴장로"
+                    ) != undefined}
+                    on:change={() => {
+                      if (document.querySelector("#a5").checked) {
+                        document.querySelector("#a").checked = false
+                        jikbunArray = [
+                          ...jikbunArray.filter((item) => item != "장로"),
+                          "무임은퇴장로",
+                        ]
+                      } else {
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (value) => value !== "무임은퇴장로"
+                          ),
+                        ]
+                      }
+                    }}
+                  />
+                  <label for="a5">무임은퇴장로</label>
+                </div>
+              </div>
+            </button>
+
+            <!-- 권사 checkbox -->
+            <button
+              class="relative flex items-center text-gray-600 text-sm gap-2 px-3"
+              on:mouseover={() => {
+                document
+                  .querySelector("#gwonsa-tooltip")
+                  ?.classList.remove("hidden")
+              }}
+              on:mouseleave={() => {
+                document
+                  .querySelector("#gwonsa-tooltip")
+                  ?.classList.add("hidden")
+              }}
+              on:focus={null}
+            >
               <input
                 type="checkbox"
                 id="b"
-                checked={jikbunArray.find((element) => element == "안수집사") !=
-                  undefined}
-                on:change={() => {
-                  if (document.querySelector("#b").checked) {
-                    jikbunArray = [...jikbunArray, "안수집사"]
-                    // jikbunList.set(jikbunArray)
-                  } else {
-                    jikbunArray = [
-                      ...jikbunArray.filter((value) => value !== "안수집사"),
-                    ]
-                    // jikbunList.set(jikbunArray)
-                  }
-                }}
-              />
-              <label for="b">안수집사</label>
-            </p>
-            <p class="flex text-gray-600 text-sm gap-2 px-3">
-              <input
-                type="checkbox"
-                id="c"
                 checked={jikbunArray.find((element) => element == "권사") !=
                   undefined}
                 on:change={() => {
-                  if (document.querySelector("#c").checked) {
-                    jikbunArray = [...jikbunArray, "권사"]
-                    // jikbunList.set(jikbunArray)
+                  if (document.querySelector("#b").checked) {
+                    document.querySelector("#b1").checked = false
+                    document.querySelector("#b2").checked = false
+                    document.querySelector("#b3").checked = false
+                    document.querySelector("#b4").checked = false
+                    jikbunArray = [
+                      ...jikbunArray.filter((value) => !value.includes("권사")),
+                      "권사",
+                    ]
                   } else {
                     jikbunArray = [
                       ...jikbunArray.filter((value) => value !== "권사"),
                     ]
-                    // jikbunList.set(jikbunArray)
                   }
                 }}
               />
-              <label for="c">권사</label>
-            </p>
-            <p class="flex text-gray-600 text-sm gap-2 px-3">
+              <label for="b">권사</label>
+              <div
+                id="gwonsa-tooltip"
+                class="hidden flex flex-col gap-2 absolute left-16 top-1/2 z-20 ml-3 -translate-y-1/2 border border-gray-300 whitespace-nowrap rounded-md bg-white py-3 px-4 text-xs text-gray-800 font-medium transition-opacity duration-300 shadow-[-12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
+                role="tooltip"
+              >
+                <span
+                  class="absolute -left-1.5 top-1/2 -z-10 h-3 w-3 border-gray-300 border-b border-l -translate-y-1/2 rotate-45 bg-white"
+                ></span>
+                <div class="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="b1"
+                    class="text-xs mr-2"
+                    checked={jikbunArray.find(
+                      (element) => element == "시무권사"
+                    ) != undefined}
+                    on:change={() => {
+                      if (document.querySelector("#b1").checked) {
+                        document.querySelector("#b").checked = false
+                        jikbunArray = [
+                          ...jikbunArray.filter((item) => item != "권사"),
+                          "시무권사",
+                        ]
+                      } else {
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (value) => value !== "시무권사"
+                          ),
+                        ]
+                      }
+                    }}
+                  />
+                  <label for="b1">시무권사</label>
+                </div>
+                <div class="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="b2"
+                    class="text-xs mr-2"
+                    checked={jikbunArray.find(
+                      (element) => element == "무임권사"
+                    ) != undefined}
+                    on:change={() => {
+                      if (document.querySelector("#b2").checked) {
+                        document.querySelector("#b").checked = false
+                        jikbunArray = [
+                          ...jikbunArray.filter((item) => item != "권사"),
+                          "무임권사",
+                        ]
+                      } else {
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (value) => value !== "무임권사"
+                          ),
+                        ]
+                      }
+                    }}
+                  />
+                  <label for="b2">무임권사</label>
+                </div>
+                <div class="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="b3"
+                    class="text-xs mr-2"
+                    checked={jikbunArray.find(
+                      (element) => element == "은퇴권사"
+                    ) != undefined}
+                    on:change={() => {
+                      if (document.querySelector("#b3").checked) {
+                        document.querySelector("#b").checked = false
+                        jikbunArray = [
+                          ...jikbunArray.filter((item) => item != "권사"),
+                          "은퇴권사",
+                        ]
+                      } else {
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (value) => value !== "은퇴권사"
+                          ),
+                        ]
+                      }
+                    }}
+                  />
+                  <label for="b3">은퇴권사</label>
+                </div>
+                <div class="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="b4"
+                    class="text-xs mr-2"
+                    checked={jikbunArray.find(
+                      (element) => element == "무임은퇴권사"
+                    ) != undefined}
+                    on:change={() => {
+                      if (document.querySelector("#b4").checked) {
+                        document.querySelector("#b").checked = false
+                        jikbunArray = [
+                          ...jikbunArray.filter((item) => item != "권사"),
+                          "무임은퇴권사",
+                        ]
+                      } else {
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (value) => value !== "무임은퇴권사"
+                          ),
+                        ]
+                      }
+                    }}
+                  />
+                  <label for="b4">무임은퇴권사</label>
+                </div>
+              </div>
+            </button>
+
+            <!-- 안수집사 checkbox -->
+            <button
+              class="relative flex items-center text-gray-600 text-sm gap-2 px-3"
+              on:mouseover={() => {
+                document
+                  .querySelector("#janglip-tooltip")
+                  ?.classList.remove("hidden")
+              }}
+              on:mouseleave={() => {
+                document
+                  .querySelector("#janglip-tooltip")
+                  ?.classList.add("hidden")
+              }}
+              on:focus={null}
+            >
+              <input
+                type="checkbox"
+                id="c"
+                checked={jikbunArray.find(
+                  (element) => element == "장립집사all"
+                ) != undefined}
+                on:change={() => {
+                  if (document.querySelector("#c").checked) {
+                    document.querySelector("#c1").checked = false
+                    document.querySelector("#c2").checked = false
+                    document.querySelector("#c3").checked = false
+                    document.querySelector("#c4").checked = false
+
+                    jikbunArray = [
+                      ...jikbunArray.filter(
+                        (value) => !value.includes("장립집사")
+                      ),
+                      "장립집사all",
+                    ]
+                  } else {
+                    jikbunArray = [
+                      ...jikbunArray.filter((value) => value !== "장립집사all"),
+                    ]
+                  }
+                }}
+              />
+              <label for="c">장립집사</label>
+              <div
+                id="janglip-tooltip"
+                class="hidden flex flex-col gap-2 absolute left-16 top-1/2 z-20 ml-3 -translate-y-1/2 border border-gray-300 whitespace-nowrap rounded-md bg-white py-3 px-4 text-xs text-gray-800 font-medium transition-opacity duration-300 shadow-[-12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
+                role="tooltip"
+              >
+                <span
+                  class="absolute -left-1.5 top-1/2 -z-10 h-3 w-3 border-gray-300 border-b border-l -translate-y-1/2 rotate-45 bg-white"
+                ></span>
+                <div class="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="c1"
+                    class="text-xs mr-2"
+                    checked={jikbunArray.find(
+                      (element) => element == "장립집사"
+                    ) != undefined}
+                    on:change={() => {
+                      if (document.querySelector("#c1").checked) {
+                        document.querySelector("#c").checked = false
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (item) => item != "장립집사all"
+                          ),
+                          "장립집사",
+                        ]
+                      } else {
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (value) => value !== "장립집사"
+                          ),
+                        ]
+                      }
+                    }}
+                  />
+                  <label for="c1">장립집사</label>
+                </div>
+                <div class="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="c2"
+                    class="text-xs mr-2"
+                    checked={jikbunArray.find(
+                      (element) => element == "무임장립집사"
+                    ) != undefined}
+                    on:change={() => {
+                      if (document.querySelector("#c2").checked) {
+                        document.querySelector("#c").checked = false
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (item) => item != "장립집사all"
+                          ),
+                          "무임장립집사",
+                        ]
+                      } else {
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (value) => value !== "무임장립집사"
+                          ),
+                        ]
+                      }
+                    }}
+                  />
+                  <label for="c2">무임장립집사</label>
+                </div>
+
+                <div class="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="c3"
+                    class="text-xs mr-2"
+                    checked={jikbunArray.find(
+                      (element) => element == "은퇴장립집사"
+                    ) != undefined}
+                    on:change={() => {
+                      if (document.querySelector("#c3").checked) {
+                        document.querySelector("#c").checked = false
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (item) => item != "장립집사all"
+                          ),
+                          "은퇴장립집사",
+                        ]
+                      } else {
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (value) => value !== "은퇴장립집사"
+                          ),
+                        ]
+                      }
+                    }}
+                  />
+                  <label for="c3">은퇴장립집사</label>
+                </div>
+
+                <div class="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="c4"
+                    class="text-xs mr-2"
+                    checked={jikbunArray.find(
+                      (element) => element == "무임은퇴장립집사"
+                    ) != undefined}
+                    on:change={() => {
+                      if (document.querySelector("#c4").checked) {
+                        document.querySelector("#c").checked = false
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (item) => item != "장립집사all"
+                          ),
+                          "무임은퇴장립집사",
+                        ]
+                      } else {
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (value) => value !== "무임은퇴장립집사"
+                          ),
+                        ]
+                      }
+                    }}
+                  />
+                  <label for="c4">무임은퇴장립집사</label>
+                </div>
+              </div>
+            </button>
+
+            <!-- 서리집사 checkbox -->
+            <button
+              class="relative flex items-center text-gray-600 text-sm gap-2 px-3"
+              on:mouseover={() => {
+                document
+                  .querySelector("#seori-tooltip")
+                  ?.classList.remove("hidden")
+              }}
+              on:mouseleave={() => {
+                document
+                  .querySelector("#seori-tooltip")
+                  ?.classList.add("hidden")
+              }}
+              on:focus={null}
+            >
               <input
                 type="checkbox"
                 id="d"
-                checked={jikbunArray.find((element) => element == "은퇴권사") !=
-                  undefined}
+                checked={jikbunArray.find(
+                  (element) => element == "서리집사all"
+                ) != undefined}
                 on:change={() => {
                   if (document.querySelector("#d").checked) {
-                    jikbunArray = [...jikbunArray, "은퇴권사"]
-                    // jikbunList.set(jikbunArray)
+                    document.querySelector("#d1").checked = false
+
+                    jikbunArray = [
+                      ...jikbunArray.filter(
+                        (value) => !value.includes("서리집사")
+                      ),
+                      "서리집사all",
+                    ]
                   } else {
                     jikbunArray = [
-                      ...jikbunArray.filter((value) => value !== "은퇴권사"),
+                      ...jikbunArray.filter((value) => value !== "서리집사all"),
                     ]
-                    // jikbunList.set(jikbunArray)
                   }
                 }}
               />
-              <label for="d">은퇴권사</label>
-            </p>
+              <label for="d">서리집사</label>
+              <div
+                id="seori-tooltip"
+                class="hidden flex flex-col gap-2 absolute left-16 top-1/2 z-20 ml-3 -translate-y-1/2 border border-gray-300 whitespace-nowrap rounded-md bg-white py-3 px-4 text-xs text-gray-800 font-medium transition-opacity duration-300 shadow-[-12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
+                role="tooltip"
+              >
+                <span
+                  class="absolute -left-1.5 top-1/2 -z-10 h-3 w-3 border-gray-300 border-b border-l -translate-y-1/2 rotate-45 bg-white"
+                ></span>
+                <div class="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="d1"
+                    class="text-xs mr-2"
+                    checked={jikbunArray.find(
+                      (element) => element == "서리집사"
+                    ) != undefined}
+                    on:change={() => {
+                      if (document.querySelector("#d1").checked) {
+                        document.querySelector("#d").checked = false
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (item) => item != "서리집사all"
+                          ),
+                          "서리집사",
+                        ]
+                      } else {
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (value) => value !== "서리집사all"
+                          ),
+                        ]
+                      }
+                    }}
+                  />
+                  <label for="d1">서리집사</label>
+                </div>
+                <div class="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="d2"
+                    class="text-xs mr-2"
+                    checked={jikbunArray.find(
+                      (element) => element == "명예서리집사"
+                    ) != undefined}
+                    on:change={() => {
+                      if (document.querySelector("#d2").checked) {
+                        document.querySelector("#d").checked = false
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (item) => item != "서리집사all"
+                          ),
+                          "명예서리집사",
+                        ]
+                      } else {
+                        jikbunArray = [
+                          ...jikbunArray.filter(
+                            (value) => value !== "명예서리집사"
+                          ),
+                        ]
+                      }
+                    }}
+                  />
+                  <label for="d2">명예서리집사</label>
+                </div>
+              </div>
+            </button>
+            <!-- 권찰 checkbox -->
             <p class="flex text-gray-600 text-sm gap-2 px-3">
               <input
                 type="checkbox"
                 id="e"
-                checked={jikbunArray.find((element) => element == "무임권사") !=
+                checked={jikbunArray.find((element) => element == "권찰") !=
                   undefined}
                 on:change={() => {
                   if (document.querySelector("#e").checked) {
-                    jikbunArray = [...jikbunArray, "무임권사"]
-                    // jikbunList.set(jikbunArray)
+                    jikbunArray = [...jikbunArray, "권찰"]
                   } else {
                     jikbunArray = [
-                      ...jikbunArray.filter((value) => value !== "무임권사"),
+                      ...jikbunArray.filter((value) => value !== "권찰"),
                     ]
-                    // jikbunList.set(jikbunArray)
                   }
                 }}
               />
-              <label for="e">무임권사</label>
+              <label for="e">권찰</label>
             </p>
             <p class="flex text-gray-600 text-sm gap-2 px-3">
               <input
                 type="checkbox"
                 id="f"
-                checked={jikbunArray.find(
-                  (element) => element == "무임은퇴권사"
-                ) != undefined}
-                on:change={() => {
-                  if (document.querySelector("#f").checked) {
-                    jikbunArray = [...jikbunArray, "무임은퇴권사"]
-                    // jikbunList.set(jikbunArray)
-                  } else {
-                    jikbunArray = [
-                      ...jikbunArray.filter(
-                        (value) => value !== "무임은퇴권사"
-                      ),
-                    ]
-                    // jikbunList.set(jikbunArray)
-                  }
-                }}
-              />
-              <label for="f">무임은퇴권사</label>
-            </p>
-            <p class="flex text-gray-600 text-sm gap-2 px-3">
-              <input
-                type="checkbox"
-                id="g"
-                checked={jikbunArray.find((element) => element == "서리집사") !=
-                  undefined}
-                on:change={() => {
-                  if (document.querySelector("#g").checked) {
-                    jikbunArray = [...jikbunArray, "서리집사"]
-                    // jikbunList.set(jikbunArray)
-                  } else {
-                    jikbunArray = [
-                      ...jikbunArray.filter((value) => value !== "서리집사"),
-                    ]
-                    // jikbunList.set(jikbunArray)
-                  }
-                }}
-              />
-              <label for="g">서리집사</label>
-            </p>
-            <p class="flex text-gray-600 text-sm gap-2 px-3">
-              <input
-                type="checkbox"
-                id="h"
-                checked={jikbunArray.find((element) => element == "은퇴집사") !=
-                  undefined}
-                on:change={() => {
-                  if (document.querySelector("#h").checked) {
-                    jikbunArray = [...jikbunArray, "은퇴집사"]
-                    // jikbunList.set(jikbunArray)
-                  } else {
-                    jikbunArray = [
-                      ...jikbunArray.filter((value) => value !== "은퇴집사"),
-                    ]
-                    // jikbunList.set(jikbunArray)
-                  }
-                }}
-              />
-              <label for="h">은퇴집사</label>
-            </p>
-            <p class="flex text-gray-600 text-sm gap-2 px-3">
-              <input
-                type="checkbox"
-                id="i"
-                checked={jikbunArray.find((element) => element == "무임집사") !=
-                  undefined}
-                on:change={() => {
-                  if (document.querySelector("#i").checked) {
-                    jikbunArray = [...jikbunArray, "무임집사"]
-                    // jikbunList.set(jikbunArray)
-                  } else {
-                    jikbunArray = [
-                      ...jikbunArray.filter((value) => value !== "무임집사"),
-                    ]
-                    // jikbunList.set(jikbunArray)
-                  }
-                }}
-              />
-              <label for="i">무임집사</label>
-            </p>
-            <p class="flex text-gray-600 text-sm gap-2 px-3">
-              <input
-                type="checkbox"
-                id="j"
-                checked={jikbunArray.find(
-                  (element) => element == "무임은퇴집사"
-                ) != undefined}
-                on:change={() => {
-                  if (document.querySelector("#j").checked) {
-                    jikbunArray = [...jikbunArray, "무임은퇴집사"]
-                    // jikbunList.set(jikbunArray)
-                  } else {
-                    jikbunArray = [
-                      ...jikbunArray.filter(
-                        (value) => value !== "무임은퇴집사"
-                      ),
-                    ]
-                    // jikbunList.set(jikbunArray)
-                  }
-                }}
-              />
-              <label for="j">무임은퇴집사</label>
-            </p>
-            <p class="flex text-gray-600 text-sm gap-2 px-3">
-              <input
-                type="checkbox"
-                id="k"
-                checked={jikbunArray.find((element) => element == "권찰") !=
-                  undefined}
-                on:change={() => {
-                  if (document.querySelector("#k").checked) {
-                    jikbunArray = [...jikbunArray, "권찰"]
-                    // jikbunList.set(jikbunArray)
-                  } else {
-                    jikbunArray = [
-                      ...jikbunArray.filter((value) => value !== "권찰"),
-                    ]
-                    // jikbunList.set(jikbunArray)
-                  }
-                }}
-              />
-              <label for="k">권찰</label>
-            </p>
-            <p class="flex text-gray-600 text-sm gap-2 px-3">
-              <input
-                type="checkbox"
-                id="l"
                 checked={jikbunArray.find((element) => element == "성도") !=
                   undefined}
                 on:change={() => {
-                  if (document.querySelector("#l").checked) {
+                  if (document.querySelector("#f").checked) {
                     jikbunArray = [...jikbunArray, "성도"]
-                    // jikbunList.set(jikbunArray)
                   } else {
                     jikbunArray = [
                       ...jikbunArray.filter((value) => value !== "성도"),
                     ]
-                    // jikbunList.set(jikbunArray)
                   }
                 }}
               />
-              <label for="l">성도</label>
+              <label for="f">성도</label>
             </p>
           </div>
         </div>

@@ -61,6 +61,7 @@ export interface ISeongdoEduPage {
     seongdoId?: string
     educationId?: string
     className?: string
+    semester?: string
     birthStart?: string
     birthEnd?: string
   }

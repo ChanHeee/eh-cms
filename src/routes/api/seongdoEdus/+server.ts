@@ -20,6 +20,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
       : null
   const order = url.searchParams.get("order")
   const className = url.searchParams.get("class")
+  const semester = url.searchParams.get("semester")
   const birthStart = url.searchParams.get("birthStart")
   const birthEnd = url.searchParams.get("birthEnd")
   const group1 = url.searchParams.get("group1")
@@ -76,8 +77,32 @@ export const GET: RequestHandler = async ({ request, url }) => {
   if (name) {
     seongdoMatch.name = { $regex: name }
   }
-  if (jikbun) {
-    seongdoMatch.jikbun = { $in: jikbun }
+  if (jikbun?.length > 0) {
+    const jikbunTemp = [...jikbun]
+    if (jikbun.includes("장로")) {
+      jikbunTemp.push(
+        "시무장로",
+        "무임장로",
+        "협동장로",
+        "은퇴장로",
+        "무임은퇴장로"
+      )
+    }
+    if (jikbun.includes("권사")) {
+      jikbunTemp.push("시무권사", "무임권사", "은퇴권사", "무임은퇴권사")
+    }
+    if (jikbun.includes("장립집사all")) {
+      jikbunTemp.push(
+        "안수집사",
+        "무임안수집사",
+        "은퇴안수집사",
+        "은퇴무임안수집사"
+      )
+    }
+    if (jikbun.includes("서리집사all")) {
+      jikbunTemp.push("서리집사", "명예서리집사")
+    }
+    seongdoMatch.jikbun = { $in: jikbunTemp }
   }
   if (birthStart) {
     seongdoMatch.birth = { $gte: birthStart }
@@ -85,125 +110,56 @@ export const GET: RequestHandler = async ({ request, url }) => {
   if (birthEnd) {
     seongdoMatch.birth = { ...seongdoMatch.birth, $lte: birthEnd }
   }
+
+  // if (group1 == "교회학교" && group2 == "은혜브릿지") {
+  //   seongdoMatch["services.group1"] = "교회학교"
+  //   seongdoMatch["services.group2"] = "은혜브릿지"
+  // } else {
+  //   seongdoMatch.group1 = group1
+  //   if (group2) {
+  //     seongdoMatch.group2 = group2
+  //   }
+  // }
   if (group1) {
     seongdoMatch.group1 = group1
-  }
-  if (group2) {
-    seongdoMatch.group2 = group2
+
+    if (group2) {
+      seongdoMatch.group2 = group2
+
+      if (group2 == "은혜브릿지") {
+        seongdoMatch["services.group1"] = "교회학교"
+        seongdoMatch["services.group2"] = "은혜브릿지"
+      }
+    }
   }
 
   if (className && className != "전체") {
-    educationMatch.name = className
+    if (className == "통합") {
+      educationMatch.semester = "통합"
+      if (semester) {
+        educationMatch.name = semester
+      }
+    } else {
+      // if(className=="기초반"){
+      //   educationMatch = {$and: [{name: className}, {semester: {$ne: '통합'}}]}
+      // }
+
+      // educationMatch.name = className
+
+      educationMatch = {
+        $and: [{ name: className }, { semester: { $ne: "통합" } }],
+      }
+
+      if (semester) {
+        educationMatch.semester = semester
+      }
+    }
   }
   if (educationId) {
     educationMatch._id = new Types.ObjectId(educationId)
   }
 
   let seongdoEdus, total
-
-  // if (educationId) {
-  //   // let query = SeongdoEdu.find({ education: educationId })
-  //   // if (seongdoId) {
-  //   //   query = query.find({ seongdo: seongdoId })
-  //   // }
-  //   // seongdoEdus = await SeongdoEdu.find(query)
-  //   //   .skip((page - 1) * take)
-  //   //   .limit(take)
-  //   //   .populate("seongdo")
-  //   //   .populate("education")
-  //   let seongdoEduMatch: any = {}
-  //   seongdoEduMatch.education = educationId
-  //   if (seongdoId) {
-  //     seongdoEduMatch.seongdo = seongdoId
-  //   }
-  //   console.log(educationId)
-
-  //   seongdoEdus = await SeongdoEdu.aggregate()
-  //     .match({ _id: "65ceb29ee667a01ec89f3112" })
-  //     .exec()
-
-  //   const totalArray = await SeongdoEdu.aggregate()
-  //     .match(seongdoEduMatch)
-  //     .lookup({
-  //       from: "seongdos",
-  //       localField: "seongdo",
-  //       foreignField: "_id",
-  //       as: "seongdo",
-  //     })
-  //     .unwind("seongdo")
-  //     .lookup({
-  //       from: "educations",
-  //       localField: "education",
-  //       foreignField: "_id",
-  //       as: "education",
-  //     })
-  //     .unwind("education")
-  //     .count("total")
-
-  //   total = totalArray.length > 0 ? totalArray[0].total : 0
-
-  //   // total = await SeongdoEdu.count(query)
-  // } else {
-  //   seongdoEdus = await SeongdoEdu.aggregate()
-  //     .sort(aggregateSort)
-  //     .skip((page - 1) * take)
-  //     .limit(take)
-  //     .lookup({
-  //       from: "seongdos",
-  //       localField: "seongdo",
-  //       foreignField: "_id",
-  //       as: "seongdo",
-  //       pipeline: [{ $match: seongdoMatch }],
-  //     })
-  //     .unwind("seongdo")
-  //     .lookup({
-  //       from: "educations",
-  //       localField: "education",
-  //       foreignField: "_id",
-  //       as: "education",
-  //       pipeline: [{ $match: educationMatch }],
-  //     })
-  //     .unwind("education")
-  //     .project({
-  //       _id: 1,
-  //       seongdo: {
-  //         _id: 1,
-  //         name: 1,
-  //         jikbun: 1,
-  //         birth: 1,
-  //         age: 1,
-  //         group1: 1,
-  //         group2: 1,
-  //       },
-  //       education: {
-  //         name: 1,
-  //         semester: 1,
-  //         startDate: 1,
-  //         endDate: 1,
-  //       },
-  //     })
-
-  //   const totalArray = await SeongdoEdu.aggregate()
-  //     .lookup({
-  //       from: "seongdos",
-  //       localField: "seongdo",
-  //       foreignField: "_id",
-  //       as: "seongdo",
-  //       pipeline: [{ $match: seongdoMatch }],
-  //     })
-  //     .unwind("seongdo")
-  //     .lookup({
-  //       from: "educations",
-  //       localField: "education",
-  //       foreignField: "_id",
-  //       as: "education",
-  //       pipeline: [{ $match: educationMatch }],
-  //     })
-  //     .unwind("education")
-  //     .count("total")
-
-  //   total = totalArray.length > 0 ? totalArray[0].total : 0
-  // }
 
   seongdoEdus = await SeongdoEdu.aggregate()
     .lookup({
@@ -292,6 +248,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
         name,
         jikbun,
         className,
+        semester,
         order,
         take,
         seongdoId,

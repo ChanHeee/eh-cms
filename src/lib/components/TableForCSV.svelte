@@ -30,7 +30,7 @@
     <div
       class="flex flex-col divide-y whitespace-nowrap border-l border-b border-t"
     >
-      <div
+      <!-- <div
         class="flex justify-center px-2 bg-[#D9D9D8] font-bold divide-b divide-x items-center h-10"
       >
         사진
@@ -45,7 +45,7 @@
             alt=""
           />
         </div>
-      {/each}
+      {/each} -->
     </div>
     <div
       class="flex flex-col divide-y whitespace-nowrap border-l border-b border-t"

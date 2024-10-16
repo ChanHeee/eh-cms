@@ -4,18 +4,22 @@
   import { AlignBoxMiddleCenter, Search } from "carbon-icons-svelte"
   import { goto } from "$app/navigation"
   import EducationSideBarSearch from "$lib/components/EducationSideBarSearch.svelte"
-  import type { ISeongdoEduSearchParams } from "$lib/interfaces"
+  import type { IGroup, ISeongdoEduSearchParams } from "$lib/interfaces"
   import { getSearchParams } from "$lib/utils"
+  import EducationSideBarGroup from "$lib/components/EducationSideBarGroup.svelte"
 
   export let data: {
     searchParams: ISeongdoEduSearchParams
     groupList: any
+    groupTree: IGroup
   }
 
   const nameData = data.searchParams.name
 
   $: searchParams = data.searchParams
   $: groupList = data.groupList
+  $: groupTree = data.groupTree
+
   $: name = nameData ?? ""
   $: className = searchParams.className || "전체"
   $: jikbunArray = searchParams.jikbun ?? []
@@ -120,6 +124,28 @@
         <p>사명자반</p>
       </button>
     </li>
+    <li
+      class="hover:bg-[#D9D9D8] cursor-pointer"
+      class:bg-[#D9D9D8]={className == "통합" ? true : false}
+    >
+      <button
+        class="py-4 flex w-full flex-col items-center text-white hover:text-[#FBA244] font-medium"
+        class:text-[#FBA244]={className == "통합" ? true : false}
+        class:text-white={className != "통합" ? true : false}
+        on:click={() => {
+          name = ""
+          goto(`/educations/통합`)
+        }}
+      >
+        <!-- <Book size={20} class="mb-1" /> -->
+        <BookStroke
+          color={className == "통합" ? "#FBA244" : "#FFFFFF"}
+          width="20px"
+          classString="mb-1"
+        />
+        <p>통합</p>
+      </button>
+    </li>
 
     <!--     
     <li
@@ -145,6 +171,12 @@
     </li> -->
   </ul>
 </aside>
-<EducationSideBarSearch {searchParams} {groupList} />
+
+<!-- {#if ["기초반", "성숙반", "사명자반"].includes(className)}
+  <EducationSideBarGroup {searchParams} {groupList} {groupTree} />
+{:else}
+  <EducationSideBarSearch {searchParams} {groupList} />
+{/if} -->
+<EducationSideBarGroup {searchParams} {groupList} {groupTree} />
 
 <slot><!-- optional fallback --></slot>

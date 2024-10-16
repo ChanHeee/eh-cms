@@ -46,7 +46,6 @@
         name: name.trim(),
         originalName: name.trim(),
         avatar,
-        // thumb: avatar ? await getThumbFile(avatar) : "",
         birth,
         age,
         gender,
@@ -306,31 +305,55 @@
                     class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
                     >직분 / 신급</label
                   >
-                  <div class="flex w-full justify-center gap-1 pr-1">
+                  <div class="relative flex w-full justify-center gap-1 pr-1">
                     <select
                       id="jikbun"
                       value={jikbun}
                       on:change={() => {
-                        jikbun = document.querySelector(
-                          "#jikbun > option:checked"
-                        ).value
+                        jikbun = document.querySelector("#jikbun").value
                       }}
                       class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                     >
                       <option value="none" class="hidden" />
-                      <option value="장로">장로</option>
-                      <option value="안수집사">안수집사</option>
-                      <option value="권사">권사</option>
-                      <option value="은퇴권사">은퇴권사</option>
-                      <option value="무임권사">무임권사</option>
-                      <option value="무임은퇴권사">무임은퇴권사</option>
-                      <option value="서리집사">서리집사</option>
-                      <option value="은퇴집사">은퇴집사</option>
-                      <option value="무임집사">무임집사</option>
-                      <option value="무임은퇴집사">무임은퇴집사</option>
-                      <option value="권찰">권찰</option>
-                      <option value="성도">성도</option>
+                      <optgroup label="장로">
+                        <option value="시무장로">시무장로</option>
+                        <option value="무임장로">무임장로</option>
+                        <option value="협동장로">협동장로</option>
+                        <option value="은퇴장로">은퇴장로</option>
+                        <option value="무임은퇴장로">무임은퇴장로</option>
+                      </optgroup>
+                      <hr />
+
+                      <optgroup label="권사">
+                        <option value="시무권사">시무권사</option>
+                        <option value="무임권사">무임권사</option>
+                        <option value="은퇴권사">은퇴권사</option>
+                        <option value="무임은퇴권사">무임은퇴권사</option>
+                      </optgroup>
+                      <hr />
+                      <optgroup label="장립집사">
+                        <option value="시무장립집사">시무장립집사</option>
+                        <option value="무임장립집사">무임장립집사</option>
+                        <option value="은퇴장립집사">은퇴장립집사</option>
+                        <option value="무임은퇴장립집사"
+                          >무임은퇴장립집사</option
+                        >
+                      </optgroup>
+                      <hr />
+                      <optgroup label="서리집사">
+                        <option value="서리집사">서리집사</option>
+                        <option value="명예서리집사">명예서리집사</option>
+                      </optgroup>
+                      <hr />
+                      <optgroup label="권찰">
+                        <option value="권찰">권찰</option>
+                      </optgroup>
+                      <hr />
+                      <optgroup label="성도">
+                        <option value="성도">성도</option>
+                      </optgroup>
                     </select>
+
                     <div class="border-l border-gray-300" />
                     <select
                       id="singeup"
@@ -647,18 +670,41 @@
                     class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                   >
                     <option value="none" class="hidden" />
-                    <option value="장로">장로</option>
-                    <option value="안수집사">안수집사</option>
-                    <option value="권사">권사</option>
-                    <option value="은퇴권사">은퇴권사</option>
-                    <option value="무임권사">무임권사</option>
-                    <option value="무임은퇴권사">무임은퇴권사</option>
-                    <option value="서리집사">서리집사</option>
-                    <option value="은퇴집사">은퇴집사</option>
-                    <option value="무임집사">무임집사</option>
-                    <option value="무임은퇴집사">무임은퇴집사</option>
-                    <option value="권찰">권찰</option>
-                    <option value="성도">성도</option>
+                    <optgroup label="장로">
+                      <option value="시무장로">시무장로</option>
+                      <option value="무임장로">무임장로</option>
+                      <option value="협동장로">협동장로</option>
+                      <option value="은퇴장로">은퇴장로</option>
+                      <option value="무임은퇴장로">무임은퇴장로</option>
+                    </optgroup>
+                    <hr />
+
+                    <optgroup label="권사">
+                      <option value="시무권사">시무권사</option>
+                      <option value="무임권사">무임권사</option>
+                      <option value="은퇴권사">은퇴권사</option>
+                      <option value="무임은퇴권사">무임은퇴권사</option>
+                    </optgroup>
+                    <hr />
+                    <optgroup label="장립집사">
+                      <option value="시무장립집사">시무장립집사</option>
+                      <option value="무임장립집사">무임장립집사</option>
+                      <option value="은퇴장립집사">은퇴장립집사</option>
+                      <option value="무임은퇴장립집사">무임은퇴장립집사</option>
+                    </optgroup>
+                    <hr />
+                    <optgroup label="서리집사">
+                      <option value="서리집사">서리집사</option>
+                      <option value="명예서리집사">명예서리집사</option>
+                    </optgroup>
+                    <hr />
+                    <optgroup label="권찰">
+                      <option value="권찰">권찰</option>
+                    </optgroup>
+                    <hr />
+                    <optgroup label="성도">
+                      <option value="성도">성도</option>
+                    </optgroup>
                   </select>
                   <div class="border-l border-gray-300" />
                   <select

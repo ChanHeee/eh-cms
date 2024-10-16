@@ -6,7 +6,13 @@
   import { Checkmark, Close, Renew } from "carbon-icons-svelte"
   import type { ISeongdo } from "$lib/interfaces"
 
-  $: seongdos = []
+  export let data: {
+    group2: String
+  }
+
+  $: group2 = data.group2
+  let seongdos: any[] = []
+  $: seongdos = seongdos
   $: addedNum = 0
 
   var loadFile = async function (event) {
@@ -102,6 +108,57 @@
     )
   }
 
+  var loadFileOnlyName = async function (event) {
+    var input = event.target
+    var file = input.files[0]
+
+    const readFile = (file: File) =>
+      new Promise((resolve, reject) => {
+        let reader = new FileReader()
+        reader.onload = () => resolve(reader.result)
+
+        reader.readAsArrayBuffer(file)
+      })
+
+    let csv = await readFile(file)
+
+    const wb = read(csv)
+    const sheet = wb.Sheets[wb.SheetNames[0]]
+
+    Object.keys(sheet).map((item) => {
+      if (sheet[item]["w"]) {
+        sheet[item]["v"] = sheet[item]["w"]
+      }
+    })
+
+    csv = utils.sheet_to_json<ISeongdo>(wb.Sheets[wb.SheetNames[0]], {
+      header: ["name"],
+    })
+
+    seongdos = csv.slice(1)
+
+    Promise.all(
+      seongdos.map(async (seongdo) => {
+        const { name } = seongdo
+        seongdo.name = name?.trim()
+      })
+    )
+    const names = seongdos.map((seongdo) => seongdo.name)
+
+    const response = await fetch("/api/v2/seongdos/getSeongdosInNames", {
+      method: "POST",
+      body: JSON.stringify({ names }),
+      headers: {
+        "content-type": "application/json",
+      },
+    })
+
+    if (response.ok) {
+      const result = await response.json()
+      seongdos = result.seongdos
+    }
+  }
+
   const seongdoAdd = async () => {
     const response = await fetch("/api/seongdos", {
       method: "POST",
@@ -128,7 +185,7 @@
 
     if (response.ok) {
       const result = await response.json()
-      goto(`/seongdos`)
+      history.back()
     }
   }
 
@@ -152,20 +209,6 @@
         })
       }
     }
-    // const response = await fetch("/api/seongdos", {
-    //   method: "POST",
-    //   body: JSON.stringify({ seongdos }),
-    //   headers: {
-    //     "content-type": "application/json",
-    //   },
-    // })
-
-    // if (response.ok) {
-    //   const result = await response.json()
-    //   const seongdos = result.seongdos
-    //   toast.success(`${seongdos.length}명의 성도가 저장되었습니다.`)
-    //   goto(`/seongdos`)
-    // }
   }
 </script>
 
@@ -174,62 +217,115 @@
   class="flex flex-col px-16 pt-8 pb-15 flex w-full bg-white overflow-x-scroll"
 >
   <div class="flex w-full justify-between mb-2">
-    <h1 class="text-lg font-medium">
-      추가될 성도 목록 {seongdos.length > 0 ? `(${seongdos.length}명)` : ""}
-    </h1>
+    {#if group2}
+      <h1 class="text-lg font-medium">
+        {group2}에 추가될 성도 목록 {seongdos.length > 0
+          ? `(${seongdos.length}명)`
+          : ""}
+      </h1>
 
-    <div class="flex ml-auto gap-2">
-      <a
-        href="https://chemical-slug-198.notion.site/e19681f2e69c4d5fb21747b50411111b"
-        target="_blank"
-      >
+      <div class="flex ml-auto gap-2">
+        <input
+          id="example1"
+          type="file"
+          class="bg-gray-50 block text-xs rounded-sm border truncate max-h-fit file:mr-3 file:border-0 file:bg-[#237334] file:py-[0.4rem] file:px-4 file:text-xs file:text-white focus:outline-none"
+          accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+          on:change={(e) => {
+            loadFileOnlyName(e)
+          }}
+        />
+
         <button
           type="submit"
           class="flex h-fit border-[#F46055] border items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+          on:click={() => {
+            seongdos.map((seongdo) => {
+              seongdo.services = [
+                ...seongdo.services,
+                {
+                  group1: "교회학교",
+                  group2,
+                  classification: "",
+                },
+              ]
+            })
+            submitHandler({ update: true })
+          }}
         >
-          <span>❔</span>
-          <span>등록 가이드</span>
+          <Checkmark scale={16} />
+          <span>추가</span>
         </button>
-      </a>
-      <input
-        id="example1"
-        type="file"
-        class="bg-gray-50 block text-xs rounded-sm border truncate max-h-fit file:mr-3 file:border-0 file:bg-[#237334] file:py-[0.4rem] file:px-4 file:text-xs file:text-white focus:outline-none"
-        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-        on:change={(e) => {
-          loadFile(e)
-        }}
-      />
 
-      <button
-        type="submit"
-        class="flex h-fit border-[#F46055] border items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-        on:click={() => submitHandler()}
-      >
-        <Checkmark scale={16} />
-        <span>추가</span>
-      </button>
-      <button
-        class="flex h-fit border-[#F46055] border items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-        on:click={() => submitHandler({ update: true })}
-      >
-        <Renew scale={16} />
-        <span>수정</span>
-      </button>
+        <button
+          type="button"
+          class="h-fit border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
+          on:click={() => {
+            history.back()
+          }}
+        >
+          <span class="flex items-center">
+            <Close class="text-[#F46055]" />
+            <p>닫기</p>
+          </span>
+        </button>
+      </div>
+    {:else}
+      <h1 class="text-lg font-medium">
+        추가될 성도 목록 {seongdos.length > 0 ? `(${seongdos.length}명)` : ""}
+      </h1>
+      <div class="flex ml-auto gap-2">
+        <a
+          href="https://chanheee.notion.site/e19681f2e69c4d5fb21747b50411111b?pvs=4"
+          target="_blank"
+        >
+          <button
+            type="submit"
+            class="flex h-fit border-[#F46055] border items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+          >
+            <span>❔</span>
+            <span>등록 가이드</span>
+          </button>
+        </a>
+        <input
+          id="example1"
+          type="file"
+          class="bg-gray-50 block text-xs rounded-sm border truncate max-h-fit file:mr-3 file:border-0 file:bg-[#237334] file:py-[0.4rem] file:px-4 file:text-xs file:text-white focus:outline-none"
+          accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+          on:change={(e) => {
+            loadFile(e)
+          }}
+        />
 
-      <button
-        type="button"
-        class="h-fit border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
-        on:click={() => {
-          goto("/seongdos")
-        }}
-      >
-        <span class="flex items-center">
-          <Close class="text-[#F46055]" />
-          <p>닫기</p>
-        </span>
-      </button>
-    </div>
+        <button
+          type="submit"
+          class="flex h-fit border-[#F46055] border items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+          on:click={() => submitHandler()}
+        >
+          <Checkmark scale={16} />
+          <span>추가</span>
+        </button>
+        <button
+          class="flex h-fit border-[#F46055] border items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+          on:click={() => submitHandler({ update: true })}
+        >
+          <Renew scale={16} />
+          <span>수정</span>
+        </button>
+
+        <button
+          type="button"
+          class="h-fit border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
+          on:click={() => {
+            history.back()
+          }}
+        >
+          <span class="flex items-center">
+            <Close class="text-[#F46055]" />
+            <p>닫기</p>
+          </span>
+        </button>
+      </div>
+    {/if}
   </div>
   <TableForCSV {seongdos} />
 </div>

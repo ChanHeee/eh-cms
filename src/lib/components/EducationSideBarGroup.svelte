@@ -1,70 +1,84 @@
 <script lang="ts">
+  import type { IGroup, ISeongdoEduSearchParams } from "$lib/interfaces"
   import { goto } from "$app/navigation"
-  import type { ISeongdoSearchParams } from "$lib/interfaces"
-  import { getSearchParams } from "$lib/utils"
+  import { getGroupItem, getSearchParams } from "$lib/utils"
+  import { UserFilled } from "carbon-icons-svelte"
   import { ChevronDown, ChevronUp, Renew, Search } from "carbon-icons-svelte"
+  import DotFill from "$lib/icon/DotFill.svelte"
+  import DotBorder from "$lib/icon/DotBorder.svelte"
 
-  export let searchParams: ISeongdoSearchParams
+  export let searchParams: ISeongdoEduSearchParams
+  export let groupList: string[]
+  export let groupTree: IGroup
+
   $: name = searchParams.name
-  $: phone = searchParams.phone
   $: jikbunArray = searchParams.jikbun ?? []
+  $: className = searchParams.className ?? "전체"
+  $: semester = searchParams.semester
   $: birthStart = searchParams.birthStart
   $: birthEnd = searchParams.birthEnd
+  $: groupItem = getGroupItem(searchParams.group1, searchParams.group2)
+  $: group1 = groupItem.group1
+  $: group2 = groupItem.group2
+  $: group2Add = groupItem.group2Add ?? ""
 
   const searchHandler = () => {
-    if (phone) {
-      name = ""
-    }
     const params = getSearchParams({
       page: 1,
       name,
-      phone,
       jikbun: jikbunArray,
+      group1,
+      group2: group2Add ? group2 + "," + group2Add : group2,
       birthStart,
       birthEnd,
+      semester,
     })
 
-    const url = params ? `/seongdos${params}` : "/seongdos"
+    if (!["기초반", "성숙반", "사명자반", "전체", ""].includes(className)) {
+      className = "전체"
+    }
+
+    const url = `/educations/${className}${params}`
+
     goto(url)
   }
 </script>
 
-<aside class="hidden-if-modile flex flex-col w-[30rem] px-6 py-8 gap-4">
+<aside
+  class="hidden-if-modile flex flex-col w-[30rem] px-6 py-8 font-semilight text-gray-600 text-sm gap-4"
+>
   <!-- 이름 검색 -->
   <div class="flex gap-2">
     <div class="flex flex-none items-center mx-auto">
       <button
         class="bg-[#B0B1B0] p-2 border-y border-r border-gray-300"
         on:click={() => {
-          goto("/seongdos")
+          goto("/educations/전체")
         }}
       >
         <Renew size={20} class="text-gray-600" />
       </button>
     </div>
-    <form class="flex flex-auto items-center mx-auto">
+    <div class="flex flex-auto items-center mx-auto">
       <input
         id="name"
         type="text"
-        value={name || phone}
+        value={name}
         on:focus={() => {
           name = ""
-          phone = ""
         }}
         on:input={(e) => {
           name = e.target.value
-          phone = Number(name) ? name : ""
         }}
         class="w-full bg-gray-50 border-y border-l border-gray-300 text-gray-900 text-sm focus:outline-0 p-2"
-        placeholder="이름 or 전화번호"
+        placeholder="이름"
       />
       <button
-        type="submit"
         class="bg-[#B0B1B0] p-2 border-y border-r border-gray-300"
         on:click|preventDefault={searchHandler}
         ><Search size={20} class="text-gray-600" />
       </button>
-    </form>
+    </div>
   </div>
 
   <!-- 직분 검색 -->
@@ -77,7 +91,6 @@
           <input
             type="checkbox"
             id="dropdown"
-            checked
             class="jikbun-input hidden"
             on:change={(e) => {
               if (e.target.checked) {
@@ -106,13 +119,13 @@
           />
           <label class="flex w-full justify-between p-2" for="dropdown">
             <p class="text-gray-400 text-sm select-none">직분</p>
-            <ChevronDown id="jikbun-down" class="hidden cursor-pointer" />
-            <ChevronUp id="jikbun-up" class="cursor-pointer" />
+            <ChevronDown id="jikbun-down" class="cursor-pointer" />
+            <ChevronUp id="jikbun-up" class="hidden cursor-pointer" />
           </label>
 
           <div
             id="jikbun-dropdown"
-            class="grid grid-cols-2 gap-[5px] border-t border-gray-300 focus:outline-0 px-3 py-2"
+            class="hidden grid grid-cols-2 gap-[5px] border-t border-gray-300 focus:outline-0 px-3 py-2"
           >
             <!-- 장로 checkbox -->
             <button
@@ -762,7 +775,136 @@
     </div>
   </div>
 
-  <!-- 생년월일 검색 -->
+  <!-- 소속 검색 -->
+  <div class="flex flex-col w-full items-center">
+    <div class="flex w-full items-center mx-auto text-sm">
+      <div
+        class="flex w-full bg-gray-50 border-y border-x border-gray-300 focus:outline-0"
+      >
+        <div class="flex flex-col w-full">
+          <input
+            id="group-dropdown"
+            type="checkbox"
+            class="hidden"
+            on:change={(e) => {
+              if (e.target.checked) {
+                document.getElementById("groupBox")?.classList.remove("hidden")
+
+                document.getElementById("group-down")?.classList.add("hidden")
+                document.getElementById("group-up")?.classList.remove("hidden")
+              } else {
+                document.getElementById("groupBox")?.classList.add("hidden")
+                document
+                  .getElementById("group-down")
+                  ?.classList.remove("hidden")
+                document.getElementById("group-up")?.classList.add("hidden")
+                document.getElementById("group1").value = ""
+                document.getElementById("group2").value = ""
+                group1 = ""
+                group2 = ""
+              }
+            }}
+          />
+          <label class="flex w-full justify-between p-2" for="group-dropdown">
+            <p class="select-none text-gray-400">소속</p>
+            <ChevronDown id="group-down" class="cursor-pointer" />
+            <ChevronUp id="group-up" class="hidden cursor-pointer" />
+          </label>
+
+          <div
+            id="groupBox"
+            class="hidden flex justify-between text-gray-600 border-t border-gray-300 focus:outline-0 px-5 gap-3"
+          >
+            <select
+              id="group1"
+              value={group1}
+              on:change={() => {
+                group1 = document.querySelector(
+                  "#group1 > option:checked"
+                ).value
+                group2 = ""
+              }}
+              class="flex w-[50%] bg-gray-50 text-gray-600 text-sm focus:outline-0 py-2"
+            >
+              <option value="none" class="hidden" />
+              {#each Object.keys(groupList) as group1}
+                <option value={group1}>{group1}</option>
+              {/each}
+            </select>
+            <div class="border-l border-gray-300" />
+
+            <select
+              id="group2"
+              value={group2}
+              required
+              on:change={() => {
+                group2 = document.querySelector("#group2").value
+              }}
+              class="flex w-[50%] bg-gray-50 text-gray-600 text-sm focus:outline-0 py-2"
+            >
+              <option value="none" class="hidden" />
+              {#if group1 == "장년부"}
+                {#each groupList["장년부"] as item}
+                  <option value={item}>{item}</option>
+                {/each}
+              {:else if group1 == "청년부"}
+                {#each groupList["청년부"] as item}
+                  <option value={item}>{item}</option>
+                {/each}
+              {:else if group1 == "교회학교"}
+                {#each groupList["교회학교"] as item}
+                  <option value={item}>{item}</option>
+                {/each}
+              {/if}
+            </select>
+            <div
+              class="border-l border-gray-300"
+              class:hidden={group1 == "장년부" && group2 != "" ? false : true}
+            />
+            <select
+              id="group2Add"
+              value={group2Add}
+              required
+              on:change={() => {
+                group2Add = document.querySelector("#group2Add").value
+              }}
+              class="flex bg-gray-50 text-gray-600 text-sm focus:outline-0 py-2"
+              class:hidden={group1 == "장년부" && group2 != "" ? false : true}
+            >
+              <option value="none" class="hidden" />
+              <option value="1구역">1구역</option>
+              <option value="2구역">2구역</option>
+              <option value="3구역">3구역</option>
+              <option value="4구역">4구역</option>
+              <option value="5구역">5구역</option>
+              <option value="6구역">6구역</option>
+              <option value="7구역">7구역</option>
+              <option value="8구역">8구역</option>
+              <option value="9구역">9구역</option>
+              <option value="10구역">10구역</option>
+              <option value="11구역">11구역</option>
+              <option value="12구역">12구역</option>
+              <option value="13구역">13구역</option>
+              <option value="14구역">14구역</option>
+              <option value="15구역">15구역</option>
+              <option value="16구역">16구역</option>
+              <option value="17구역">17구역</option>
+              <option value="18구역">18구역</option>
+              <option value="19구역">19구역</option>
+              <option value="20구역">20구역</option>
+              <option value="21구역">21구역</option>
+              <option value="22구역">22구역</option>
+              <option value="23구역">23구역</option>
+              <option value="24구역">24구역</option>
+              <option value="25구역">25구역</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 생년월일 검색-->
   <div class="flex flex-col w-full justify-center items-center">
     <div class="flex w-full items-center mx-auto text-sm">
       <div
@@ -773,7 +915,6 @@
             id="birth-dropdown"
             type="checkbox"
             class="hidden"
-            checked
             on:change={(e) => {
               if (e.target.checked) {
                 document.getElementById("birthBox")?.classList.remove("hidden")
@@ -795,13 +936,13 @@
           />
           <label class="flex w-full justify-between p-2" for="birth-dropdown">
             <p class="select-none text-gray-400">생년월일</p>
-            <ChevronDown id="birth-down" class="hidden cursor-pointer" />
-            <ChevronUp id="birth-up" class="cursor-pointer" />
+            <ChevronDown id="birth-down" class="cursor-pointer" />
+            <ChevronUp id="birth-up" class="hidden cursor-pointer" />
           </label>
 
           <div
             id="birthBox"
-            class="flex justify-between text-gray-600 border-t border-gray-300 focus:outline-0 px-5 py-2"
+            class="hidden flex justify-between text-gray-600 border-t border-gray-300 focus:outline-0 px-5 py-2"
           >
             <input
               type="date"
@@ -824,5 +965,62 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- 그룹 트리 -->
+  <div class="ml-2 flex flex-col mt-2 h-2/5 overflow-scroll">
+    <div class="flex items-center pb-[10px] sticky top-0 bg-gray-50">
+      {#if groupTree.name == className && semester == null}
+        <DotFill width="12px" fill="#636363" />
+      {:else}
+        <DotBorder width="12px" fill="#c4c4c4" />
+      {/if}
+      <UserFilled
+        fill={groupTree.name == className && semester == null
+          ? "#636363"
+          : "#c4c4c4"}
+        size={16}
+        class="mr-1"
+      />
+      <button
+        class:font-bold={groupTree.name == className && semester == null
+          ? true
+          : false}
+        on:click={() => {
+          goto(`/educations/${groupTree.name}`)
+        }}
+      >
+        {`${groupTree.name}(${groupTree.count})`}
+      </button>
+    </div>
+    {#each groupTree.child as child}
+      <div
+        class="flex items-center pb-[10px] ml-3 sticky top-[30px] bg-gray-50"
+      >
+        {#if child.name == semester}
+          <DotFill width="12px" fill="#636363" />
+        {:else}
+          <DotBorder width="12px" fill="#c4c4c4" />
+        {/if}
+
+        <UserFilled
+          fill={child.name == semester ? "#636363" : "#c4c4c4"}
+          size={16}
+          class="mr-1"
+        />
+        <button
+          class:font-bold={child.name == semester ? true : false}
+          on:click={() => {
+            if (groupTree.name == "전체") {
+              goto(`/educations/${child.name}`)
+            } else {
+              goto(`/educations/${groupTree.name}?semester=${child.name}`)
+            }
+          }}
+        >
+          {`${child.name}(${child.count})`}</button
+        >
+      </div>
+    {/each}
   </div>
 </aside>

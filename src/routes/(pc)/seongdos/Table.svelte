@@ -30,6 +30,9 @@
     const item = services.find(
       (service) => service.group1 == searchParams.group1
     )
+    if (!item?.classification) {
+      return ""
+    }
     if (item) {
       if (item?.group1 == "장년부") {
         return item?.classification

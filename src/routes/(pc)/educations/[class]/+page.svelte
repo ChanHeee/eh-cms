@@ -53,7 +53,12 @@
     <div
       class=" bg-white pt-8 bg-white sticky top-0 flex w-full justify-between pb-2"
     >
-      <p class="text-lg font-medium mr-1">{className} 수강 내역</p>
+      <div class="flex items-center">
+        <p class="text-lg font-medium mr-1">{className} 수강 내역</p>
+        <p class="text-lg">
+          {`(${page.totalSize}명)`}
+        </p>
+      </div>
       <button
         class="flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#FBA244]"
         on:click={() => {
