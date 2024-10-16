@@ -177,6 +177,8 @@
 
   const seongdoUpdate = async () => {
     const { name, originalName, age, group2, address, ...rest } = seongdo
+    console.log({ ...seongdo })
+
     const response = await fetch("/api/seongdos", {
       method: "PUT",
       body: JSON.stringify({
@@ -587,7 +589,7 @@
                       value={seongdo.jikbun}
                       on:change={() => {
                         seongdo.jikbun = document.querySelector(
-                          "#jikbun > option:checked"
+                          "#jikbun > optgroup > option:checked"
                         ).value
                       }}
                       class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"

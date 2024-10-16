@@ -51,10 +51,10 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
     }
     if (jikbun.includes("장립집사all")) {
       jikbunTemp.push(
-        "안수집사",
-        "무임안수집사",
-        "은퇴안수집사",
-        "은퇴무임안수집사"
+        "장립집사",
+        "무임장립집사",
+        "은퇴장립집사",
+        "은퇴무임장립집사"
       )
     }
     if (jikbun.includes("서리집사all")) {

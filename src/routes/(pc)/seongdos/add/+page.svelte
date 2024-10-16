@@ -332,7 +332,7 @@
                       </optgroup>
                       <hr />
                       <optgroup label="장립집사">
-                        <option value="시무장립집사">시무장립집사</option>
+                        <option value="장립집사">장립집사</option>
                         <option value="무임장립집사">무임장립집사</option>
                         <option value="은퇴장립집사">은퇴장립집사</option>
                         <option value="무임은퇴장립집사"
@@ -687,7 +687,7 @@
                     </optgroup>
                     <hr />
                     <optgroup label="장립집사">
-                      <option value="시무장립집사">시무장립집사</option>
+                      <option value="장립집사">장립집사</option>
                       <option value="무임장립집사">무임장립집사</option>
                       <option value="은퇴장립집사">은퇴장립집사</option>
                       <option value="무임은퇴장립집사">무임은퇴장립집사</option>
