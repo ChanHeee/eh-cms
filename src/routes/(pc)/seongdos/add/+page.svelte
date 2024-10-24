@@ -451,7 +451,7 @@
                         <option value="전도사">전도사</option>
                         <option value="교육전도사">교육전도사</option>
                       {:else if group1 == "기타"}
-                        <option value="별명부">별명부</option>
+                        <option value="소천">소천</option>
                         <option value="재적">재적</option>
                       {/if}
                     </select>
@@ -784,7 +784,7 @@
                       <option value="전도사">전도사</option>
                       <option value="교육전도사">교육전도사</option>
                     {:else if group1 == "기타"}
-                      <option value="별명부">별명부</option>
+                      <option value="소천">소천</option>
                       <option value="재적">재적</option>
                     {/if}
                   </select>
