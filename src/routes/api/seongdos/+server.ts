@@ -54,7 +54,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
         "장립집사",
         "무임장립집사",
         "은퇴장립집사",
-        "은퇴무임장립집사"
+        "무임은퇴장립집사"
       )
     }
     if (jikbun.includes("서리집사all")) {
@@ -375,7 +375,8 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       _id: 1,
       name: 1,
       // avatar: 1,
-      avatarVercelBlob: 1,
+      gender: 1,
+      singeup: 1,
       jikbun: 1,
       birth: 1,
       services: 1,
