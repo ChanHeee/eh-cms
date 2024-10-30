@@ -922,6 +922,27 @@
                     <p class="flex text-gray-600 text-sm gap-2 px-3">
                       <input
                         type="checkbox"
+                        id="enrolled_at"
+                        checked={exportFieldList.find(
+                          (element) => element == "등록일자"
+                        ) != undefined}
+                        on:change={() => {
+                          if (document.querySelector("#enrolled_at").checked) {
+                            exportFieldList = [...exportFieldList, "등록일자"]
+                          } else {
+                            exportFieldList = [
+                              ...exportFieldList.filter(
+                                (value) => value !== "등록일자"
+                              ),
+                            ]
+                          }
+                        }}
+                      />
+                      <label for="enrolled_at">등록일자</label>
+                    </p>
+                    <p class="flex text-gray-600 text-sm gap-2 px-3">
+                      <input
+                        type="checkbox"
                         id="birth"
                         checked={exportFieldList.find(
                           (element) => element == "생일"
@@ -1116,6 +1137,9 @@
                 }
                 if (exportFieldList.includes("성별")) {
                   result["성별"] = item.gender
+                }
+                if (exportFieldList.includes("등록일자")) {
+                  result["등록일자"] = item.enrolled_at
                 }
                 if (exportFieldList.includes("생일")) {
                   result["생일"] = item.birth

@@ -378,6 +378,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       gender: 1,
       singeup: 1,
       jikbun: 1,
+      enrolled_at: 1,
       birth: 1,
       services: 1,
       age: 1,
