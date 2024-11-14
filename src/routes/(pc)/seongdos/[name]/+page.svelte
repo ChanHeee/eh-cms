@@ -177,7 +177,6 @@
 
   const seongdoUpdate = async () => {
     const { name, originalName, age, group2, address, ...rest } = seongdo
-    console.log({ ...seongdo })
 
     const response = await fetch("/api/seongdos", {
       method: "PUT",
@@ -645,7 +644,7 @@
                       }}
                       class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                     >
-                      <option value="none" class="hidden" />
+                      <option value="" />
                       <option value="세례">세례</option>
                       <option value="입교">입교</option>
                       <option value="학습">학습</option>
@@ -1027,7 +1026,7 @@
                     }}
                     class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                   >
-                    <option value="none" class="hidden" />
+                    <option value="" />
                     <option value="세례">세례</option>
                     <option value="입교">입교</option>
                     <option value="학습">학습</option>
