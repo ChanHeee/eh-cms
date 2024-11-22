@@ -74,34 +74,10 @@ export const load = async ({ url, locals, fetch }) => {
     return totalArray.length > 0 ? totalArray[0].total : 0
   }
 
-  if (!className || className == "전체") {
-    groupTree = {
-      name: "전체",
-      count: await getEduCount(),
-      child: [
-        {
-          name: "기초반",
-          count: await getEduCount("기초반"),
-          child: [],
-        },
-        {
-          name: "성숙반",
-          count: await getEduCount("성숙반"),
-          child: [],
-        },
-        {
-          name: "사명자반",
-          count: await getEduCount("사명자반"),
-          child: [],
-        },
-        {
-          name: "통합",
-          count: await getEduCount("통합"),
-          child: [],
-        },
-      ],
-    }
-  } else if (className == "기초반") {
+  // if (!className || className == "전체") {
+  // } else
+
+  if (className == "기초반") {
     groupTree = {
       name: "기초반",
       count: await getEduCount("기초반"),
@@ -170,6 +146,33 @@ export const load = async ({ url, locals, fetch }) => {
         {
           name: "청지기반",
           count: await getEduCount("통합", "청지기반"),
+          child: [],
+        },
+      ],
+    }
+  } else {
+    groupTree = {
+      name: "전체",
+      count: await getEduCount(),
+      child: [
+        {
+          name: "기초반",
+          count: await getEduCount("기초반"),
+          child: [],
+        },
+        {
+          name: "성숙반",
+          count: await getEduCount("성숙반"),
+          child: [],
+        },
+        {
+          name: "사명자반",
+          count: await getEduCount("사명자반"),
+          child: [],
+        },
+        {
+          name: "통합",
+          count: await getEduCount("통합"),
           child: [],
         },
       ],

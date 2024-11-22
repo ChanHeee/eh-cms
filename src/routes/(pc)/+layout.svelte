@@ -11,6 +11,7 @@
   import { goto } from "$app/navigation"
   import toast, { Toaster } from "svelte-french-toast"
   import { AllowedGroupStore } from "$lib/store"
+  import { Settings } from "carbon-icons-svelte"
 
   export let data: {
     path: string
@@ -32,6 +33,7 @@
     class:border-[#F46055]={path == "seongdos" ? true : false}
     class:border-[#FBA244]={path == "educations" ? true : false}
     class:border-[#41B8AF]={path == "simbangs" ? true : false}
+    class:border-[#3493eb]={path == "admin" ? true : false}
   >
     <div class="flex w-full flex-col">
       <div class="flex justify-between items-center px-7 sm:px-0 items-center">
@@ -68,6 +70,17 @@
                   <Briefcase color="#ffffff" width="16px" />
                 </div>
                 <p class="text-sm">심방관리</p>
+              </button>
+            </a>
+            <a href="/admin">
+              <button
+                class="flex flex-col items-center px-4 pt-3 pb-1 gap-1 hover:bg-[#3493eb]"
+                class:bg-[#3493eb]={path == "admin" ? true : false}
+              >
+                <div class="flex items-center h-[20px]">
+                  <Settings size={20} />
+                </div>
+                <p class="text-sm">기타 기능</p>
               </button>
             </a>
           </div>
