@@ -7,20 +7,20 @@ import { json, RequestHandler } from "@sveltejs/kit"
 //*  @access  Private/Admin
 export const POST: RequestHandler = async ({ request }) => {
   const date = new Date()
-  const today = `${date.getMonth() + 1}-${date.getDate()}`
+  const today = `${date.getMonth() + 1}-${
+    date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
+  }`
 
   const seongdos = await Seongdo.find({ birth: { $regex: `${today}$` } })
 
-  console.log("cron job test [/api/v2/cron/updateAge]")
-
-  // Promise.all(
-  //   seongdos.map(async (seongdo) => {
-  //     await Seongdo.updateOne(
-  //       { _id: seongdo.id },
-  //       { age: getAgeFromBirth(seongdo.birth) }
-  //     )
-  //   })
-  // )
+  Promise.all(
+    seongdos.map(async (seongdo) => {
+      await Seongdo.updateOne(
+        { _id: seongdo.id },
+        { age: getAgeFromBirth(seongdo.birth) }
+      )
+    })
+  )
 
   if (seongdos.length > 0) {
     return json({ success: true })

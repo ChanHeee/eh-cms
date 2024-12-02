@@ -540,7 +540,7 @@
                     }}
                     class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 pl-1 pr-2 border-gray-300"
                     min="1900-01-01"
-                    max="2024-12-31"
+                    max="2025-12-31"
                     value={seongdo.enrolled_at}
                   />
                 </div>
@@ -563,7 +563,7 @@
                     }}
                     class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 pl-1 pr-2 border-gray-300 border-r"
                     min="1900-01-01"
-                    max="2023-12-31"
+                    max="2025-12-31"
                     value={seongdo.birth}
                   />
                   <input
@@ -919,7 +919,7 @@
                   }}
                   class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 border-gray-300 px-1"
                   min="1900-01-01"
-                  max="2023-12-31"
+                  max="2025-12-31"
                   value={seongdo.birth}
                 />
               </div>
@@ -941,7 +941,7 @@
                   }}
                   class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 border-gray-300 px-1"
                   min="1900-01-01"
-                  max="2023-12-31"
+                  max="2025-12-31"
                   value={seongdo.enrolled_at}
                 />
               </div>
