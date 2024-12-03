@@ -58,9 +58,7 @@
   $: groupList = data.groupList
   // value for senogdo detail
   $: seongdo = data.seongdo
-
-  let seongdoName = data.seongdo.name
-
+  $: isNameChanged = false
   $: ageWithString = seongdo.age ? seongdo.age + " 세" : ""
   $: groupItem = getGroupItem(seongdo.group1, seongdo.group2)
   $: group2Add = groupItem.group2Add
@@ -196,7 +194,6 @@
       },
     })
     if (response.ok) {
-      seongdoName = seongdo.name
       goto(`/seongdos/${seongdo.name}`)
     }
   }
@@ -209,7 +206,7 @@
     })
     const result = await response.json()
 
-    if (name != seongdoName && result.seongdo) {
+    if (isNameChanged && result.seongdo) {
       toast.error("이미 등록된 이름은 사용할 수 없습니다.")
     } else {
       if (family) {
@@ -507,6 +504,9 @@
                     bind:value={seongdo.name}
                     required
                     class="flex w-full bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 p-2"
+                    on:change={() => {
+                      isNameChanged = true
+                    }}
                   />
                   <div class="border-l border-gray-300" />
                   <select
