@@ -11,18 +11,27 @@ export const POST: RequestHandler = async ({ request }) => {
     date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
   }`
 
-  const seongdos = await Seongdo.find({ birth: { $regex: `${today}$` } })
-
-  Promise.all(
-    seongdos.map(async (seongdo) => {
-      await Seongdo.updateOne(
-        { _id: seongdo.id },
-        { age: getAgeFromBirth(seongdo.birth) }
-      )
-    })
+  const seongdos = await Seongdo.find(
+    {
+      name: { $regex: "^temp.*" },
+      birth: { $regex: `${today}$` },
+    },
+    "name birth"
   )
 
-  if (seongdos.length > 0) {
+  let bulkUpdateOps: any = []
+
+  seongdos.map((seongdo) => {
+    bulkUpdateOps.push({
+      updateOne: {
+        filter: { _id: seongdo.id },
+        update: { age: getAgeFromBirth(seongdo.birth) },
+      },
+    })
+  })
+
+  const { modifiedCount } = await Seongdo.bulkWrite(bulkUpdateOps)
+  if (modifiedCount) {
     return json({ success: true })
   } else {
     return json({ success: false })
