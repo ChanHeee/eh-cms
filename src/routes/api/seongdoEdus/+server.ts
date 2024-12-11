@@ -75,7 +75,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
     seongdoMatch._id = new Types.ObjectId(seongdoId)
   }
   if (name) {
-    seongdoMatch.name = { $regex: name }
+    seongdoMatch.name = name
   }
   if (jikbun?.length > 0) {
     const jikbunTemp = [...jikbun]
