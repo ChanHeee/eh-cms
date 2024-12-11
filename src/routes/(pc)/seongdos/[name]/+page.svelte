@@ -18,6 +18,7 @@
     Close,
     Search,
     TrashCan,
+    Edit,
   } from "carbon-icons-svelte"
   import {
     AllowedGroupStore,
@@ -26,6 +27,7 @@
   } from "$lib/store"
   import type {
     IFamily,
+    IMember,
     ISeongdo,
     ISeongdoEduPopulate,
     ISimbang,
@@ -99,14 +101,10 @@
   $: addedGender = ""
   $: addedBirth = ""
   $: addedPhone = ""
-  let selectedNonSeongdoFamily: {
-    classification: string
-    name: string
-    gender: string
-    birth: string
-    phone: string
-  } | null
+  let selectedNonSeongdoFamily: IMember | null
+  let selectedSeongdoFamily: IMember | null
   $: selectedNonSeongdoFamily = selectedNonSeongdoFamily
+  $: selectedSeongdoFamily = selectedSeongdoFamily
 
   $: family = data.family
   $: familyId = family?._id
@@ -1419,9 +1417,6 @@
                     } else {
                       goto(`/seongdos/${member.seongdo.name}`)
                     }
-                  } else {
-                    selectedNonSeongdoFamily = member
-                    isFamilyModalHidden = !isFamilyModalHidden
                   }
                 }}
               >
@@ -1572,7 +1567,23 @@
                 </button>
                 <button
                   type="button"
-                  class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem]"
+                  class="flex items-center gap-1 rounded-sm text-white text-xs px-1 py-[0.4rem]"
+                  on:click={() => {
+                    console.log(member)
+
+                    if (member.isSeongdo) {
+                      selectedSeongdoFamily = member
+                    } else {
+                      selectedNonSeongdoFamily = member
+                    }
+                    isFamilyModalHidden = !isFamilyModalHidden
+                  }}
+                >
+                  <Edit fill="#4a4a4a" size={20} />
+                </button>
+                <button
+                  type="button"
+                  class="flex items-center gap-1 rounded-sm text-white text-xs px-1 py-[0.4rem]"
                   on:click={async () => {
                     if (member.isSeongdo) {
                       memberIds = memberIds.filter(
@@ -1999,21 +2010,21 @@
                       id="familyName"
                       type="text"
                       bind:value={selectedNonSeongdoFamily.name}
+                      disabled
                       class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
                     />
                   </div>
                 </div>
                 <div class="flex w-full h-8 border-gray-300 border">
                   <div
-                    class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
                   >
                     구분
                   </div>
                   <div class="flex w-full bg-gray-50 px-1">
                     <input
                       class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                      value={selectedNonSeongdoFamily.classification}
-                      disabled
+                      bind:value={selectedNonSeongdoFamily.classification}
                     />
                   </div>
                 </div>
@@ -2024,11 +2035,20 @@
                     >성별</label
                   >
                   <div class="flex flex-auto justify-start bg-gray-50 pr-1">
-                    <input
+                    <select
+                      id="familyGender"
                       class="px-1 flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      on:change={() => {
+                        addedGender = document.querySelector(
+                          "#familyGender > option:checked"
+                        ).value
+                      }}
                       value={selectedNonSeongdoFamily.gender}
-                      disabled
-                    />
+                    >
+                      <option value="none" class="hidden" />
+                      <option value="남자">남자</option>
+                      <option value="여자">여자</option>
+                    </select>
                   </div>
                 </div>
                 <div class="flex w-full h-8 border-gray-300 border-x border-y">
@@ -2041,8 +2061,7 @@
                     <input
                       id="familyBirth"
                       type="date"
-                      value={selectedNonSeongdoFamily.birth}
-                      disabled
+                      bind:value={selectedNonSeongdoFamily.birth}
                       class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                     />
                   </div>
@@ -2077,8 +2096,7 @@
                     <input
                       id="familyPhone"
                       type="text"
-                      value={selectedNonSeongdoFamily.phone}
-                      disabled
+                      bind:value={selectedNonSeongdoFamily.phone}
                       class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                     />
                   </div>
@@ -2086,6 +2104,7 @@
               </div>
             </form>
           </div>
+
           <div
             class="bg-gray-50 h-[55px] px-4 py-3 flex flex-row-reverse px-6 gap-2"
           >
@@ -2103,6 +2122,36 @@
             </button>
             <button
               class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              on:click={async () => {
+                if (selectedNonSeongdoFamily?.classification == "") {
+                  return toast.error("구분을 입력해주세요.")
+                }
+
+                members = [
+                  ...members.filter(
+                    (member) => member.name != selectedNonSeongdoFamily?.name
+                  ),
+                  {
+                    seongdo: undefined,
+                    classification: selectedNonSeongdoFamily?.classification,
+                    isSeongdo: false,
+                    name: selectedNonSeongdoFamily?.name,
+                    gender: selectedNonSeongdoFamily?.gender,
+                    birth: selectedNonSeongdoFamily?.birth,
+                    phone: selectedNonSeongdoFamily?.phone,
+                  },
+                ]
+                const result = await familyHandler()
+                if (result) {
+                  selectedSeongdo = null
+                  isFamilyModalHidden = !isFamilyModalHidden
+                  classification = ""
+                  classificationValue = ""
+                  searchName = ""
+                  selectedNonSeongdoFamily = null
+                  toast.success("수정되었습니다.")
+                }
+              }}
             >
               <Checkmark scale={16} />
               <span>저장</span>
@@ -2167,6 +2216,168 @@
             >
               <AddLarge scale={16} />
               <span>성도로 등록</span>
+            </button>
+          </div>
+        {:else if selectedSeongdoFamily}
+          <div
+            class="overflow-scroll h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
+          >
+            <form class="flex flex-col">
+              <div class="flex flex-col text-sm gap-3">
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="familyName"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >이름</label
+                  >
+                  <div
+                    class="flex flex-auto justify-start bg-gray-50 pl-1.5 pr-1"
+                  >
+                    <input
+                      id="familyName"
+                      type="text"
+                      bind:value={selectedSeongdoFamily.seongdo.name}
+                      disabled
+                      class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    />
+                  </div>
+                </div>
+                <div class="flex w-full h-8 border-gray-300 border">
+                  <div
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                  >
+                    구분
+                  </div>
+                  <div class="flex w-full bg-gray-50 px-1 pl-1.5 pr-1">
+                    <input
+                      class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      bind:value={selectedSeongdoFamily.classification}
+                    />
+                  </div>
+                </div>
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="familyGender"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >성별</label
+                  >
+                  <div
+                    class="flex flex-auto justify-start bg-gray-50 pl-1.5 pr-1"
+                  >
+                    <input
+                      id="familyGender"
+                      type="text"
+                      value={selectedSeongdoFamily.seongdo.gender}
+                      disabled
+                      class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    />
+                  </div>
+                </div>
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="familyBirth"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >생년월일</label
+                  >
+                  <div class="flex flex-auto justify-start bg-gray-50">
+                    <input
+                      id="familyBirth"
+                      type="date"
+                      value={selectedSeongdoFamily.seongdo.birth}
+                      class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      disabled
+                    />
+                  </div>
+                </div>
+
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="familyBirth"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >나이</label
+                  >
+                  <div class="flex flex-auto justify-start bg-gray-50">
+                    <input
+                      id="age"
+                      type="text"
+                      value={selectedSeongdoFamily.seongdo.birth
+                        ? getAgeFromBirth(selectedSeongdoFamily.seongdo.birth) +
+                          "세"
+                        : ""}
+                      disabled
+                      class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    />
+                  </div>
+                </div>
+
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="familyPhone"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >핸드폰</label
+                  >
+                  <div class="flex flex-auto justify-start bg-gray-50">
+                    <input
+                      id="familyPhone"
+                      type="text"
+                      value={selectedSeongdoFamily.seongdo.phone}
+                      class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      disabled
+                    />
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div
+            class="bg-gray-50 h-[55px] px-4 py-3 flex flex-row-reverse px-6 gap-2"
+          >
+            <button
+              class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
+              on:click={async () => {
+                selectedSeongdoFamily = null
+                isFamilyModalHidden = !isFamilyModalHidden
+              }}
+            >
+              <span class="flex items-center">
+                <Close class="text-[#F46055]" />
+                <p>뒤로</p>
+              </span>
+            </button>
+            <button
+              class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              on:click={async () => {
+                if (selectedSeongdoFamily?.classification == "") {
+                  return toast.error("구분을 입력해주세요.")
+                }
+
+                members = [
+                  ...members.filter(
+                    (member) =>
+                      member?.seongdo?.name !=
+                        selectedSeongdoFamily?.seongdo?.name ||
+                      member.isSeongdo == false
+                  ),
+                  {
+                    seongdo: selectedSeongdoFamily.seongdo,
+                    classification: selectedSeongdoFamily?.classification,
+                    isSeongdo: true,
+                  },
+                ]
+                const result = await familyHandler()
+                if (result) {
+                  isFamilyModalHidden = !isFamilyModalHidden
+                  classification = ""
+                  classificationValue = ""
+                  searchName = ""
+                  selectedSeongdoFamily = null
+                  toast.success("수정되었습니다.")
+                }
+              }}
+            >
+              <Checkmark scale={16} />
+              <span>저장</span>
             </button>
           </div>
         {:else if addNonSeongdo}
