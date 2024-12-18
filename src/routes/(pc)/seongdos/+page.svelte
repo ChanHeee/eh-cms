@@ -156,7 +156,7 @@
       </div>
       <div class="rounded flex ml-auto gap-2">
         <button
-          class="hidden md:flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#237334]"
+          class="hidden md:flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#237334]"
           on:click={() => {
             isExportModalHidden = false
           }}
@@ -167,7 +167,7 @@
 
         {#if deleteMany}
           <button
-            class="flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+            class="flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
             on:click={async () => {
               if (ids.length == 0) {
                 toast.error("선택된 성도가 없습니다.")
@@ -188,7 +188,7 @@
 
           <button
             type="button"
-            class="flex h-fit items-center gap-1 rounded-sm text-xs px-2 py-[0.335rem] border-gray-300 border"
+            class="flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-xs px-2 py-[0.335rem] border-gray-300 border"
             on:click={async () => {
               goto("/seongdos")
             }}
@@ -200,7 +200,7 @@
           </button>
         {:else if searchParams.group2 == "은혜브릿지" || searchParams.group2 == "늘푸른부"}
           <button
-            class="hidden md:flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+            class="hidden md:flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
             on:click={() => {
               goto(
                 `/seongdos/addMany?group1=${searchParams.group1}&group2=${searchParams.group2}`
@@ -222,7 +222,7 @@
           </button>
         {:else}
           <button
-            class="flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+            class="flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
             on:click={() => {
               goto("/seongdos/add")
             }}
@@ -232,7 +232,7 @@
           </button>
 
           <button
-            class="hidden md:flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+            class="hidden md:flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
             on:click={() => {
               goto("/seongdos/addMany")
             }}
@@ -887,6 +887,32 @@
                     for="dropdownM"
                   >
                     <p class="text-gray-400 text-sm select-none">항목 선택</p>
+                    <p class="flex text-gray-600 text-sm gap-2 px-3">
+                      <input
+                        type="checkbox"
+                        id="checkAll"
+                        checked={exportFieldList.length == 10}
+                        on:change={() => {
+                          if (document.querySelector("#checkAll").checked) {
+                            exportFieldList = [
+                              "이름",
+                              "성별",
+                              "등록일자",
+                              "생년월일",
+                              "나이",
+                              "직분",
+                              "신급",
+                              "휴대전화",
+                              "소속",
+                              "주소",
+                            ]
+                          } else {
+                            exportFieldList = ["이름"]
+                          }
+                        }}
+                      />
+                      <label for="checkAll">전체 선택</label>
+                    </p>
                   </label>
 
                   <div
@@ -945,21 +971,21 @@
                         type="checkbox"
                         id="birth"
                         checked={exportFieldList.find(
-                          (element) => element == "생일"
+                          (element) => element == "생년월일"
                         ) != undefined}
                         on:change={() => {
                           if (document.querySelector("#birth").checked) {
-                            exportFieldList = [...exportFieldList, "생일"]
+                            exportFieldList = [...exportFieldList, "생년월일"]
                           } else {
                             exportFieldList = [
                               ...exportFieldList.filter(
-                                (value) => value !== "생일"
+                                (value) => value !== "생년월일"
                               ),
                             ]
                           }
                         }}
                       />
-                      <label for="birth">생일</label>
+                      <label for="birth">생년월일</label>
                     </p>
                     <p class="flex text-gray-600 text-sm gap-2 px-3">
                       <input
@@ -1141,8 +1167,8 @@
                 if (exportFieldList.includes("등록일자")) {
                   result["등록일자"] = item.enrolled_at
                 }
-                if (exportFieldList.includes("생일")) {
-                  result["생일"] = item.birth
+                if (exportFieldList.includes("생년월일")) {
+                  result["생년월일"] = item.birth
                 }
                 if (exportFieldList.includes("나이")) {
                   result["나이"] = item.age
@@ -1157,7 +1183,8 @@
                   result["휴대전화"] = item.phone
                 }
                 if (exportFieldList.includes("소속")) {
-                  result["소속"] = getGroupString(item.group1, item.group2)
+                  result["소속1"] = item.group1
+                  result["소속2"] = item.group2
                 }
                 if (exportFieldList.includes("주소")) {
                   result["주소"] = item.address

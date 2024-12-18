@@ -4,7 +4,6 @@
   import GraduationCap from "$lib/icon/GraduationCap.svelte"
   import { enhance } from "$app/forms"
   import "../../app.postcss"
-  import "@xyflow/svelte/dist/style.css"
 
   import UserMultiple from "carbon-icons-svelte/lib/UserMultiple.svelte"
   import Logout from "carbon-icons-svelte/lib/Logout.svelte"

@@ -72,5 +72,19 @@
         </button>
       </div>
     </a>
+
+    <a href="/admin?action=editSocheon">
+      <div class="flex w-[11rem]">
+        <button
+          class="bg-[#B0B1B0] p-2 border-y border-l border-gray-300 h-[37px]"
+        >
+        </button>
+        <button
+          class="flex flex-auto bg-gray-50 border-y border-r border-gray-300 text-gray-900 text-sm focus:outline-0 p-2 h-[37px]"
+        >
+          <p class="text-gray-400">소천자 관리</p>
+        </button>
+      </div>
+    </a>
   </div>
 </aside>

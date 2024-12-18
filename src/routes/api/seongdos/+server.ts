@@ -28,7 +28,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       ? parseInt(url.searchParams.get("take"))
       : 12
 
-  let seongdoMatch: any = {}
+  let seongdoMatch: any = { group2: { $ne: "소천" } }
   if (name) {
     seongdoMatch.name = { $regex: name }
   }

@@ -1,10 +1,11 @@
 <script lang="ts">
   import TableForCSV from "./TableForCSV.svelte"
   import Table from "./Table.svelte"
-  import type { IPage, ISeongdo } from "$lib/interfaces"
+  import type { IFamily, IPage, ISeongdo } from "$lib/interfaces"
   import { goto } from "$app/navigation"
   import toast from "svelte-french-toast"
   import { read, utils } from "xlsx"
+  import { Search } from "carbon-icons-svelte"
 
   export let data: {
     action: String
@@ -13,11 +14,15 @@
   }
 
   $: action = data.action
-  $: seongdos = data.seongdos
+  $: seongdos = data.seongdos || []
   $: page = data.page
+  let familyType: IFamily
+  $: family = familyType
 
   $: targetName = ""
   $: input = undefined
+  $: socheonName = ""
+  $: socheonSeongdo = undefined
 
   var loadFile = async function (event) {
     input = event.target
@@ -112,7 +117,7 @@
             class="flex h-[2rem] max-h-[2rem] items-center rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#3493eb]"
             on:click={async () => {
               if (!targetName) {
-                return alert("부서를 선택해주세요.")
+                return toast.error("부서를 선택해주세요.")
               } else if (!confirm("부서를 이동하시겠습니까?")) {
                 return false
               }
@@ -200,9 +205,9 @@
             class="hidden md:flex h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#3493eb]"
             on:click={async () => {
               if (!input) {
-                return alert("파일을 선택해주세요.")
+                return toast.error("파일을 선택해주세요.")
               } else if (!targetName) {
-                return alert("부서를 선택해주세요.")
+                return toast.error("부서를 선택해주세요.")
               } else if (!confirm("추가하시겠습니까?")) {
                 return false
               }
@@ -270,7 +275,7 @@
             class="flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#3493eb]"
             on:click={async () => {
               if (!input) {
-                alert("파일을 선택해주세요.")
+                return toast.error("파일을 선택해주세요.")
               } else if (!confirm("추가하시겠습니까?")) {
                 return false
               }
@@ -337,7 +342,7 @@
             class="flec h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#3493eb]"
             on:click={async () => {
               if (!input) {
-                alert("파일을 선택해주세요.")
+                return toast.error("파일을 선택해주세요.")
               } else if (!confirm("추가하시겠습니까?")) {
                 return false
               }
@@ -406,7 +411,7 @@
             class="flex h-[2rem] max-h-[2rem] items-center rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#3493eb]"
             on:click={async () => {
               if (!input) {
-                alert("파일을 선택해주세요.")
+                return toast.error("파일을 선택해주세요.")
               } else if (!confirm("이동하시겠습니까?")) {
                 return false
               }
@@ -430,12 +435,122 @@
             <span class="truncate">이동</span>
           </button>
         </div>
+      {:else if action == "editSocheon"}
+        <div class="flex items-center">
+          <p class="truncate text-lg font-medium mr-1">소천자 관리</p>
+        </div>
+        <div class="hidden lg:flex rounded ml-auto items-center">
+          <input
+            type="text"
+            placeholder="이름"
+            bind:value={socheonName}
+            class="pl-1 w-[10rem] h-[2rem] max-h-[2rem] bg-gray-50 text-gray-900 text-sm focus:outline-0 border rounded-l-sm pl-1"
+          />
+          <button
+            class="flex h-[2rem] max-h-[2rem] items-center rounded-r-sm text-white mr-2 text-xs px-2 py-[0.4rem] bg-[#3493eb]"
+            on:click={async () => {
+              if (!socheonName) {
+                return toast.error("이름을 입력해주세요.")
+              }
+              const response = await fetch(`/api/seongdos/${socheonName}`, {
+                method: "GET",
+                headers: {
+                  "content-type": "application/json",
+                },
+              })
+
+              if (response.ok) {
+                const result = await response.json()
+
+                if (result.seongdo == null) {
+                  return toast.error("일치하는 성도가 없습니다.")
+                }
+                seongdos = [result.seongdo]
+                page = {
+                  totalSize: 1,
+                  totalPage: 1,
+                  requestPage: 1,
+                  requestSize: 1,
+                  requestParams: {},
+                }
+              }
+            }}
+          >
+            <span>검색</span>
+          </button>
+
+          <button
+            class="flex h-[2rem] max-h-[2rem] items-center rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#3493eb]"
+            on:click={async () => {
+              if (seongdos?.length == 0) {
+                return toast.error("성도를 선택해주세요.")
+              }
+
+              // 소천 그룹으로 이동
+              let response = await fetch(`/api/seongdos`, {
+                method: "PUT",
+                body: JSON.stringify({
+                  _id: seongdos[0]._id,
+                  name: `${seongdos[0].name}†`,
+                  group1: "기타",
+                  group2: "소천",
+                }),
+                headers: {
+                  "content-type": "application/json",
+                },
+              })
+
+              //가족관계 있는지 확인
+              response = await fetch(
+                `/api/families?seongdoId=${seongdos[0]._id}`,
+                {
+                  method: "GET",
+                  headers: {
+                    "content-type": "application/json",
+                  },
+                }
+              )
+
+              if (response.ok) {
+                family = (await response.json()).family
+              }
+
+              if (family) {
+                family.memberIds = family.memberIds?.filter(
+                  (id) => id != seongdos[0]._id
+                )
+                family.members = family.members?.filter(
+                  (member) =>
+                    member.isSeongdo == false ||
+                    member.seongdo._id != seongdos[0]._id
+                )
+
+                //가족관계에서 본인 제외
+                response = await fetch(`/api/families/${family._id}`, {
+                  method: "PUT",
+                  body: JSON.stringify({
+                    memberIds: family.memberIds,
+                    members: family.members,
+                    detail: family.detail,
+                  }),
+                  headers: {
+                    "content-type": "application/json",
+                  },
+                })
+              }
+
+              toast.success("수정되었습니다.")
+            }}
+          >
+            <span>이동</span>
+          </button>
+        </div>
       {:else}
         <!-- else content here -->
       {/if}
     </div>
   </div>
-  {#if action == "graduate" && seongdos?.length > 0 && page != undefined}
+  {#if (action == "graduate" || action == "editSocheon") && seongdos?.length > 0 && page != undefined}
     <Table {seongdos} {page} />
   {:else if (action == "addTeacher" || action == "addToBridge" || action == "addToNpr" || action == "updateGyogu") && seongdos?.length > 0}
     <TableForCSV {seongdos} />

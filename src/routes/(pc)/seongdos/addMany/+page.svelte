@@ -270,11 +270,11 @@
         </button>
       </div>
     {:else}
-      <h1 class="text-lg font-medium">
+      <h1 class="text-lg font-medium truncate">
         추가될 성도 목록 {seongdos.length > 0 ? `(${seongdos.length}명)` : ""}
       </h1>
-      <div class="flex ml-auto gap-2">
-        <a
+      <div class="relative flex ml-auto gap-2">
+        <!-- <a
           href="https://chanheee.notion.site/e19681f2e69c4d5fb21747b50411111b?pvs=4"
           target="_blank"
         >
@@ -285,11 +285,36 @@
             <span>❔</span>
             <span>등록 가이드</span>
           </button>
-        </a>
+        </a> -->
+        <button
+          class="flex h-[2rem] max-h-[2rem] mr-2 border items-center rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+          on:mouseover={() => {
+            document
+              .querySelector("#addMany-tooltip")
+              ?.classList.remove("hidden")
+          }}
+          on:mouseleave={() => {
+            document.querySelector("#addMany-tooltip")?.classList.add("hidden")
+          }}
+          on:focus={null}
+        >
+          <span>❔</span>
+          <span class="truncate">파일 예시</span>
+        </button>
+        <div
+          id="addMany-tooltip"
+          class="hidden flex flex-col gap-2 absolute -left-[22rem] top-[7.5rem] z-20 ml-3 -translate-y-1/2 border border-gray-300 whitespace-nowrap rounded-md bg-white py-2 text-xs text-gray-800 font-medium transition-opacity duration-300 shadow-[-12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
+          role="tooltip"
+        >
+          <span
+            class="absolute -top-[0.8px] left-[50%] -z-10 h-3 w-3 border-gray-300 border-b border-l -translate-y-1/2 rotate-[135deg] bg-white"
+          ></span>
+          <img class="w-90" src="/image_addMany.png" alt="" />
+        </div>
         <input
           id="example1"
           type="file"
-          class="bg-gray-50 block text-xs rounded-sm border truncate max-h-fit file:mr-3 file:border-0 file:bg-[#237334] file:py-[0.4rem] file:px-4 file:text-xs file:text-white focus:outline-none"
+          class="h-[2rem] max-h-[2rem] bg-gray-50 block text-xs rounded-sm border truncate max-h-fit file:mr-3 file:border-0 file:bg-[#237334] file:py-[0.4rem] file:px-4 file:text-xs file:text-white focus:outline-none"
           accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
           on:change={(e) => {
             loadFile(e)
@@ -298,30 +323,30 @@
 
         <button
           type="submit"
-          class="flex h-fit border-[#F46055] border items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+          class="h-[2rem] max-h-[2rem] flex border-[#F46055] border items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
           on:click={() => submitHandler()}
         >
           <Checkmark scale={16} />
-          <span>추가</span>
+          <span class="truncate">추가</span>
         </button>
         <button
-          class="flex h-fit border-[#F46055] border items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+          class="flex h-[2rem] max-h-[2rem] border-[#F46055] border items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
           on:click={() => submitHandler({ update: true })}
         >
           <Renew scale={16} />
-          <span>수정</span>
+          <span class="truncate">수정</span>
         </button>
 
         <button
           type="button"
-          class="h-fit border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
+          class="h-[2rem] max-h-[2rem] border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
           on:click={() => {
             history.back()
           }}
         >
           <span class="flex items-center">
             <Close class="text-[#F46055]" />
-            <p>닫기</p>
+            <p class="truncate">닫기</p>
           </span>
         </button>
       </div>
