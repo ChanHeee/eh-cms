@@ -19,6 +19,7 @@
     Search,
     TrashCan,
     Edit,
+    PedestrianFamily,
   } from "carbon-icons-svelte"
   import {
     AllowedGroupStore,
@@ -173,8 +174,6 @@
 
   const seongdoUpdate = async () => {
     const { name, originalName, age, group2, address, ...rest } = seongdo
-
-    console.log(group2)
 
     const response = await fetch("/api/seongdos", {
       method: "PUT",
@@ -442,11 +441,24 @@
           <button
             type="button"
             class="h-[2rem] max-h-[2rem] flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-            on:click={() => {
+            on:click={async () => {
               if (!confirm("삭제하시겠습니까?")) {
                 return false
               }
-              deleteHandler()
+              const response = await fetch(
+                `/api/v2/familyCharts/getChartsWithSeongdoId?id=${seongdo._id}`,
+                {
+                  headers: {
+                    "content-type": "application/json",
+                  },
+                }
+              )
+              const { charts } = (await response.json()).charts
+              if (charts.length > 0) {
+                toast.error("가족관계도에서 먼저 삭제해주세요.")
+                return goto(`/seongdos/${seongdo.name}/family-chart`)
+              }
+              // deleteHandler()
             }}
           >
             <TrashCan scale={16} />
@@ -1347,6 +1359,16 @@
             type="submit"
             class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
             on:click={() => {
+              goto(`/seongdos/${seongdo.name}/family-chart`)
+            }}
+          >
+            <PedestrianFamily scale={16} />
+            <span>가족관계도</span>
+          </button>
+          <button
+            type="submit"
+            class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+            on:click={() => {
               isFamilyModalHidden = !isFamilyModalHidden
               $SeongdosStore = []
               if (!familyId) {
@@ -1571,8 +1593,6 @@
                   type="button"
                   class="flex items-center gap-1 rounded-sm text-white text-xs px-1 py-[0.4rem]"
                   on:click={() => {
-                    console.log(member)
-
                     if (member.isSeongdo) {
                       selectedSeongdoFamily = member
                     } else {

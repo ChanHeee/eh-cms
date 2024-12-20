@@ -37,10 +37,6 @@
     "vite": "^4.4.2",
     "xlsx": "^0.18.5"
   },
-  "type": "module",
-  "dependencies": {
-    "@dagrejs/dagre": "^1.1.4",
-    "@xyflow/svelte": "^0.1.21",
-    "dagrejs": "^0.2.1"
-  }
+  "dependencies": {},
+  "type": "module"
 }

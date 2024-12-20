@@ -1,4 +1,4 @@
-import { isAllowGroup } from "$lib/utils"
+import { getFamilyChartFromDb, isAllowGroup } from "$lib/utils"
 import { redirect } from "@sveltejs/kit"
 import { loadFlash } from "sveltekit-flash-message/server"
 /** @type {import('@sveltejs/kit').Load} */
@@ -76,7 +76,7 @@ export const load = loadFlash(async ({ url, fetch, locals, cookies }) => {
   }
 
   response = await fetch(
-    `/api/v2/familyCharts/getChartsWithSeongdoId?id=${seongdo._id}`,
+    `/api/v2/familyCharts/getChartsWithSeongdoId?id=${seongdo._id}&avatar=true`,
     {
       method: "GET",
       headers: {
@@ -88,31 +88,11 @@ export const load = loadFlash(async ({ url, fetch, locals, cookies }) => {
   if (response.ok) {
     const result = await response.json()
 
-    charts = result.charts?.chart.map((item) => {
-      return {
-        id: item.id._id,
-        data: {
-          이름: item.id.name,
-          생년월일: item.id.birth,
-          gender:
-            item.id.gender == "남자"
-              ? "M"
-              : item.id.gender == "여자"
-              ? "F"
-              : "",
-        },
-        rels: {
-          father: item.rels.father?._id,
-          mother: item.rels.mother?._id,
-          spouses: item.rels.spouses?.map((spouse) => spouse._id),
-          children: item.rels.children?.map((child) => child._id),
-        },
-      }
-    })
+    charts = getFamilyChartFromDb(result.charts)
   }
 
   return {
-    seongdoId: seongdo._id,
+    seongdo,
     charts,
   }
 })

@@ -293,3 +293,34 @@ export const getGroupList = (allowedGroup: string[]) => {
   }
   return groupList
 }
+
+export const getFamilyChartFromDb = (charts) => {
+  if (!charts) {
+    return []
+  }
+  return {
+    _id: charts._id,
+    charts: charts?.charts.map((item) => {
+      return {
+        id: item.id._id,
+        data: {
+          이름: item.id.name,
+          avatar: item.id.avatar,
+          생년월일: item.id.birth,
+          gender:
+            item.id.gender == "남자"
+              ? "M"
+              : item.id.gender == "여자"
+              ? "F"
+              : "",
+        },
+        rels: {
+          father: item.rels.father?._id,
+          mother: item.rels.mother?._id,
+          spouses: item.rels.spouses?.map((spouse) => spouse._id),
+          children: item.rels.children?.map((child) => child._id),
+        },
+      }
+    }),
+  }
+}

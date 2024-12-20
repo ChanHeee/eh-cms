@@ -115,6 +115,23 @@ export interface IFamily {
   detail?: string
 }
 
+export interface IFamilyChartRelation {
+  father?: string
+  mother?: string
+  spouses?: string[]
+  children?: string[]
+}
+
+export interface IChart {
+  id?: string
+  rels?: IFamilyChartRelation
+}
+
+export interface IFamilyChart {
+  _id: string
+  charts: IChart[]
+}
+
 export interface IMember {
   _id?: string
   seongdo?: string
