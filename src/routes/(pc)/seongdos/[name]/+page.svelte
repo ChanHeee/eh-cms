@@ -453,12 +453,13 @@
                   },
                 }
               )
-              const { charts } = (await response.json()).charts
-              if (charts.length > 0) {
+
+              const result = await response.json()
+              if (result?.charts?.charts?.length > 0) {
                 toast.error("가족관계도에서 먼저 삭제해주세요.")
                 return goto(`/seongdos/${seongdo.name}/family-chart`)
               }
-              // deleteHandler()
+              deleteHandler()
             }}
           >
             <TrashCan scale={16} />
@@ -765,7 +766,6 @@
                         <option value="전도사">전도사</option>
                         <option value="교육전도사">교육전도사</option>
                       {:else if seongdo.group1 == "기타"}
-                        <option value="소천">소천</option>
                         <option value="재적">재적</option>
                       {/if}
                     </select>
@@ -1136,7 +1136,6 @@
                       <option value="전도사">전도사</option>
                       <option value="교육전도사">교육전도사</option>
                     {:else if seongdo.group1 == "기타"}
-                      <option value="소천">소천</option>
                       <option value="재적">재적</option>
                     {/if}
                   </select>
