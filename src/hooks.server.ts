@@ -6,19 +6,18 @@ export const handle = async ({ event, resolve }) => {
   const token = event.cookies.get("token")
   let tokenError = false
 
-  // if (event.url.pathname.startsWith("/api")) {
-  //   // if (event.url.pathname != "/api/users/login") {
-  //   if (!event.url.pathname.startsWith("/api/users")) {
-  //     if (!token) {
-  //       return json({ success: false, message: "token is required" })
-  //     }
-  //     jwt.verify(token, JWT_SECRET, (err, decoded) => {
-  //       if (err) {
-  //         tokenError = true
-  //       }
-  //     })
-  //   }
-  // }
+  if (event.url.pathname.startsWith("/api")) {
+    if (!event.url.pathname.startsWith("/api/users")) {
+      if (!token) {
+        return json({ success: false, message: "token is required" })
+      }
+      jwt.verify(token, JWT_SECRET, (err, decoded) => {
+        if (err) {
+          tokenError = true
+        }
+      })
+    }
+  }
 
   event.locals.token = token
 
@@ -34,19 +33,18 @@ export const handleFetch = ({ request, fetch, event }) => {
 
   let tokenError = false
 
-  // if (event.url.pathname.startsWith("/api")) {
-  //   if (!event.url.pathname.startsWith("/api/users")) {
-  //     // if (event.url.pathname != "/api/users/login") {
-  //     if (!token) {
-  //       return json({ success: false, message: "token is required" })
-  //     }
-  //     jwt.verify(token, JWT_SECRET, (err, decoded) => {
-  //       if (err) {
-  //         tokenError = true
-  //       }
-  //     })
-  //   }
-  // }
+  if (event.url.pathname.startsWith("/api")) {
+    if (!event.url.pathname.startsWith("/api/users")) {
+      if (!token) {
+        return json({ success: false, message: "token is required" })
+      }
+      jwt.verify(token, JWT_SECRET, (err, decoded) => {
+        if (err) {
+          tokenError = true
+        }
+      })
+    }
+  }
 
   if (token) {
     request.headers.set("authorization", token)
