@@ -159,7 +159,7 @@
       <div class="flex items-center">
         <p class="text-lg font-medium mr-1">성도 목록</p>
         <p class="text-lg">
-          {`(${groupTree?.count || page?.totalSize}명)`}
+          {`(${group1 == "기타" && group2 == "" ? groupTree?.count : page?.totalSize}명)`}
         </p>
       </div>
       <div class="rounded flex ml-auto gap-2">
