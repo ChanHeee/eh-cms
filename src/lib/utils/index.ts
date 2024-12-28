@@ -10,6 +10,7 @@ export const getSeongdosSearchParams = ({
   group1,
   group2,
   excludeETC,
+  showTeacher,
 }: ISeongdoSearchParams) => {
   let searchParams = []
   if (phone) {
@@ -30,6 +31,7 @@ export const getSeongdosSearchParams = ({
 
   if (page) searchParams.push(`page=${page}`)
   if (excludeETC) searchParams.push(`excludeETC=${excludeETC}`)
+  if (showTeacher) searchParams.push(`showTeacher=${showTeacher}`)
 
   return searchParams.length > 0 ? "?" + searchParams.join("&") : ""
 }

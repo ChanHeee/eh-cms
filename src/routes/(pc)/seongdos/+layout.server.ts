@@ -18,8 +18,8 @@ export const load = async ({ url, locals, fetch }) => {
   const group2 = url.searchParams.get("group2")
   const birthStart = url.searchParams.get("birthStart")
   const birthEnd = url.searchParams.get("birthEnd")
+  const showTeacher = url.searchParams.get("showTeacher")
 
-  const targetBirth = `${new Date().getFullYear() - 70}-12-31`
   if (
     (group1 != null &&
       group1 != "장년부" &&
@@ -42,6 +42,7 @@ export const load = async ({ url, locals, fetch }) => {
     group2,
     birthStart,
     birthEnd,
+    showTeacher,
   }
 
   let groupTree: IGroup | null = null
@@ -321,6 +322,7 @@ export const load = async ({ url, locals, fetch }) => {
         group2,
         birthStart,
         birthEnd,
+        showTeacher,
       },
       groupTree,
     }
@@ -336,6 +338,7 @@ export const load = async ({ url, locals, fetch }) => {
         group2,
         birthStart,
         birthEnd,
+        showTeacher,
       },
     }
   }

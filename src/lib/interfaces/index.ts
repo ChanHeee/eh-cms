@@ -217,6 +217,7 @@ export interface ISeongdoSearchParams {
   dateEnd?: string
   simbangja?: string
   excludeETC?: boolean
+  showTeacher?: boolean
 }
 
 export interface ISeongdoEduSearchParams {

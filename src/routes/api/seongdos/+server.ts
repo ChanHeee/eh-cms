@@ -1,10 +1,7 @@
-import { BLOB_READ_WRITE_TOKEN } from "$lib/env"
 import type { ISeongdo } from "$lib/interfaces"
 import { Seongdo } from "$lib/models/Seongdo"
 import { getAgeFromBirth, getGroupItem } from "$lib/utils"
-import { dataURItoBlob } from "$lib/utils/canvasUtils"
 import { json, type RequestHandler } from "@sveltejs/kit"
-import { put, del } from "@vercel/blob"
 
 export const GET: RequestHandler = async ({ request, url, locals }) => {
   const name = url.searchParams.get("name")
@@ -29,6 +26,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       : 12
 
   const excludeETC = url.searchParams.get("excludeETC")
+  const showTeacher = url.searchParams.get("showTeacher")
 
   let seongdoMatch: any = {}
   if (excludeETC) {
@@ -162,22 +160,18 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
         seongdoMatch.group1 = group1
         seongdoMatch.group2 = { $regex: group2 }
       } else {
-        if (group2 == "늘푸른부") {
-          // const targetBirth = `${new Date().getFullYear() - 70}-12-31`
-          // seongdoMatch["$or"] = [
-          //   {
-          //     $and: [{ birth: { $ne: "" } }, { birth: { $lte: targetBirth } }],
-          //   },
-          //   { "services.group1": group1, "services.group2": group2 },
-          // ]
+        if (group2 == "늘푸른부" || group2 == "은혜브릿지") {
           seongdoMatch = {
             "services.group1": group1,
             "services.group2": group2,
           }
         } else {
           seongdoMatch["$or"] = [
-            { group1, group2 },
-            { "services.group1": group1, "services.group2": group2 },
+            showTeacher
+              ? { "services.group1": group1, "services.group2": group2 }
+              : { group1, group2 },
+            // { group1, group2 },
+            // { "services.group1": group1, "services.group2": group2 },
           ]
         }
       }
@@ -185,7 +179,16 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       if (group1 == "장년부") {
         seongdoMatch.group1 = group1
       } else {
-        seongdoMatch["$or"] = [{ group1 }, { "services.group1": group1 }]
+        seongdoMatch["$or"] = [
+          showTeacher
+            ? {
+                $and: [
+                  { "services.group1": group1 },
+                  { "services.group2": { $ne: "늘푸른부" } },
+                ],
+              }
+            : { group1 },
+        ]
       }
     }
   }
@@ -437,6 +440,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
         birthStart,
         birthEnd,
         take,
+        showTeacher,
       },
     },
   })

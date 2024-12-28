@@ -19,9 +19,15 @@
     TrashCan,
     UserFollow,
     UserMultiple,
+    View,
   } from "carbon-icons-svelte"
   import { goto } from "$app/navigation"
-  import { getGroupItem, getGroupString, getSearchParams } from "$lib/utils"
+  import {
+    getGroupItem,
+    getGroupString,
+    getSearchParams,
+    getSeongdosSearchParams,
+  } from "$lib/utils"
   import toast from "svelte-french-toast"
   import { SeongdoDeleteIdsStore } from "$lib/store"
 
@@ -55,6 +61,7 @@
   $: group2 = groupItem.group2
   $: group2Add = groupItem.group2Add ?? ""
   $: groupList = data.groupList
+  $: console.log(group1, group2)
 
   $: deleteMany = data.deleteMany
   $: ids = $SeongdoDeleteIdsStore
@@ -163,6 +170,31 @@
         </p>
       </div>
       <div class="rounded flex ml-auto gap-2">
+        {#if (group1 == "청년부" || group1 == "교회학교") && group2 != "늘푸른부" && group2 != "은혜브릿지"}
+          {#if searchParams.showTeacher}
+            <button
+              class="flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              on:click={() => {
+                goto(`/seongdos${getSeongdosSearchParams({ group1, group2 })}`)
+              }}
+            >
+              <View scale={16} />
+              <span>학생 보기</span>
+            </button>
+          {:else}
+            <button
+              class="flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              on:click={() => {
+                goto(
+                  `/seongdos${getSeongdosSearchParams({ group1, group2, showTeacher: true })}`
+                )
+              }}
+            >
+              <View scale={16} />
+              <span>교사 보기</span>
+            </button>
+          {/if}
+        {/if}
         <button
           class="hidden md:flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#237334]"
           on:click={() => {
@@ -206,28 +238,6 @@
               <p>닫기</p>
             </span>
           </button>
-        {:else if searchParams.group2 == "은혜브릿지" || searchParams.group2 == "늘푸른부"}
-          <button
-            class="hidden md:flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-            on:click={() => {
-              goto(
-                `/seongdos/addMany?group1=${searchParams.group1}&group2=${searchParams.group2}`
-              )
-            }}
-          >
-            <UserMultiple scale={16} />
-            <span>{`${searchParams.group2} 등록`}</span>
-          </button>
-          <button
-            type="button"
-            class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-            on:click={() => {
-              goto("/seongdos?deleteMany=true")
-            }}
-          >
-            <TrashCan scale={16} />
-            <span>여러명 삭제</span>
-          </button>
         {:else}
           <button
             class="flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
@@ -248,7 +258,7 @@
             <UserMultiple scale={16} />
             <span>여러명 등록</span>
           </button>
-          <button
+          <!-- <button
             type="button"
             class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
             on:click={() => {
@@ -257,7 +267,7 @@
           >
             <TrashCan scale={16} />
             <span>여러명 삭제</span>
-          </button>
+          </button> -->
         {/if}
       </div>
     </div>

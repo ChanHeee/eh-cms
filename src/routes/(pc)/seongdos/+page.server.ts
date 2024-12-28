@@ -3,8 +3,17 @@ import { redirect } from "@sveltejs/kit"
 
 /** @type {import('@sveltejs/kit').Load} */
 export const load = async ({ request, fetch, url, locals }) => {
-  const { name, jikbun, page, order, group1, group2, birthStart, birthEnd } =
-    locals.searchParams
+  const {
+    name,
+    jikbun,
+    page,
+    order,
+    group1,
+    group2,
+    birthStart,
+    birthEnd,
+    showTeacher,
+  } = locals.searchParams
 
   const deleteMany = url.searchParams.get("deleteMany") || false
 
@@ -33,6 +42,7 @@ export const load = async ({ request, fetch, url, locals }) => {
     birthStart,
     birthEnd,
     excludeETC: group1 == "기타" ? false : true,
+    showTeacher,
   })}`
 
   const response = await fetch(requestUrl, {
