@@ -11,8 +11,8 @@
 
 <div
   class={"w-[200px] min-w-[200px] h-[70px] flex rounded " + classString}
-  class:bg-[#789fac]={gender == "M" ? true : false}
-  class:bg-[#c48a92]={gender == "F" ? true : false}
+  class:bg-[#6cb8de]={gender == "M" ? true : false}
+  class:bg-[#e4708f]={gender == "F" ? true : false}
   class:bg-[#d3d3d3]={gender == "" ? true : false}
 >
   {#if avatar}

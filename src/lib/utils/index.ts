@@ -9,6 +9,7 @@ export const getSeongdosSearchParams = ({
   page,
   group1,
   group2,
+  excludeETC,
 }: ISeongdoSearchParams) => {
   let searchParams = []
   if (phone) {
@@ -28,6 +29,7 @@ export const getSeongdosSearchParams = ({
   }
 
   if (page) searchParams.push(`page=${page}`)
+  if (excludeETC) searchParams.push(`excludeETC=${excludeETC}`)
 
   return searchParams.length > 0 ? "?" + searchParams.join("&") : ""
 }

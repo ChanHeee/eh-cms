@@ -7,25 +7,50 @@
   import Card from "./components/Card.svelte"
   import { onMount } from "svelte"
   import "./family-chart.css"
-  import { Close, Edit, ArrowUp, ArrowDown } from "carbon-icons-svelte"
+  import {
+    Close,
+    Edit,
+    ArrowUp,
+    ArrowDown,
+    AddLarge,
+  } from "carbon-icons-svelte"
   import toast from "svelte-french-toast"
   import { getFamilyChartFromDb } from "$lib/utils"
   import { goto, invalidateAll } from "$app/navigation"
+  import type { IPage, ISeongdo } from "$lib/interfaces"
 
   export let data: {
     seongdo: any
     charts: any
   }
 
+  let page: IPage
+  let Iseongdo: ISeongdo
+
   $: seongdo = data.seongdo
+  $: searchSeongdos = []
+  $: seongdoPage = page
   $: charts = data.charts.charts
   $: chartId = data.charts._id
   $: newPerson = null
+  $: addType = ""
+  $: newChart = {}
+
   $: searchName = ""
   $: isAdding = false
-
+  $: isModalHidden = true
   $: f3Chart = null
   $: f3Card = null
+
+  $: take = seongdoPage?.requestParams.take
+  $: name = seongdoPage?.requestParams.name
+  $: now = seongdoPage?.requestPage
+  $: min =
+    now % 5 == 0 ? (parseInt(now / 5) - 1) * 5 + 1 : parseInt(now / 5) * 5 + 1
+  $: last = seongdoPage?.totalPage
+  $: pagination = [0, 1, 2, 3, 4]
+    .filter((i) => min + i <= last)
+    .map((i) => min + i)
 
   let idWithBirth: any
 
@@ -38,6 +63,23 @@
         }
       })
     )
+  }
+
+  const searchHandler = async (pageInput: number) => {
+    const response = await fetch(
+      `/api/seongdos?name=${name}&seongdoPage=${pageInput}&take=${take}`,
+      {
+        headers: {
+          "content-type": "application/json",
+        },
+      }
+    )
+    if (response.ok) {
+      const result = await response.json()
+
+      searchSeongdos = result.seongdos
+      seongdoPage = result.seongdoPage
+    }
   }
 
   function sortDate(charts) {
@@ -162,20 +204,7 @@
     }
   }
 
-  const addPerson = async (type, chart) => {
-    if (!searchName) {
-      return toast.error("이름을 입력해주세요.")
-    }
-    if (charts.map((chart) => chart.data["이름"]).includes(searchName)) {
-      return toast.error("이미 가족에 추가되어있습니다.")
-    }
-
-    await searchSeongdo()
-
-    if (!newPerson) {
-      return toast.error("일치하는 성도 정보가 없습니다.")
-    }
-
+  const postAddPerson = async (type, chart) => {
     let response = await fetch(
       `/api/v2/familyCharts/getChartsWithSeongdoId?id=${newPerson._id}`,
       {
@@ -188,6 +217,7 @@
 
     if (response.ok) {
       const result = await response.json()
+
       if (result?.charts?.charts?.length > 0) {
         return toast.error("이미 다른 가족에 추가된 성도입니다.")
       }
@@ -218,6 +248,28 @@
 
     invalidateAll()
     searchName = ""
+  }
+  const preAddPerson = async (type, chart) => {
+    addType = type
+    newChart = chart
+
+    if (!searchName) {
+      return toast.error("이름을 입력해주세요.")
+    }
+
+    if (charts.map((chart) => chart.data["이름"]).includes(searchName)) {
+      return toast.error("이미 가족에 추가되어있습니다.")
+    }
+
+    const result = await searchSeongdosByName()
+    searchSeongdos = result.seongdos
+    seongdoPage = result.page
+
+    if (searchSeongdos?.length < 1) {
+      return toast.error("일치하는 성도 정보가 없습니다.")
+    }
+
+    isModalHidden = false
   }
 
   const deletePerson = async (chart) => {
@@ -283,6 +335,17 @@
     })
     const result = await response.json()
     newPerson = result.seongdo
+  }
+
+  const searchSeongdosByName = async () => {
+    let response = await fetch(`/api/seongdos?name=${searchName}`, {
+      headers: {
+        "content-type": "application/json",
+      },
+    })
+    const result = await response.json()
+
+    return { seongdos: result.seongdos, page: result.page }
   }
 
   const getChartsWithSeongdoId = async () => {
@@ -356,7 +419,11 @@
               },
             })
 
-            return goto(`/seongdos/${seongdo.name}`)
+            return goto(
+              seongdo.birth
+                ? `/seongdos/${seongdo.name}-${seongdo.birth}`
+                : `/seongdos/${seongdo.name}`
+            )
           }}
         >
           <span class="flex items-center">
@@ -484,15 +551,15 @@
                 {#if chart.data.gender == "M"}
                   <AddSpouse
                     onClick={() => {
-                      addPerson("spouse", chart)
+                      preAddPerson("spouse", chart)
                     }}
                     bind:value={searchName}
                   />
                 {:else}
                   <AddSpouse
-                    color="#789fac"
+                    color="#6cb8de"
                     onClick={() => {
-                      addPerson("spouse", chart)
+                      preAddPerson("spouse", chart)
                     }}
                     bind:value={searchName}
                   />
@@ -502,7 +569,7 @@
               {#if !chart.rels.father}
                 <AddFather
                   onClick={() => {
-                    addPerson("father", chart)
+                    preAddPerson("father", chart)
                   }}
                   bind:value={searchName}
                 />
@@ -511,20 +578,20 @@
               {#if !chart.rels.mother}
                 <AddMother
                   onClick={() => {
-                    addPerson("mother", chart)
+                    preAddPerson("mother", chart)
                   }}
                   bind:value={searchName}
                 />
               {/if}
               <AddSon
                 onClick={() => {
-                  addPerson("child", chart)
+                  preAddPerson("child", chart)
                 }}
                 bind:value={searchName}
               />
               <AddDaughter
                 onClick={() => {
-                  addPerson("child", chart)
+                  preAddPerson("child", chart)
                 }}
                 bind:value={searchName}
               />
@@ -537,5 +604,197 @@
         <div id="FamilyChart" class="f3 h-[calc(80vh)]"></div>
       </div>
     {/if}
+  </div>
+</div>
+
+<div
+  class="relative z-10 h-full"
+  class:hidden={isModalHidden}
+  aria-labelledby="modal-title"
+  role="dialog"
+  aria-modal="true"
+>
+  <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" />
+  <div class="w-full fixed inset-0 z-10 w-screen">
+    <div
+      class="h-full flex min-h-full items-end justify-center p-4 text-center items-center"
+    >
+      <div
+        class="sm:h-2/3 h-3/4 sm:max-md:w-2/3 md:w-1/3 w-full relative transform rounded-md bg-white shadow-xl transition-all"
+      >
+        <div
+          class="overflow-scroll h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
+        >
+          {#if searchSeongdos.length > 0}
+            <div class={"flex text-sm border-l mb-7 overflow-scroll"}>
+              <div
+                class="flex flex-col whitespace-nowrap border-r divide-y border-b"
+              >
+                <div
+                  id="nameField"
+                  class=" flex justify-between px-3 font-bold items-center h-10 bg-[#D9D9D8]"
+                >
+                  이름
+                </div>
+
+                {#each searchSeongdos as item, index}
+                  <div class="flex px-3 items-center h-10">
+                    <button>
+                      {item.name}
+                    </button>
+                  </div>
+                {/each}
+              </div>
+              <div
+                class="flex flex-col whitespace-nowrap border-r divide-y border-b"
+              >
+                <button
+                  class=" flex justify-between px-3 font-bold items-center h-10 bg-[#D9D9D8]"
+                >
+                  생년월일
+                </button>
+
+                {#each searchSeongdos as item, index}
+                  <div class="flex px-3 items-center h-10">
+                    {item.birth}
+                  </div>
+                {/each}
+              </div>
+              <div
+                class="flex flex-col flex-auto whitespace-nowrap divide-y border-b"
+              >
+                <button
+                  class="flex gap-2 px-3 bg-[#D9D9D8] font-bold items-center w-full text-center h-10"
+                >
+                  직분
+                </button>
+                {#each searchSeongdos as item}
+                  <div class="flex px-3 items-center h-10">
+                    {item.jikbun}
+                  </div>
+                {/each}
+              </div>
+              <div
+                class="flex flex-col flex-none whitespace-nowrap border-r divide-y border-b"
+              >
+                <button
+                  class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
+                />
+                {#each searchSeongdos as item, index}
+                  <div class="flex items-center px-3 h-10">
+                    <button
+                      type="button"
+                      class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem]"
+                      on:click={async () => {
+                        newPerson = item
+                        await postAddPerson(addType, newChart)
+                        isModalHidden = !isModalHidden
+                        searchSeongdos = []
+                        searchName = ""
+                        addType = ""
+                        newChart = {}
+                      }}
+                    >
+                      <AddLarge fill="#4a4a4a" size={20} />
+                    </button>
+                  </div>
+                {/each}
+              </div>
+            </div>
+
+            {#if pagination.length > 0}
+              <!-- content here -->
+
+              <div class={"w-fit mx-auto flex items-center mb-5"}>
+                <button
+                  on:click={async () => {
+                    const arrayStart = pagination[0]
+                    if (arrayStart == 1) {
+                      if (now != 1) {
+                        await searchHandler(1)
+                      }
+                    } else {
+                      await searchHandler(arrayStart - 1)
+                    }
+                  }}
+                  class=" p-4 border text-base rounded-l-xl text-gray-600 bg-white hover:bg-gray-100"
+                >
+                  <svg
+                    width="9"
+                    fill="currentColor"
+                    height="8"
+                    class=""
+                    viewBox="0 0 1792 1792"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1427 301l-531 531 531 531q19 19 19 45t-19 45l-166 166q-19 19-45 19t-45-19l-742-742q-19-19-19-45t19-45l742-742q19-19 45-19t45 19l166 166q19 19 19 45t-19 45z"
+                    />
+                  </svg>
+                </button>
+                {#each pagination as item}
+                  <button
+                    class="px-4 py-2 border-t border-b border-r text-base text-gray-600"
+                    class:bg-gray-100={item == now}
+                    class:bg-white={item != now}
+                    on:click={async () => {
+                      // searchSeongdos = await searchHandler(item)
+                      await searchHandler(item)
+                    }}
+                  >
+                    {item}
+                  </button>
+                {/each}
+
+                <button
+                  on:click={async () => {
+                    const arrayEnd = pagination.slice(-1)[0]
+                    const next = arrayEnd < last ? arrayEnd + 1 : arrayEnd
+
+                    if (now != last) {
+                      // searchSeongdos = await searchHandler(next)
+                      await searchHandler(next)
+                    }
+                  }}
+                  class="w-full p-4 border-t border-b border-r text-base rounded-r-xl text-gray-600 bg-white hover:bg-gray-100"
+                >
+                  <svg
+                    width="9"
+                    fill="currentColor"
+                    height="8"
+                    class=""
+                    viewBox="0 0 1792 1792"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1363 877l-742 742q-19 19-45 19t-45-19l-166-166q-19-19-19-45t19-45l531-531-531-531q-19-19-19-45t19-45l166-166q19-19 45-19t45 19l742 742q19 19 19 45t-19 45z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            {/if}
+          {/if}
+        </div>
+
+        <div class="bg-gray-50 h-[55px] px-4 py-3 flex flex-row-reverse px-6">
+          <button
+            type="button"
+            class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
+            on:click={async () => {
+              isModalHidden = !isModalHidden
+              searchSeongdos = []
+              searchName = ""
+              addType = ""
+              newChart = {}
+            }}
+          >
+            <span class="flex items-center">
+              <Close class="text-[#F46055]" />
+              <p>닫기</p>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

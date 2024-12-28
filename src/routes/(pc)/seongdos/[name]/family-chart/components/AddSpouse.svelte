@@ -2,7 +2,7 @@
   export let classString = ""
   export let onClick
   export let value: string
-  export let color: string = "#c48a92"
+  export let color: string = "#e4708f"
 
   $: showInput = false
 </script>

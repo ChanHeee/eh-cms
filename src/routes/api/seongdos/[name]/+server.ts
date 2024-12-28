@@ -5,7 +5,9 @@ import { json, type RequestHandler } from "@sveltejs/kit"
 
 export const GET: RequestHandler = async ({ request, url, locals }) => {
   const name = decodeURI(url.pathname).split("/")[3]
-  const seongdo = await Seongdo.findOne({ name })
+  const birth = url.searchParams.get("birth")
+
+  const seongdo = await Seongdo.findOne({ name, birth })
 
   return json({
     seongdo,

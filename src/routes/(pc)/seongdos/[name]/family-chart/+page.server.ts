@@ -4,10 +4,12 @@ import { loadFlash } from "sveltekit-flash-message/server"
 /** @type {import('@sveltejs/kit').Load} */
 
 export const load = loadFlash(async ({ url, fetch, locals, cookies }) => {
-  const name = decodeURIComponent(url.pathname.split("/")[2])
+  const value = decodeURIComponent(url.pathname.split("/")[2])
+  const name = value.split("-")[0]
+  const birth = value.split("-").splice(1).join("-")
 
   let seongdo, charts
-  let response = await fetch(`/api/seongdos/${name}`, {
+  let response = await fetch(`/api/seongdos/${name}?birth=${birth}`, {
     method: "GET",
     headers: {
       "content-type": "application/json",

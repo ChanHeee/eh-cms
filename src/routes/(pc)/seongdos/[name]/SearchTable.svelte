@@ -64,11 +64,9 @@
 
     {#each seongdos as item, index}
       <div class="flex px-3 items-center h-10">
-        <a href={`/seongdos/${item.name}`}>
-          <button>
-            {item.name}
-          </button>
-        </a>
+        <button>
+          {item.name}
+        </button>
       </div>
     {/each}
   </div>

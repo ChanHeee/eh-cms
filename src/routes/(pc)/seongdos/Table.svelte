@@ -135,7 +135,11 @@
             if (!isAllowGroup($AllowedGroupStore, item.group1, item.group2)) {
               toast.error("접근할 수 없습니다.")
             } else {
-              goto(`/seongdos/${item.name}`)
+              goto(
+                item.birth
+                  ? `/seongdos/${item.name}-${item.birth}`
+                  : `/seongdos/${item.name}`
+              )
             }
           }}
         >

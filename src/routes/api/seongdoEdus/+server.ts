@@ -14,6 +14,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
       ? parseInt(url.searchParams.get("take"))
       : 12
   const name = url.searchParams.get("name")
+  const birth = url.searchParams.get("birth")
   const jikbun =
     url.searchParams.get("jikbun") != null
       ? JSON.parse(url.searchParams.get("jikbun"))
@@ -76,7 +77,9 @@ export const GET: RequestHandler = async ({ request, url }) => {
   }
   if (name) {
     seongdoMatch.name = name
+    seongdoMatch.birth = birth
   }
+
   if (jikbun?.length > 0) {
     const jikbunTemp = [...jikbun]
     if (jikbun.includes("장로")) {

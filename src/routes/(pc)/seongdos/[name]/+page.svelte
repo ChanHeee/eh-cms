@@ -20,6 +20,7 @@
     TrashCan,
     Edit,
     PedestrianFamily,
+    DecisionTree,
   } from "carbon-icons-svelte"
   import {
     AllowedGroupStore,
@@ -193,7 +194,11 @@
       },
     })
     if (response.ok) {
-      goto(`/seongdos/${seongdo.name}`)
+      goto(
+        seongdo.birth
+          ? `/seongdos/${seongdo.name}-${seongdo.birth}`
+          : `/seongdos/${seongdo.name}`
+      )
     }
   }
   const submitHandler = async () => {
@@ -1354,11 +1359,45 @@
       >
         <h1 class="text-lg font-medium">가족관계</h1>
         <div class="flex ml-auto gap-2">
+          <!-- <button
+            type="submit"
+            class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+            on:click={async () => {
+              const response = await fetch(`/api/families`, {
+                method: "POST",
+                body: JSON.stringify({
+                  members: [
+                    {
+                      seongdo,
+                      classification: "본인",
+                      isSeongdo: true,
+                    },
+                  ],
+                  memberIds: [seongdo?._id],
+                  detail: "",
+                }),
+                headers: {
+                  "content-type": "application/json",
+                },
+              })
+              if (response.ok) {
+                toast.success("분가를 완료했습니다.")
+                await invalidateAll()
+              }
+            }}
+          >
+            <DecisionTree scale={16} />
+            <span>세대 분가</span>
+          </button> -->
           <button
             type="submit"
             class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
             on:click={() => {
-              goto(`/seongdos/${seongdo.name}/family-chart`)
+              goto(
+                seongdo.birth
+                  ? `/seongdos/${seongdo.name}-${seongdo.birth}/family-chart`
+                  : `/seongdos/${seongdo.name}/family-chart`
+              )
             }}
           >
             <PedestrianFamily scale={16} />
@@ -1438,13 +1477,17 @@
                     ) {
                       toast.error("접근할 수 없습니다.")
                     } else {
-                      goto(`/seongdos/${member.seongdo.name}`)
+                      goto(
+                        member.seongdo.birth
+                          ? `/seongdos/${member.seongdo.name}-${member.seongdo.birth}`
+                          : `/seongdos/${member.seongdo.name}`
+                      )
                     }
                   }
                 }}
               >
                 <div>
-                  {member.isSeongdo ? member.seongdo.name : member.name}
+                  {member.isSeongdo ? member?.seongdo?.name : member?.name}
                 </div>
               </button>
             {/each}
@@ -1460,7 +1503,7 @@
             <!-- content here -->
             {#each members as member}
               <div class="flex px-3 items-center h-10">
-                {member.isSeongdo ? member.seongdo.jikbun : ""}
+                {member.isSeongdo ? member?.seongdo?.jikbun : ""}
               </div>
             {/each}
           {/if}
@@ -1475,7 +1518,7 @@
             <!-- content here -->
             {#each members as member}
               <div class="flex px-3 justify-center items-center h-10">
-                {member.isSeongdo ? member.seongdo.singeup : ""}
+                {member.isSeongdo ? member?.seongdo?.singeup : ""}
               </div>
             {/each}
           {/if}
@@ -1488,7 +1531,7 @@
             <!-- content here -->
             {#each members as member}
               <div class="flex justify-center px-3 items-center h-10">
-                {member.isSeongdo ? member.seongdo.birth : member.birth}
+                {member.isSeongdo ? member?.seongdo?.birth : member?.birth}
               </div>
             {/each}
           {/if}
@@ -1502,7 +1545,7 @@
             <!-- content here -->
             {#each members as member}
               <div class="flex justify-center px-3 items-center h-10">
-                {member.isSeongdo ? member.seongdo.phone : member.phone}
+                {member.isSeongdo ? member?.seongdo?.phone : member?.phone}
               </div>
             {/each}
           {/if}
@@ -1521,7 +1564,10 @@
             {#each members as member}
               <div class="flex justify-center px-3 items-center h-10">
                 {member.isSeongdo
-                  ? getGroupString(member.seongdo.group1, member.seongdo.group2)
+                  ? getGroupString(
+                      member?.seongdo?.group1,
+                      member?.seongdo?.group2
+                    )
                   : "미등록"}
               </div>
             {/each}

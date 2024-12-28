@@ -1,5 +1,4 @@
 import { JWT_SECRET } from "$lib/env"
-import { Simbang } from "$lib/models/Simbang"
 import { redirect } from "@sveltejs/kit"
 import jwt from "jsonwebtoken"
 

@@ -28,7 +28,18 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       ? parseInt(url.searchParams.get("take"))
       : 12
 
-  let seongdoMatch: any = { group2: { $ne: "소천" } }
+  const excludeETC = url.searchParams.get("excludeETC")
+
+  let seongdoMatch: any = {}
+  if (excludeETC) {
+    seongdoMatch = {
+      $and: [
+        { group1: { $ne: "" } },
+        { group1: { $ne: undefined } },
+        { group2: { $nin: ["소천", "재적"] } },
+      ],
+    }
+  }
   if (name) {
     seongdoMatch.name = { $regex: name }
   }

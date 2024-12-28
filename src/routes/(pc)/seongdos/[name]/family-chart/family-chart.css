@@ -4,8 +4,10 @@
 }
 
 .f3 {
-  --female-color: rgb(196, 138, 146);
-  --male-color: rgb(120, 159, 172);
+  /* --female-color: rgb(196, 138, 146); */
+  --female-color: #e4708f;
+  /* --male-color: rgb(120, 159, 172); */
+  --male-color: #6cb8de;
   --background-color: rgb(249 250 251);
 
   font-family: "Roboto", sans-serif;

@@ -114,26 +114,31 @@ export const load = async ({ url, locals, fetch }) => {
     groupTree = {
       name: "청년부",
       count: await Seongdo.count().where({
-        $or: [{ group1: "청년부" }, { "services.group1": "청년부" }],
+        // $or: [{ group1: "청년부" }, { "services.group1": "청년부" }],
+        group1: "청년부",
       }),
       child: [
         {
           name: "1청년",
           count: await Seongdo.count().where({
-            $or: [
-              { group1: "청년부", group2: "1청년" },
-              { "services.group1": "청년부", "services.group2": "1청년" },
-            ],
+            // $or: [
+            //   { group1: "청년부", group2: "1청년" },
+            //   { "services.group1": "청년부", "services.group2": "1청년" },
+            // ],
+            group1: "청년부",
+            group2: "1청년",
           }),
           child: [],
         },
         {
           name: "2청년",
           count: await Seongdo.count().where({
-            $or: [
-              { group1: "청년부", group2: "2청년" },
-              { "services.group1": "청년부", "services.group2": "2청년" },
-            ],
+            // $or: [
+            //   { group1: "청년부", group2: "2청년" },
+            //   { "services.group1": "청년부", "services.group2": "2청년" },
+            // ],
+            group1: "청년부",
+            group2: "2청년",
           }),
           child: [],
         },
@@ -143,66 +148,79 @@ export const load = async ({ url, locals, fetch }) => {
     groupTree = {
       name: "교회학교",
       count: await Seongdo.count().where({
-        $or: [{ group1: "교회학교" }, { "services.group1": "교회학교" }],
+        // $or: [{ group1: "교회학교" }, { "services.group1": "교회학교" }],
+        group1: "교회학교",
       }),
       child: [
         {
           name: "영아부",
           count: await Seongdo.count().where({
-            $or: [
-              { group1: "교회학교", group2: "영아부" },
-              { "services.group1": "교회학교", "services.group2": "영아부" },
-            ],
+            // $or: [
+            //   { group1: "교회학교", group2: "영아부" },
+            //   { "services.group1": "교회학교", "services.group2": "영아부" },
+            // ],
+            group1: "교회학교",
+            group2: "영아부",
           }),
           child: [],
         },
         {
           name: "유치부",
           count: await Seongdo.count().where({
-            $or: [
-              { group1: "교회학교", group2: "유치부" },
-              { "services.group1": "교회학교", "services.group2": "유치부" },
-            ],
+            // $or: [
+            //   { group1: "교회학교", group2: "유치부" },
+            //   { "services.group1": "교회학교", "services.group2": "유치부" },
+            // ],
+            group1: "교회학교",
+            group2: "유치부",
           }),
           child: [],
         },
         {
           name: "유년부",
           count: await Seongdo.count().where({
-            $or: [
-              { group1: "교회학교", group2: "유년부" },
-              { "services.group1": "교회학교", "services.group2": "유년부" },
-            ],
+            // $or: [
+            //   { group1: "교회학교", group2: "유년부" },
+            //   { "services.group1": "교회학교", "services.group2": "유년부" },
+            // ],
+            group1: "교회학교",
+            group2: "유년부",
           }),
           child: [],
         },
         {
           name: "초등부",
           count: await Seongdo.count().where({
-            $or: [
-              { group1: "교회학교", group2: "초등부" },
-              { "services.group1": "교회학교", "services.group2": "초등부" },
-            ],
+            // $or: [
+            //   { group1: "교회학교", group2: "초등부" },
+            //   { "services.group1": "교회학교", "services.group2": "초등부" },
+            // ],
+            group1: "교회학교",
+            group2: "초등부",
           }),
           child: [],
         },
         {
           name: "중등부",
           count: await Seongdo.count().where({
-            $or: [
-              { group1: "교회학교", group2: "중등부" },
-              { "services.group1": "교회학교", "services.group2": "중등부" },
-            ],
+            // $or: [
+            //   { group1: "교회학교", group2: "중등부" },
+            //   { "services.group1": "교회학교", "services.group2": "중등부" },
+            // ],
+            group1: "교회학교",
+            group2: "중등부",
           }),
           child: [],
         },
         {
           name: "고등부",
           count: await Seongdo.count().where({
-            $or: [
-              { group1: "교회학교", group2: "고등부" },
-              { "services.group1": "교회학교", "services.group2": "고등부" },
-            ],
+            // $or: [
+            //   { group1: "교회학교", group2: "고등부" },
+            //   { "services.group1": "교회학교", "services.group2": "고등부" },
+            // ],
+            group1: "교회학교",
+            group2: "고등부",
           }),
           child: [],
         },

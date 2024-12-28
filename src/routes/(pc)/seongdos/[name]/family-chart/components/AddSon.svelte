@@ -7,7 +7,7 @@
 </script>
 
 <form
-  class={"pl-1 pr-3 border-2 border-dashed border-[#789fac] w-[150px] min-w-[150px] h-[70px] flex rounded bg-[#f9fafb] " +
+  class={"pl-1 pr-3 border-2 border-dashed border-[#6cb8de] w-[150px] min-w-[150px] h-[70px] flex rounded bg-[#f9fafb] " +
     classString}
   on:submit|preventDefault={onClick}
   on:mouseleave={(e) => {
@@ -19,7 +19,7 @@
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
-      style="fill: #789fac"
+      style="fill: #6cb8de"
       data-icon="plus"
       width="32"
     >
@@ -31,7 +31,7 @@
     </svg>
   </button>
 
-  <div class="flex flex-col justify-center text-[#789fac] ml-1">
+  <div class="flex flex-col justify-center text-[#6cb8de] ml-1">
     <p
       class="truncate text-sm"
       on:focus={undefined}
@@ -46,7 +46,7 @@
         type="text"
         bind:value
         on:focus={() => (value = "")}
-        class="rounded py-[1px] mt-1 w-[75px] pl-2 focus:outline-0 text-black text-sm border border-[#789fac]"
+        class="rounded py-[1px] mt-1 w-[75px] pl-2 focus:outline-0 text-black text-sm border border-[#6cb8de]"
       />
     {/if}
   </div>

@@ -88,7 +88,11 @@
             ) {
               toast.error("접근할 수 없습니다.")
             } else {
-              goto(`/seongdos/${item.seongdo.name}`)
+              goto(
+                item.seongdo?.birth
+                  ? `/seongdos/${item.seongdo?.name}-${item.seongdo?.birth}`
+                  : `/seongdos/${item.seongdo?.name}`
+              )
             }
           }}
         >

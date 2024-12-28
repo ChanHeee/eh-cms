@@ -35,21 +35,6 @@ const seongdoSchema = new Schema<ISeongdo>({
 })
 
 seongdoSchema.set("timestamps", { createdAt: true, updatedAt: true })
-seongdoSchema.pre("save", async function (next) {
-  const { birth, name } = this
-  if (birth) {
-    this.age = getAgeFromBirth(birth)
-  }
-
-  const seongdoWithOriginalName = await Seongdo.find({ originalName: name })
-
-  this.name =
-    seongdoWithOriginalName.length > 0
-      ? name + (seongdoWithOriginalName.length + 1)
-      : name
-
-  next()
-})
 
 seongdoSchema.pre("deleteOne", async function (next) {
   const { _id } = this.getFilter()

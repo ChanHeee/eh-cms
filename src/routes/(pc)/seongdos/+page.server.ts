@@ -23,7 +23,17 @@ export const load = async ({ request, fetch, url, locals }) => {
     throw redirect(302, encodeURI(url))
   }
 
-  let requestUrl = `/api/seongdos${decodeURI(url.search)}`
+  let requestUrl = `/api/seongdos${getSeongdosSearchParams({
+    name,
+    jikbun,
+    order,
+    page,
+    group1,
+    group2,
+    birthStart,
+    birthEnd,
+    excludeETC: group1 == "기타" ? false : true,
+  })}`
 
   const response = await fetch(requestUrl, {
     headers: {

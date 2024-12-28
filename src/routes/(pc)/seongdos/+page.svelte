@@ -1,7 +1,12 @@
 <script lang="ts">
   import TableForDelete from "./TableForDelete.svelte"
   import Table from "./Table.svelte"
-  import type { IPage, ISeongdo, ISeongdoSearchParams } from "$lib/interfaces"
+  import type {
+    IGroup,
+    IPage,
+    ISeongdo,
+    ISeongdoSearchParams,
+  } from "$lib/interfaces"
   import { utils, writeFile } from "xlsx"
   import {
     ChevronDown,
@@ -27,6 +32,7 @@
     deleteMany: boolean
     groupList: any
     searchParams: ISeongdoSearchParams
+    groupTree: IGroup
   }
 
   $: seongdos = data.seongdos
@@ -52,6 +58,8 @@
 
   $: deleteMany = data.deleteMany
   $: ids = $SeongdoDeleteIdsStore
+
+  $: groupTree = data.groupTree
 
   $: isSearchModalHidden = true
   $: isExportModalHidden = true
@@ -151,7 +159,7 @@
       <div class="flex items-center">
         <p class="text-lg font-medium mr-1">성도 목록</p>
         <p class="text-lg">
-          {`(${page.totalSize}명)`}
+          {`(${groupTree?.count || page?.totalSize}명)`}
         </p>
       </div>
       <div class="rounded flex ml-auto gap-2">
