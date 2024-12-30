@@ -191,7 +191,9 @@ export const isAllowGroup = (
   }
 
   if (group1 == "기타" || group1 == "교역자") {
-    isAllow = true
+    if (!allowedGroup.includes("게스트")) {
+      isAllow = true
+    }
   }
 
   return isAllow

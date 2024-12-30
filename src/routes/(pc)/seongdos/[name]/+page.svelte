@@ -43,7 +43,11 @@
     simbangId: string
     groupList: string[]
     seongdoEdus: ISeongdoEduPopulate[]
+    allowedGroup: string[]
   }
+
+  $: allowedGroup = data.allowedGroup
+  $: console.log(allowedGroup)
 
   onMount(async () => {
     selectedSimbang = data.simbangs.filter(
@@ -434,43 +438,44 @@
           {seongdo.jikbun || ""}
         </h1>
         <div class="flex ml-auto gap-2">
-          <button
-            type="submit"
-            class="h-[2rem] max-h-[2rem] flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-            on:click={submitHandler}
-          >
-            <Checkmark scale={16} />
-            <span>저장</span>
-          </button>
+          {#if !allowedGroup.includes("게스트")}
+            <button
+              type="submit"
+              class="h-[2rem] max-h-[2rem] flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              on:click={submitHandler}
+            >
+              <Checkmark scale={16} />
+              <span>저장</span>
+            </button>
 
-          <button
-            type="button"
-            class="h-[2rem] max-h-[2rem] flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-            on:click={async () => {
-              if (!confirm("삭제하시겠습니까?")) {
-                return false
-              }
-              const response = await fetch(
-                `/api/v2/familyCharts/getChartsWithSeongdoId?id=${seongdo._id}`,
-                {
-                  headers: {
-                    "content-type": "application/json",
-                  },
+            <button
+              type="button"
+              class="h-[2rem] max-h-[2rem] flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              on:click={async () => {
+                if (!confirm("삭제하시겠습니까?")) {
+                  return false
                 }
-              )
+                const response = await fetch(
+                  `/api/v2/familyCharts/getChartsWithSeongdoId?id=${seongdo._id}`,
+                  {
+                    headers: {
+                      "content-type": "application/json",
+                    },
+                  }
+                )
 
-              const result = await response.json()
-              if (result?.charts?.charts?.length > 0) {
-                toast.error("가족관계도에서 먼저 삭제해주세요.")
-                return goto(`/seongdos/${seongdo.name}/family-chart`)
-              }
-              deleteHandler()
-            }}
-          >
-            <TrashCan scale={16} />
-            <span>삭제</span>
-          </button>
-
+                const result = await response.json()
+                if (result?.charts?.charts?.length > 0) {
+                  toast.error("가족관계도에서 먼저 삭제해주세요.")
+                  return goto(`/seongdos/${seongdo.name}/family-chart`)
+                }
+                deleteHandler()
+              }}
+            >
+              <TrashCan scale={16} />
+              <span>삭제</span>
+            </button>
+          {/if}
           <button
             type="button"
             class="h-[2rem] max-h-[2rem] border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
@@ -733,7 +738,7 @@
                       }}
                       class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                     >
-                      <option value="none" class="hidden" />
+                      <option value=""></option>
                       {#each Object.keys(groupList) as group1}
                         <option value={group1}>{group1}</option>
                       {/each}
@@ -752,6 +757,7 @@
                       class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                     >
                       <option value="none" class="hidden" />
+                      <option value=""></option>
                       {#if seongdo.group1 == "장년부"}
                         {#each groupList["장년부"] as item}
                           <option value={item}>{item}</option>
@@ -771,7 +777,7 @@
                         <option value="전도사">전도사</option>
                         <option value="교육전도사">교육전도사</option>
                       {:else if seongdo.group1 == "기타"}
-                        <option value="재적">재적</option>
+                        <option value="제적">제적</option>
                       {/if}
                     </select>
                     <div
@@ -795,6 +801,7 @@
                         : true}
                     >
                       <option value="none" class="hidden" />
+                      <option value=""></option>
                       <option value="1구역">1구역</option>
                       <option value="2구역">2구역</option>
                       <option value="3구역">3구역</option>
@@ -1141,7 +1148,7 @@
                       <option value="전도사">전도사</option>
                       <option value="교육전도사">교육전도사</option>
                     {:else if seongdo.group1 == "기타"}
-                      <option value="재적">재적</option>
+                      <option value="제적">제적</option>
                     {/if}
                   </select>
                   <div
@@ -1233,39 +1240,44 @@
             class="flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
           />
         </div>
-        <div class="flex flex-auto border-gray-300 border-x border-y">
-          <div
-            class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0]"
-          >
-            개인사항
-          </div>
-
-          <textarea
-            rows={3}
-            value={seongdo.remarks || ""}
-            on:input={(e) => {
-              seongdo.remarks = e.target.value
-            }}
-            class="flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
-          />
-        </div>
-        {#if family}
+        {#if !allowedGroup.includes("게스트")}
           <div class="flex flex-auto border-gray-300 border-x border-y">
             <div
               class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0]"
             >
-              가족사항
+              개인사항
             </div>
 
             <textarea
-              rows={5}
-              value={family.detail || ""}
+              rows={3}
+              value={seongdo.remarks || ""}
               on:input={(e) => {
-                family.detail = e.target.value
+                seongdo.remarks = e.target.value
               }}
               class="flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
             />
           </div>
+        {/if}
+
+        {#if family}
+          {#if !allowedGroup.includes("게스트")}
+            <div class="flex flex-auto border-gray-300 border-x border-y">
+              <div
+                class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0]"
+              >
+                가족사항
+              </div>
+
+              <textarea
+                rows={5}
+                value={family.detail || ""}
+                on:input={(e) => {
+                  family.detail = e.target.value
+                }}
+                class="flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
+              />
+            </div>
+          {/if}
         {/if}
       </div>
     </div>
@@ -1275,18 +1287,20 @@
         class="sticky top-0 pt-8 bg-white flex justify-between items-start pb-2"
       >
         <h1 class="text-lg font-medium">상세 소속</h1>
-        <div class="flex ml-auto gap-2">
-          <button
-            type="submit"
-            class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-            on:click={() => {
-              isServiceModalHidden = !isServiceModalHidden
-            }}
-          >
-            <AddLarge scale={16} />
-            <span>내용 추가</span>
-          </button>
-        </div>
+        {#if !allowedGroup.includes("게스트")}
+          <div class="flex ml-auto gap-2">
+            <button
+              type="submit"
+              class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              on:click={() => {
+                isServiceModalHidden = !isServiceModalHidden
+              }}
+            >
+              <AddLarge scale={16} />
+              <span>내용 추가</span>
+            </button>
+          </div>
+        {/if}
       </div>
       <div class="flex text-sm border-l overflow-scroll">
         <div
@@ -1389,34 +1403,37 @@
             <DecisionTree scale={16} />
             <span>세대 분가</span>
           </button> -->
-          <button
-            type="submit"
-            class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-            on:click={() => {
-              goto(
-                seongdo.birth
-                  ? `/seongdos/${seongdo.name}-${seongdo.birth}/family-chart`
-                  : `/seongdos/${seongdo.name}/family-chart`
-              )
-            }}
-          >
-            <PedestrianFamily scale={16} />
-            <span>가족관계도</span>
-          </button>
-          <button
-            type="submit"
-            class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-            on:click={() => {
-              isFamilyModalHidden = !isFamilyModalHidden
-              $SeongdosStore = []
-              if (!familyId) {
-                selectedSeongdo = seongdo
-              }
-            }}
-          >
-            <AddLarge scale={16} />
-            <span>가족 추가</span>
-          </button>
+          {#if !allowedGroup.includes("게스트")}
+            <button
+              type="submit"
+              class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              on:click={() => {
+                goto(
+                  seongdo.birth
+                    ? `/seongdos/${seongdo.name}-${seongdo.birth}/family-chart`
+                    : `/seongdos/${seongdo.name}/family-chart`
+                )
+              }}
+            >
+              <PedestrianFamily scale={16} />
+              <span>가족관계도</span>
+            </button>
+
+            <button
+              type="submit"
+              class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              on:click={() => {
+                isFamilyModalHidden = !isFamilyModalHidden
+                $SeongdosStore = []
+                if (!familyId) {
+                  selectedSeongdo = seongdo
+                }
+              }}
+            >
+              <AddLarge scale={16} />
+              <span>가족 추가</span>
+            </button>
+          {/if}
         </div>
       </div>
       <div class="flex text-sm border-l overflow-scroll">
@@ -1573,111 +1590,114 @@
             {/each}
           {/if}
         </div>
+
         <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
-          <button
-            class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
-          />
-          {#if members?.length > 0}
-            {#each members as member, idx}
-              <div class="flex items-center px-3 h-10">
-                <button
-                  type="button"
-                  class="flex items-center gap-1 rounded-sm text-white text-xs px-1 py-[0.4rem]"
-                  on:click={async () => {
-                    if (idx > 0) {
-                      let tempMembers = [...members]
+          {#if !allowedGroup.includes("게스트")}
+            <button
+              class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
+            />
+            {#if members?.length > 0}
+              {#each members as member, idx}
+                <div class="flex items-center px-3 h-10">
+                  <button
+                    type="button"
+                    class="flex items-center gap-1 rounded-sm text-white text-xs px-1 py-[0.4rem]"
+                    on:click={async () => {
+                      if (idx > 0) {
+                        let tempMembers = [...members]
 
-                      tempMembers.splice(
-                        idx - 1,
-                        2,
-                        tempMembers[idx],
-                        tempMembers[idx - 1]
-                      )
-                      members = [...tempMembers]
-
-                      const newMemberIds = members
-                        .map((member) => member.seongdo?._id)
-                        .filter((item) => item != undefined)
-
-                      memberIds = newMemberIds
-
-                      await familyHandler()
-                    }
-                  }}
-                >
-                  <ArrowUp fill="#4a4a4a" size={16} />
-                </button>
-                <button
-                  type="button"
-                  class="flex items-center gap-1 rounded-sm text-white text-xs px-1 py-[0.4rem]"
-                  on:click={async () => {
-                    if (idx + 1 < members.length) {
-                      let tempMembers = [...members]
-
-                      tempMembers.splice(
-                        idx,
-                        2,
-                        tempMembers[idx + 1],
-                        tempMembers[idx]
-                      )
-                      members = [...tempMembers]
-
-                      const newMemberIds = members
-                        .map((member) => member.seongdo?._id)
-                        .filter((item) => item != undefined)
-
-                      memberIds = newMemberIds
-
-                      await familyHandler()
-                    }
-                  }}
-                >
-                  <ArrowDown fill="#4a4a4a" size={16} />
-                </button>
-                <button
-                  type="button"
-                  class="flex items-center gap-1 rounded-sm text-white text-xs px-1 py-[0.4rem]"
-                  on:click={() => {
-                    if (member.isSeongdo) {
-                      selectedSeongdoFamily = member
-                    } else {
-                      selectedNonSeongdoFamily = member
-                    }
-                    isFamilyModalHidden = !isFamilyModalHidden
-                  }}
-                >
-                  <Edit fill="#4a4a4a" size={20} />
-                </button>
-                <button
-                  type="button"
-                  class="flex items-center gap-1 rounded-sm text-white text-xs px-1 py-[0.4rem]"
-                  on:click={async () => {
-                    if (member.isSeongdo) {
-                      memberIds = memberIds.filter(
-                        (id) => id != member.seongdo._id
-                      )
-
-                      if (member.seongdo == seongdo._id) {
-                        members = members.filter(
-                          (seongdo) => seongdo.isSeongdo == true
+                        tempMembers.splice(
+                          idx - 1,
+                          2,
+                          tempMembers[idx],
+                          tempMembers[idx - 1]
                         )
+                        members = [...tempMembers]
+
+                        const newMemberIds = members
+                          .map((member) => member.seongdo?._id)
+                          .filter((item) => item != undefined)
+
+                        memberIds = newMemberIds
+
+                        await familyHandler()
+                      }
+                    }}
+                  >
+                    <ArrowUp fill="#4a4a4a" size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    class="flex items-center gap-1 rounded-sm text-white text-xs px-1 py-[0.4rem]"
+                    on:click={async () => {
+                      if (idx + 1 < members.length) {
+                        let tempMembers = [...members]
+
+                        tempMembers.splice(
+                          idx,
+                          2,
+                          tempMembers[idx + 1],
+                          tempMembers[idx]
+                        )
+                        members = [...tempMembers]
+
+                        const newMemberIds = members
+                          .map((member) => member.seongdo?._id)
+                          .filter((item) => item != undefined)
+
+                        memberIds = newMemberIds
+
+                        await familyHandler()
+                      }
+                    }}
+                  >
+                    <ArrowDown fill="#4a4a4a" size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    class="flex items-center gap-1 rounded-sm text-white text-xs px-1 py-[0.4rem]"
+                    on:click={() => {
+                      if (member.isSeongdo) {
+                        selectedSeongdoFamily = member
+                      } else {
+                        selectedNonSeongdoFamily = member
+                      }
+                      isFamilyModalHidden = !isFamilyModalHidden
+                    }}
+                  >
+                    <Edit fill="#4a4a4a" size={20} />
+                  </button>
+                  <button
+                    type="button"
+                    class="flex items-center gap-1 rounded-sm text-white text-xs px-1 py-[0.4rem]"
+                    on:click={async () => {
+                      if (member.isSeongdo) {
+                        memberIds = memberIds.filter(
+                          (id) => id != member.seongdo._id
+                        )
+
+                        if (member.seongdo == seongdo._id) {
+                          members = members.filter(
+                            (seongdo) => seongdo.isSeongdo == true
+                          )
+                        } else {
+                          members = members.filter(
+                            (seongdo) => seongdo.seongdo != member.seongdo
+                          )
+                        }
                       } else {
                         members = members.filter(
-                          (seongdo) => seongdo.seongdo != member.seongdo
+                          (seongdo) => seongdo.name != member.name
                         )
                       }
-                    } else {
-                      members = members.filter(
-                        (seongdo) => seongdo.name != member.name
-                      )
-                    }
-                    await familyHandler()
-                  }}
-                >
-                  <TrashCan fill="#4a4a4a" size={20} />
-                </button>
-              </div>
-            {/each}
+                      await familyHandler()
+                    }}
+                  >
+                    <TrashCan fill="#4a4a4a" size={20} />
+                  </button>
+                </div>
+              {/each}
+            {/if}
           {/if}
         </div>
       </div>
@@ -1688,18 +1708,20 @@
         class="sticky top-0 pt-8 bg-white flex justify-between items-start pb-2"
       >
         <h1 class="text-lg font-medium">심방내역</h1>
-        <div class="flex ml-auto gap-2">
-          <button
-            type="submit"
-            class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-            on:click={() => {
-              isSimbangModalHidden = !isSimbangModalHidden
-            }}
-          >
-            <AddLarge scale={16} />
-            <span>심방 생성</span>
-          </button>
-        </div>
+        {#if !allowedGroup.includes("게스트")}
+          <div class="flex ml-auto gap-2">
+            <button
+              type="submit"
+              class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              on:click={() => {
+                isSimbangModalHidden = !isSimbangModalHidden
+              }}
+            >
+              <AddLarge scale={16} />
+              <span>심방 생성</span>
+            </button>
+          </div>
+        {/if}
       </div>
       <div class="flex text-sm border-l overflow-scroll">
         <div

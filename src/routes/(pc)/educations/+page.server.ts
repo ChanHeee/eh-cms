@@ -3,6 +3,13 @@ import { redirect } from "@sveltejs/kit"
 
 /** @type {import('@sveltejs/kit').Load} */
 export const load = async ({ request, fetch, url, locals }) => {
+  if (
+    !locals.allowedGroup.includes("전체") ||
+    !locals.allowedGroup.includes("교육")
+  ) {
+    throw redirect(303, "/seongdos")
+  }
+
   const { page, order } = locals.searchParams
   const { allowedGroup } = locals
 

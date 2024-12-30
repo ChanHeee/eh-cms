@@ -858,7 +858,9 @@
           goto(`/seongdos?group1=${groupTree.name}`)
         }}
       >
-        {`${groupTree.name}(${groupTree.count})`}
+        {["청년부", "교회학교"].includes(group1)
+          ? `${groupTree.name}(${groupTree.count} / ${groupTree.teacherCount})`
+          : `${groupTree.name}(${groupTree.count})`}
       </button>
     </div>
     {#each groupTree.child as child}
@@ -882,7 +884,10 @@
             goto(`/seongdos?group1=${groupTree.name}&group2=${child.name}`)
           }}
         >
-          {`${child.name}(${child.count})`}</button
+          {["청년부", "교회학교"].includes(group1) &&
+          !["늘푸른부", "은혜브릿지"].includes(child.name)
+            ? `${child.name}(${child.count} / ${child.teacherCount})`
+            : `${child.name}(${child.count})`}</button
         >
       </div>
       <div class="flex flex-col">

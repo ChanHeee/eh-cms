@@ -9,6 +9,7 @@
 
   export let seongdos: ISeongdo[]
   export let page: IPage
+  const showTeacher = page.requestParams.showTeacher
 
   const getAddressString = (fullAddress: string) => {
     let address = fullAddress.split(",")[0] || ""
@@ -381,9 +382,6 @@
       </div>
       {#each seongdos as item}
         <div class="flex px-3 items-center h-10">
-          <!-- {item.services.find(
-            (service) => service.group1 == searchParams.group1
-          )?.classification || ""} -->
           {getClassification(item.services)}
         </div>
       {/each}

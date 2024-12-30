@@ -39,6 +39,7 @@
     groupList: any
     searchParams: ISeongdoSearchParams
     groupTree: IGroup
+    listName: string
   }
 
   $: seongdos = data.seongdos
@@ -61,12 +62,12 @@
   $: group2 = groupItem.group2
   $: group2Add = groupItem.group2Add ?? ""
   $: groupList = data.groupList
-  $: console.log(group1, group2)
 
   $: deleteMany = data.deleteMany
   $: ids = $SeongdoDeleteIdsStore
 
   $: groupTree = data.groupTree
+  $: listName = data.listName
 
   $: isSearchModalHidden = true
   $: isExportModalHidden = true
@@ -164,101 +165,104 @@
       class=" bg-white pt-8 bg-white sticky top-0 flex w-full justify-between pb-2"
     >
       <div class="flex items-center">
-        <p class="text-lg font-medium mr-1">성도 목록</p>
+        <p class="text-lg font-medium mr-1">{`${listName} 목록`}</p>
         <p class="text-lg">
-          {`(${group1 == "기타" && group2 == "" ? groupTree?.count : page?.totalSize}명)`}
+          {`(${page?.totalSize}명)`}
         </p>
       </div>
-      <div class="rounded flex ml-auto gap-2">
-        {#if (group1 == "청년부" || group1 == "교회학교") && group2 != "늘푸른부" && group2 != "은혜브릿지"}
-          {#if searchParams.showTeacher}
+      {#if !allowedGroup.includes("게스트")}
+        <div class="rounded flex ml-auto gap-2">
+          {#if (group1 == "청년부" || group1 == "교회학교") && group2 != "늘푸른부" && group2 != "은혜브릿지"}
+            {#if searchParams.showTeacher}
+              <button
+                class="flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+                on:click={() => {
+                  goto(
+                    `/seongdos${getSeongdosSearchParams({ group1, group2 })}`
+                  )
+                }}
+              >
+                <View scale={16} />
+                <span>학생 보기</span>
+              </button>
+            {:else}
+              <button
+                class="flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+                on:click={() => {
+                  goto(
+                    `/seongdos${getSeongdosSearchParams({ group1, group2, showTeacher: true })}`
+                  )
+                }}
+              >
+                <View scale={16} />
+                <span>교사 보기</span>
+              </button>
+            {/if}
+          {/if}
+          <button
+            class="hidden md:flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#237334]"
+            on:click={() => {
+              isExportModalHidden = false
+            }}
+          >
+            <DocumentExport scale={16} />
+            <span>엑셀로 내보내기</span>
+          </button>
+
+          {#if deleteMany}
             <button
               class="flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-              on:click={() => {
-                goto(`/seongdos${getSeongdosSearchParams({ group1, group2 })}`)
+              on:click={async () => {
+                if (ids.length == 0) {
+                  toast.error("선택된 성도가 없습니다.")
+                } else if (
+                  !confirm(
+                    `선택된 ${ids.length}명의 성도 정보를 삭제하시겠습니까?`
+                  )
+                ) {
+                  return false
+                } else {
+                  await deleteHandler(ids)
+                }
               }}
             >
-              <View scale={16} />
-              <span>학생 보기</span>
+              <TrashCan scale={16} />
+              <span>삭제</span>
+            </button>
+
+            <button
+              type="button"
+              class="flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-xs px-2 py-[0.335rem] border-gray-300 border"
+              on:click={async () => {
+                goto("/seongdos")
+              }}
+            >
+              <span class="flex items-center">
+                <Close class="text-[#F46055]" />
+                <p>닫기</p>
+              </span>
             </button>
           {:else}
             <button
               class="flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
               on:click={() => {
-                goto(
-                  `/seongdos${getSeongdosSearchParams({ group1, group2, showTeacher: true })}`
-                )
+                goto("/seongdos/add")
               }}
             >
-              <View scale={16} />
-              <span>교사 보기</span>
+              <UserFollow scale={16} />
+              <span>등록</span>
             </button>
-          {/if}
-        {/if}
-        <button
-          class="hidden md:flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#237334]"
-          on:click={() => {
-            isExportModalHidden = false
-          }}
-        >
-          <DocumentExport scale={16} />
-          <span>엑셀로 내보내기</span>
-        </button>
 
-        {#if deleteMany}
-          <button
-            class="flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-            on:click={async () => {
-              if (ids.length == 0) {
-                toast.error("선택된 성도가 없습니다.")
-              } else if (
-                !confirm(
-                  `선택된 ${ids.length}명의 성도 정보를 삭제하시겠습니까?`
-                )
-              ) {
-                return false
-              } else {
-                await deleteHandler(ids)
-              }
-            }}
-          >
-            <TrashCan scale={16} />
-            <span>삭제</span>
-          </button>
-
-          <button
-            type="button"
-            class="flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-xs px-2 py-[0.335rem] border-gray-300 border"
-            on:click={async () => {
-              goto("/seongdos")
-            }}
-          >
-            <span class="flex items-center">
-              <Close class="text-[#F46055]" />
-              <p>닫기</p>
-            </span>
-          </button>
-        {:else}
-          <button
-            class="flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-            on:click={() => {
-              goto("/seongdos/add")
-            }}
-          >
-            <UserFollow scale={16} />
-            <span>등록</span>
-          </button>
-
-          <button
-            class="hidden md:flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-            on:click={() => {
-              goto("/seongdos/addMany")
-            }}
-          >
-            <UserMultiple scale={16} />
-            <span>여러명 등록</span>
-          </button>
-          <!-- <button
+            <button
+              class="hidden md:flex h-[2rem] max-h-[2rem] items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              on:click={() => {
+                goto("/seongdos/addMany")
+              }}
+            >
+              <UserMultiple scale={16} />
+              <span>여러명 등록</span>
+            </button>
+            <!-- <button
             type="button"
             class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
             on:click={() => {
@@ -268,8 +272,9 @@
             <TrashCan scale={16} />
             <span>여러명 삭제</span>
           </button> -->
-        {/if}
-      </div>
+          {/if}
+        </div>
+      {/if}
     </div>
     {#if deleteMany}
       <TableForDelete {seongdos} {page} {allowedGroup} />

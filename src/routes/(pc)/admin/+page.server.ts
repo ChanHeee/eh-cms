@@ -1,5 +1,10 @@
+import { redirect } from "@sveltejs/kit"
+
 /** @type {import('@sveltejs/kit').Load} */
-export const load = async ({ url, fetch }) => {
+export const load = async ({ url, fetch, locals }) => {
+  if (!locals.allowedGroup.includes("전체")) {
+    throw redirect(303, "/seongdos")
+  }
   const action = url.searchParams.get("action")
   const name = url.searchParams.get("name")
   const page =

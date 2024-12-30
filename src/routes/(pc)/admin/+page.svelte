@@ -99,7 +99,7 @@
             <span>부서 선택</span>
           </button>
           <select
-            value={page?.requestParams.name || ""}
+            bind:value={targetName}
             class="w-[10rem] h-[2rem] max-h-[2rem] bg-gray-50 text-gray-900 text-sm focus:outline-0 border mr-2 rounded-r-sm pl-1"
             on:change={async (e) => {
               goto(`/admin?action=${action}&name=${e.target.value}`)
@@ -452,27 +452,25 @@
               if (!socheonName) {
                 return toast.error("이름을 입력해주세요.")
               }
-              const response = await fetch(`/api/seongdos/${socheonName}`, {
-                method: "GET",
-                headers: {
-                  "content-type": "application/json",
-                },
-              })
+
+              const response = await fetch(
+                `/api/seongdos?name=${socheonName}`,
+                {
+                  method: "GET",
+                  headers: {
+                    "content-type": "application/json",
+                  },
+                }
+              )
 
               if (response.ok) {
                 const result = await response.json()
 
-                if (result.seongdo == null) {
+                if (result.seongdos.length < 1) {
                   return toast.error("일치하는 성도가 없습니다.")
                 }
-                seongdos = [result.seongdo]
-                page = {
-                  totalSize: 1,
-                  totalPage: 1,
-                  requestPage: 1,
-                  requestSize: 1,
-                  requestParams: {},
-                }
+                seongdos = result.seongdos
+                page = result.page
               }
             }}
           >

@@ -2,6 +2,7 @@ export interface IGroup {
   name: string
   count?: number
   child: IGroup[]
+  teacherCount?: number
 }
 
 export interface IUser {

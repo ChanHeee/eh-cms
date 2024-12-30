@@ -51,37 +51,56 @@
               </button>
             </a>
 
-            <a href="/educations">
-              <button
-                class="flex flex-col items-center px-4 pt-3 pb-1 gap-1 hover:bg-[#FBA244]"
-                class:bg-[#FBA244]={path == "educations" ? true : false}
-              >
-                <GraduationCap color="#ffffff" width="20px" />
-                <p class="text-sm">교육관리</p>
-              </button>
-            </a>
-            <a href="/simbangs">
-              <button
-                class="flex flex-col items-center px-4 pt-3 pb-1 gap-1 hover:bg-[#41B8AF]"
-                class:bg-[#41B8AF]={path == "simbangs" ? true : false}
-              >
-                <div class="flex items-center h-[20px]">
-                  <Briefcase color="#ffffff" width="16px" />
-                </div>
-                <p class="text-sm">심방관리</p>
-              </button>
-            </a>
-            <a href="/admin">
-              <button
-                class="flex flex-col items-center px-4 pt-3 pb-1 gap-1 hover:bg-[#3493eb]"
-                class:bg-[#3493eb]={path == "admin" ? true : false}
-              >
-                <div class="flex items-center h-[20px]">
-                  <Settings size={20} />
-                </div>
-                <p class="text-sm">기타 기능</p>
-              </button>
-            </a>
+            <button
+              class="flex flex-col items-center px-4 pt-3 pb-1 gap-1 hover:bg-[#FBA244]"
+              class:bg-[#FBA244]={path == "educations" ? true : false}
+              on:click={() => {
+                if (
+                  !data.allowedGroup.includes("전체") ||
+                  !data.allowedGroup.includes("교육")
+                ) {
+                  toast.error("접근할 수 없습니다!")
+                }
+                goto("/educations")
+              }}
+            >
+              <GraduationCap color="#ffffff" width="20px" />
+              <p class="text-sm">교육관리</p>
+            </button>
+            <button
+              class="flex flex-col items-center px-4 pt-3 pb-1 gap-1 hover:bg-[#41B8AF]"
+              class:bg-[#41B8AF]={path == "simbangs" ? true : false}
+              on:click={() => {
+                if (
+                  !data.allowedGroup.includes("전체") ||
+                  !data.allowedGroup.includes("심방")
+                ) {
+                  toast.error("접근할 수 없습니다!")
+                }
+                goto("/simbangs")
+              }}
+            >
+              <div class="flex items-center h-[20px]">
+                <Briefcase color="#ffffff" width="16px" />
+              </div>
+              <p class="text-sm">심방관리</p>
+            </button>
+
+            <button
+              class="flex flex-col items-center px-4 pt-3 pb-1 gap-1 hover:bg-[#3493eb]"
+              class:bg-[#3493eb]={path == "admin" ? true : false}
+              on:click={() => {
+                if (!data.allowedGroup.includes("전체")) {
+                  toast.error("접근할 수 없습니다!")
+                }
+                goto("/admin")
+              }}
+            >
+              <div class="flex items-center h-[20px]">
+                <Settings size={20} />
+              </div>
+              <p class="text-sm">기타 기능</p>
+            </button>
           </div>
         </div>
         <div class="nav_right">

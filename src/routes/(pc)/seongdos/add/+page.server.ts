@@ -1,7 +1,12 @@
 import { getGroupList } from "$lib/utils"
+import { redirect } from "@sveltejs/kit"
 
 export const load = async ({ locals }) => {
   const { allowedGroup } = locals
+
+  if (locals.allowedGroup.includes("게스트")) {
+    throw redirect(303, "/seongdos")
+  }
 
   // let groupList = {}
   // allowedGroup.map((item) => {

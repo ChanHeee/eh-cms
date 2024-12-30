@@ -130,6 +130,10 @@ export const load = async ({ url, locals, fetch }) => {
             group2: "1청년",
           }),
           child: [],
+          teacherCount: await Seongdo.count().where({
+            "services.group1": "청년부",
+            "services.group2": "1청년",
+          }),
         },
         {
           name: "2청년",
@@ -142,8 +146,15 @@ export const load = async ({ url, locals, fetch }) => {
             group2: "2청년",
           }),
           child: [],
+          teacherCount: await Seongdo.count().where({
+            "services.group1": "청년부",
+            "services.group2": "2청년",
+          }),
         },
       ],
+      teacherCount: await Seongdo.count().where({
+        "services.group1": "청년부",
+      }),
     }
   } else if (group1 == "교회학교") {
     groupTree = {
@@ -164,6 +175,10 @@ export const load = async ({ url, locals, fetch }) => {
             group2: "영아부",
           }),
           child: [],
+          teacherCount: await Seongdo.count().where({
+            "services.group1": "교회학교",
+            "services.group2": "영아부",
+          }),
         },
         {
           name: "유치부",
@@ -176,6 +191,10 @@ export const load = async ({ url, locals, fetch }) => {
             group2: "유치부",
           }),
           child: [],
+          teacherCount: await Seongdo.count().where({
+            "services.group1": "교회학교",
+            "services.group2": "유치부",
+          }),
         },
         {
           name: "유년부",
@@ -188,6 +207,10 @@ export const load = async ({ url, locals, fetch }) => {
             group2: "유년부",
           }),
           child: [],
+          teacherCount: await Seongdo.count().where({
+            "services.group1": "교회학교",
+            "services.group2": "유년부",
+          }),
         },
         {
           name: "초등부",
@@ -200,6 +223,10 @@ export const load = async ({ url, locals, fetch }) => {
             group2: "초등부",
           }),
           child: [],
+          teacherCount: await Seongdo.count().where({
+            "services.group1": "교회학교",
+            "services.group2": "초등부",
+          }),
         },
         {
           name: "중등부",
@@ -212,6 +239,10 @@ export const load = async ({ url, locals, fetch }) => {
             group2: "중등부",
           }),
           child: [],
+          teacherCount: await Seongdo.count().where({
+            "services.group1": "교회학교",
+            "services.group2": "중등부",
+          }),
         },
         {
           name: "고등부",
@@ -224,6 +255,10 @@ export const load = async ({ url, locals, fetch }) => {
             group2: "고등부",
           }),
           child: [],
+          teacherCount: await Seongdo.count().where({
+            "services.group1": "교회학교",
+            "services.group2": "고등부",
+          }),
         },
         {
           name: "은혜브릿지",
@@ -242,6 +277,13 @@ export const load = async ({ url, locals, fetch }) => {
           child: [],
         },
       ],
+      teacherCount: await Seongdo.count().where({
+        $and: [
+          { "services.group1": "교회학교" },
+          { "services.group2": { $ne: "늘푸른부" } },
+          { "services.group2": { $ne: "은혜브릿지" } },
+        ],
+      }),
     }
   } else if (group1 == "교역자") {
     groupTree = {
@@ -285,7 +327,7 @@ export const load = async ({ url, locals, fetch }) => {
         $or: [
           { group1: "" },
           { group1: undefined },
-          { group1, group2: { $in: ["소천", "재적"] } },
+          { group1, group2: { $in: ["소천", "제적"] } },
         ],
       }),
       child: [
@@ -295,8 +337,8 @@ export const load = async ({ url, locals, fetch }) => {
           child: [],
         },
         {
-          name: "재적",
-          count: await Seongdo.count({ group1: "기타", group2: "재적" }),
+          name: "제적",
+          count: await Seongdo.count({ group1: "기타", group2: "제적" }),
           child: [],
         },
         {

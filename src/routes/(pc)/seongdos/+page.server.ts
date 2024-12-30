@@ -53,7 +53,7 @@ export const load = async ({ request, fetch, url, locals }) => {
 
   if (response.ok) {
     const { seongdos, page: seongdoPage } = await response.json()
-    if (seongdoPage.totalPage == 0) {
+    if (seongdoPage?.totalPage == 0) {
     } else if (seongdoPage.totalPage < page) {
       const url = `/seongdos${getSeongdosSearchParams({
         name,
@@ -69,10 +69,52 @@ export const load = async ({ request, fetch, url, locals }) => {
       throw redirect(302, encodeURI(url))
     }
 
+    let listName = ""
+    if (!group1) {
+      listName = "전체 성도"
+    } else if (group1 == "장년부") {
+      if (!group2) {
+        listName = "장년부 성도"
+      } else {
+        listName = group2 + " 성도"
+      }
+    } else if (group1 == "청년부") {
+      if (!group2) {
+        listName = "청년부"
+      } else {
+        listName = group2
+      }
+      if (showTeacher) {
+        listName = listName + " 교사"
+      } else {
+        listName = listName + " 성도"
+      }
+    } else if (group1 == "교회학교") {
+      if (!group2) {
+        listName = "교회학교"
+      } else {
+        listName = group2
+      }
+      if (showTeacher) {
+        listName = listName + " 교사"
+      } else {
+        listName = listName + " 성도"
+      }
+    } else if (group1 == "교역자") {
+      listName = "교역자"
+    } else if (group1 == "기타") {
+      if (!group2) {
+        listName = "기타 성도"
+      } else {
+        listName = group2 + " 성도"
+      }
+    }
+
     return {
       seongdos,
       page: seongdoPage,
       deleteMany,
+      listName,
     }
   }
 }
