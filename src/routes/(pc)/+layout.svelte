@@ -56,7 +56,7 @@
               class:bg-[#FBA244]={path == "educations" ? true : false}
               on:click={() => {
                 if (
-                  !data.allowedGroup.includes("전체") ||
+                  !data.allowedGroup.includes("전체") &&
                   !data.allowedGroup.includes("교육")
                 ) {
                   toast.error("접근할 수 없습니다!")
@@ -72,7 +72,7 @@
               class:bg-[#41B8AF]={path == "simbangs" ? true : false}
               on:click={() => {
                 if (
-                  !data.allowedGroup.includes("전체") ||
+                  !data.allowedGroup.includes("전체") &&
                   !data.allowedGroup.includes("심방")
                 ) {
                   toast.error("접근할 수 없습니다!")
