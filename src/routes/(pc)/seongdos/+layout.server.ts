@@ -59,14 +59,19 @@ export const load = async ({ url, locals, fetch }) => {
             group2: { $regex: "1교구" },
           }),
           child: await Promise.all(
-            ("" + Array(19)).split(",").map(async (item, idx) => {
-              return {
-                name: `${idx + 1}구역`,
-                count: await Seongdo.count({
-                  group1: "장년부",
-                  group2: `1교구,${idx + 1}구역`,
-                }),
-                child: [],
+            ("" + Array(30)).split(",").map(async (item, idx) => {
+              const count = await Seongdo.count({
+                group1: "장년부",
+                group2: `1교구,${idx + 1}구역`,
+              })
+              if (count) {
+                return {
+                  name: `${idx + 1}구역`,
+                  count,
+                  child: [],
+                }
+              } else {
+                return []
               }
             })
           ),
@@ -78,14 +83,19 @@ export const load = async ({ url, locals, fetch }) => {
             group2: { $regex: "2교구" },
           }),
           child: await Promise.all(
-            ("" + Array(20)).split(",").map(async (item, idx) => {
-              return {
-                name: `${idx + 1}구역`,
-                count: await Seongdo.count({
-                  group1: "장년부",
-                  group2: `2교구,${idx + 1}구역`,
-                }),
-                child: [],
+            ("" + Array(30)).split(",").map(async (item, idx) => {
+              const count = await Seongdo.count({
+                group1: "장년부",
+                group2: `2교구,${idx + 1}구역`,
+              })
+              if (count) {
+                return {
+                  name: `${idx + 1}구역`,
+                  count,
+                  child: [],
+                }
+              } else {
+                return []
               }
             })
           ),
@@ -97,14 +107,19 @@ export const load = async ({ url, locals, fetch }) => {
             group2: { $regex: "3교구" },
           }),
           child: await Promise.all(
-            ("" + Array(18)).split(",").map(async (item, idx) => {
-              return {
-                name: `${idx + 1}구역`,
-                count: await Seongdo.count({
-                  group1: "장년부",
-                  group2: `3교구,${idx + 1}구역`,
-                }),
-                child: [],
+            ("" + Array(30)).split(",").map(async (item, idx) => {
+              const count = await Seongdo.count({
+                group1: "장년부",
+                group2: `3교구,${idx + 1}구역`,
+              })
+              if (count) {
+                return {
+                  name: `${idx + 1}구역`,
+                  count,
+                  child: [],
+                }
+              } else {
+                return []
               }
             })
           ),

@@ -895,30 +895,35 @@
           <!-- content here -->
 
           {#each child.child as secondChild}
-            <div id={secondChild.name} class="flex items-center pb-[7px] ml-6">
-              {#if child.name + "," + secondChild.name == group2}
-                <DotFill width="12px" fill="#636363" />
-              {:else}
-                <DotBorder width="12px" fill="#c4c4c4" />
-              {/if}
-              <UserFilled
-                fill={child.name + "," + secondChild.name == group2
-                  ? "#636363"
-                  : "#c4c4c4"}
-                size={16}
-                class="mr-1"
-              />
-              <button
-                class:font-bold={child.name + "," + secondChild.name == group2
-                  ? true
-                  : false}
-                on:click={() => {
-                  goto(
-                    `/seongdos?group1=${groupTree.name}&group2=${child.name},${secondChild.name}`
-                  )
-                }}>{`${secondChild.name}(${secondChild.count})`}</button
+            {#if secondChild.name != undefined}
+              <div
+                id={secondChild.name}
+                class="flex items-center pb-[7px] ml-6"
               >
-            </div>
+                {#if child.name + "," + secondChild.name == group2}
+                  <DotFill width="12px" fill="#636363" />
+                {:else}
+                  <DotBorder width="12px" fill="#c4c4c4" />
+                {/if}
+                <UserFilled
+                  fill={child.name + "," + secondChild.name == group2
+                    ? "#636363"
+                    : "#c4c4c4"}
+                  size={16}
+                  class="mr-1"
+                />
+                <button
+                  class:font-bold={child.name + "," + secondChild.name == group2
+                    ? true
+                    : false}
+                  on:click={() => {
+                    goto(
+                      `/seongdos?group1=${groupTree.name}&group2=${child.name},${secondChild.name}`
+                    )
+                  }}>{`${secondChild.name}(${secondChild.count})`}</button
+                >
+              </div>
+            {/if}
           {/each}
         {/if}
       </div>
