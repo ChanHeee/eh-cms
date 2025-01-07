@@ -617,10 +617,14 @@
                       class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                     >
                       <option value="none" class="hidden" />
-                      <optgroup label="목사">
-                        <option value="담임목사">담임목사</option>
+                      <optgroup label="교역자">
                         <option value="원로목사">원로목사</option>
+                        <option value="담임목사">담임목사</option>
                         <option value="목사">목사</option>
+                        <option value="사모">사모</option>
+                        <option value="강도사">강도사</option>
+                        <option value="전임전도사">전임전도사</option>
+                        <option value="교육전도사">교육전도사</option>
                       </optgroup>
                       <hr />
                       <optgroup label="장로">
@@ -651,10 +655,6 @@
                       <optgroup label="서리집사">
                         <option value="서리집사">서리집사</option>
                         <option value="명예서리집사">명예서리집사</option>
-                      </optgroup>
-                      <hr />
-                      <optgroup label="권찰">
-                        <option value="권찰">권찰</option>
                       </optgroup>
                       <hr />
                       <optgroup label="성도">
@@ -771,11 +771,12 @@
                           <option value={item}>{item}</option>
                         {/each}
                       {:else if seongdo.group1 == "교역자"}
+                        <option value="원로목사">원로목사</option>
                         <option value="담임목사">담임목사</option>
                         <option value="목사">목사</option>
                         <option value="사모">사모</option>
                         <option value="강도사">강도사</option>
-                        <option value="전도사">전도사</option>
+                        <option value="전임전도사">전임전도사</option>
                         <option value="교육전도사">교육전도사</option>
                       {:else if seongdo.group1 == "기타"}
                         <option value="제적">제적</option>
@@ -1014,10 +1015,14 @@
                     class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                   >
                     <option value="none" class="hidden" />
-                    <optgroup label="목사">
-                      <option value="담임목사">담임목사</option>
+                    <optgroup label="교역자">
                       <option value="원로목사">원로목사</option>
+                      <option value="담임목사">담임목사</option>
                       <option value="목사">목사</option>
+                      <option value="사모">사모</option>
+                      <option value="강도사">강도사</option>
+                      <option value="전임전도사">전임전도사</option>
+                      <option value="교육전도사">교육전도사</option>
                     </optgroup>
                     <optgroup label="장로">
                       <option value="시무장로">시무장로</option>
@@ -1045,10 +1050,6 @@
                     <optgroup label="서리집사">
                       <option value="서리집사">서리집사</option>
                       <option value="명예서리집사">명예서리집사</option>
-                    </optgroup>
-                    <hr />
-                    <optgroup label="권찰">
-                      <option value="권찰">권찰</option>
                     </optgroup>
                     <hr />
                     <optgroup label="성도">
@@ -1146,11 +1147,12 @@
                         <option value={item}>{item}</option>
                       {/each}
                     {:else if seongdo.group1 == "교역자"}
+                      <option value="원로목사">원로목사</option>
                       <option value="담임목사">담임목사</option>
                       <option value="목사">목사</option>
                       <option value="사모">사모</option>
                       <option value="강도사">강도사</option>
-                      <option value="전도사">전도사</option>
+                      <option value="전임전도사">전임전도사</option>
                       <option value="교육전도사">교육전도사</option>
                     {:else if seongdo.group1 == "기타"}
                       <option value="제적">제적</option>
@@ -1349,6 +1351,7 @@
             {/each}
           {/if}
         </div>
+
         <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
           <button
             class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
@@ -1356,20 +1359,24 @@
           {#if seongdo.services?.length > 0}
             {#each seongdo.services as service}
               <div class="flex items-center px-3 h-10">
-                <button
-                  type="button"
-                  class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem]"
-                  on:click={async () => {
-                    seongdo.services = seongdo.services.filter(
-                      (item) =>
-                        item.group1 + item.group2 + item.classification !=
-                        service.group1 + service.group2 + service.classification
-                    )
-                    await submitHandler()
-                  }}
-                >
-                  <TrashCan fill="#4a4a4a" size={20} />
-                </button>
+                {#if !allowedGroup.includes("게스트")}
+                  <button
+                    type="button"
+                    class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem]"
+                    on:click={async () => {
+                      seongdo.services = seongdo.services.filter(
+                        (item) =>
+                          item.group1 + item.group2 + item.classification !=
+                          service.group1 +
+                            service.group2 +
+                            service.classification
+                      )
+                      await submitHandler()
+                    }}
+                  >
+                    <TrashCan fill="#4a4a4a" size={20} />
+                  </button>
+                {/if}
               </div>
             {/each}
           {/if}
@@ -1413,22 +1420,22 @@
             <DecisionTree scale={16} />
             <span>세대 분가</span>
           </button> -->
-          {#if !allowedGroup.includes("게스트")}
-            <button
-              type="submit"
-              class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-              on:click={() => {
-                goto(
-                  seongdo.birth
-                    ? `/seongdos/${seongdo.name}-${seongdo.birth}/family-chart`
-                    : `/seongdos/${seongdo.name}/family-chart`
-                )
-              }}
-            >
-              <PedestrianFamily scale={16} />
-              <span>가족관계도</span>
-            </button>
 
+          <button
+            type="submit"
+            class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+            on:click={() => {
+              goto(
+                seongdo.birth
+                  ? `/seongdos/${seongdo.name}-${seongdo.birth}/family-chart`
+                  : `/seongdos/${seongdo.name}/family-chart`
+              )
+            }}
+          >
+            <PedestrianFamily scale={16} />
+            <span>가족관계도</span>
+          </button>
+          {#if !allowedGroup.includes("게스트")}
             <button
               type="submit"
               class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
@@ -1744,14 +1751,16 @@
               <button
                 class="flex justify-center px-3 items-center h-10"
                 on:click={() => {
-                  selectedSimbang = simbang
-                  date = simbang.date
-                  hymn = simbang.hymn
-                  bible = simbang.bible
-                  simbangja = simbang.simbangja
-                  companion = simbang.companion
-                  detail = simbang.detail
-                  isSimbangModalHidden = !isSimbangModalHidden
+                  if (!allowedGroup.includes("게스트")) {
+                    selectedSimbang = simbang
+                    date = simbang.date
+                    hymn = simbang.hymn
+                    bible = simbang.bible
+                    simbangja = simbang.simbangja
+                    companion = simbang.companion
+                    detail = simbang.detail
+                    isSimbangModalHidden = !isSimbangModalHidden
+                  }
                 }}
               >
                 {simbang.date}
@@ -1828,20 +1837,26 @@
           {#if simbangs.length > 0}
             {#each simbangs as simbang}
               <div class="flex items-center px-3 h-10">
-                <button
-                  type="button"
-                  class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem]"
-                  on:click={async () => {
-                    const result = await simbangDeleteHandler(simbang._id)
-                    if (result) {
-                      simbangs = simbangs.filter(
-                        (item) => item._id != simbang._id
-                      )
-                    }
-                  }}
-                >
-                  <TrashCan fill="#4a4a4a" size={20} />
-                </button>
+                {#if !allowedGroup.includes("게스트")}
+                  <button
+                    type="button"
+                    class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem]"
+                    on:click={async () => {
+                      if (!confirm("삭제하시겠습니까?")) {
+                        return false
+                      }
+                      const result = await simbangDeleteHandler(simbang._id)
+                      if (result) {
+                        simbangs = simbangs.filter(
+                          (item) => item._id != simbang._id
+                        )
+                        toast.success("심방내역이 삭제되었습니다.")
+                      }
+                    }}
+                  >
+                    <TrashCan fill="#4a4a4a" size={20} />
+                  </button>
+                {/if}
               </div>
             {/each}
           {/if}

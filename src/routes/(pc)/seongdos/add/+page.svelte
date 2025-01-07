@@ -315,10 +315,14 @@
                       class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                     >
                       <option value="none" class="hidden" />
-                      <optgroup label="목사">
-                        <option value="담임목사">담임목사</option>
+                      <optgroup label="교역자">
                         <option value="원로목사">원로목사</option>
+                        <option value="담임목사">담임목사</option>
                         <option value="목사">목사</option>
+                        <option value="사모">사모</option>
+                        <option value="강도사">강도사</option>
+                        <option value="전임전도사">전임전도사</option>
+                        <option value="교육전도사">교육전도사</option>
                       </optgroup>
                       <optgroup label="장로">
                         <option value="시무장로">시무장로</option>
@@ -349,10 +353,7 @@
                         <option value="서리집사">서리집사</option>
                         <option value="명예서리집사">명예서리집사</option>
                       </optgroup>
-                      <hr />
-                      <optgroup label="권찰">
-                        <option value="권찰">권찰</option>
-                      </optgroup>
+
                       <hr />
                       <optgroup label="성도">
                         <option value="성도">성도</option>
@@ -451,11 +452,12 @@
                           <option value={item}>{item}</option>
                         {/each}
                       {:else if group1 == "교역자"}
+                        <option value="원로목사">원로목사</option>
                         <option value="담임목사">담임목사</option>
                         <option value="목사">목사</option>
                         <option value="사모">사모</option>
                         <option value="강도사">강도사</option>
-                        <option value="전도사">전도사</option>
+                        <option value="전임전도사">전임전도사</option>
                         <option value="교육전도사">교육전도사</option>
                       {:else if group1 == "기타"}
                         <option value="제적">제적</option>
@@ -680,10 +682,14 @@
                     class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                   >
                     <option value="none" class="hidden" />
-                    <optgroup label="목사">
-                      <option value="담임목사">담임목사</option>
+                    <optgroup label="교역자">
                       <option value="원로목사">원로목사</option>
+                      <option value="담임목사">담임목사</option>
                       <option value="목사">목사</option>
+                      <option value="사모">사모</option>
+                      <option value="강도사">강도사</option>
+                      <option value="전임전도사">전임전도사</option>
+                      <option value="교육전도사">교육전도사</option>
                     </optgroup>
                     <optgroup label="장로">
                       <option value="시무장로">시무장로</option>
@@ -794,11 +800,12 @@
                         <option value={item}>{item}</option>
                       {/each}
                     {:else if group1 == "교역자"}
+                      <option value="원로목사">원로목사</option>
                       <option value="담임목사">담임목사</option>
                       <option value="목사">목사</option>
                       <option value="사모">사모</option>
                       <option value="강도사">강도사</option>
-                      <option value="전도사">전도사</option>
+                      <option value="전임전도사">전임전도사</option>
                       <option value="교육전도사">교육전도사</option>
                     {:else if group1 == "기타"}
                       <option value="제적">제적</option>

@@ -306,6 +306,11 @@ export const load = async ({ url, locals, fetch }) => {
       count: await Seongdo.count({ group1: "교역자" }),
       child: [
         {
+          name: "원로목사",
+          count: await Seongdo.count({ group1: "교역자", group2: "원로목사" }),
+          child: [],
+        },
+        {
           name: "담임목사",
           count: await Seongdo.count({ group1: "교역자", group2: "담임목사" }),
           child: [],
@@ -326,8 +331,11 @@ export const load = async ({ url, locals, fetch }) => {
           child: [],
         },
         {
-          name: "전도사",
-          count: await Seongdo.count({ group1: "교역자", group2: "전도사" }),
+          name: "전임전도사",
+          count: await Seongdo.count({
+            group1: "교역자",
+            group2: "전임전도사",
+          }),
           child: [],
         },
         {

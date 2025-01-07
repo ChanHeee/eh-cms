@@ -22,11 +22,13 @@
   export let data: {
     seongdo: any
     charts: any
+    allowedGroup: string[]
   }
 
   let page: IPage
   let Iseongdo: ISeongdo
 
+  $: allowedGroup = data.allowedGroup
   $: seongdo = data.seongdo
   $: searchSeongdos = []
   $: seongdoPage = page
@@ -400,64 +402,66 @@
       class=" bg-white pt-8 bg-white sticky top-0 flex w-full justify-between pb-2 items-center"
     >
       <p class="text-lg font-medium mr-1">{seongdo.name} 가족관계도</p>
-      <div class="rounded flex ml-auto gap-2">
-        <button
-          type="button"
-          class="h-[2rem] max-h-[2rem] border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
-          class:hidden={isAdding ? false : true}
-          on:click={async () => {
-            await fetch(`/api/v2/familyCharts/updateChart`, {
-              method: "put",
-              body: JSON.stringify({
-                id: chartId,
-                charts: charts.map((chart) => {
-                  return { id: chart.id, rels: chart.rels }
-                }),
-              }),
-              headers: {
-                "content-type": "application/json",
-              },
-            })
-
-            return goto(
-              seongdo.birth
-                ? `/seongdos/${seongdo.name}-${seongdo.birth}`
-                : `/seongdos/${seongdo.name}`
-            )
-          }}
-        >
-          <span class="flex items-center">
-            <Close class="text-[#F46055]" />
-            <p>닫기</p>
-          </span>
-        </button>
-
-        <button
-          class="h-[2rem] max-h-[2rem] flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-          class:hidden={isAdding ? true : false}
-          on:click={async () => {
-            if (!charts) {
-              const response = await fetch(`/api/v2/familyCharts/addChart`, {
-                method: "POST",
+      {#if !allowedGroup.includes("게스트")}
+        <div class="rounded flex ml-auto gap-2">
+          <button
+            type="button"
+            class="h-[2rem] max-h-[2rem] border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
+            class:hidden={isAdding ? false : true}
+            on:click={async () => {
+              await fetch(`/api/v2/familyCharts/updateChart`, {
+                method: "put",
                 body: JSON.stringify({
-                  charts: [{ id: seongdo._id, rels: {} }],
+                  id: chartId,
+                  charts: charts.map((chart) => {
+                    return { id: chart.id, rels: chart.rels }
+                  }),
                 }),
                 headers: {
                   "content-type": "application/json",
                 },
               })
 
-              charts = await getChartsWithSeongdoId()
-              invalidateAll()
-            }
+              return goto(
+                seongdo.birth
+                  ? `/seongdos/${seongdo.name}-${seongdo.birth}`
+                  : `/seongdos/${seongdo.name}`
+              )
+            }}
+          >
+            <span class="flex items-center">
+              <Close class="text-[#F46055]" />
+              <p>닫기</p>
+            </span>
+          </button>
 
-            isAdding = true
-          }}
-        >
-          <Edit color="#ffffff" width="16px" />
-          <span>수정</span>
-        </button>
-      </div>
+          <button
+            class="h-[2rem] max-h-[2rem] flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+            class:hidden={isAdding ? true : false}
+            on:click={async () => {
+              if (!charts) {
+                const response = await fetch(`/api/v2/familyCharts/addChart`, {
+                  method: "POST",
+                  body: JSON.stringify({
+                    charts: [{ id: seongdo._id, rels: {} }],
+                  }),
+                  headers: {
+                    "content-type": "application/json",
+                  },
+                })
+
+                charts = await getChartsWithSeongdoId()
+                invalidateAll()
+              }
+
+              isAdding = true
+            }}
+          >
+            <Edit color="#ffffff" width="16px" />
+            <span>수정</span>
+          </button>
+        </div>
+      {/if}
     </div>
 
     {#if isAdding}
