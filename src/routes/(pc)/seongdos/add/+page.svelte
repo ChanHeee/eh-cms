@@ -316,10 +316,7 @@
                     >
                       <option value="none" class="hidden" />
                       <optgroup label="교역자">
-                        <option value="원로목사">원로목사</option>
-                        <option value="담임목사">담임목사</option>
                         <option value="목사">목사</option>
-                        <option value="사모">사모</option>
                         <option value="강도사">강도사</option>
                         <option value="전임전도사">전임전도사</option>
                         <option value="교육전도사">교육전도사</option>
@@ -452,10 +449,7 @@
                           <option value={item}>{item}</option>
                         {/each}
                       {:else if group1 == "교역자"}
-                        <option value="원로목사">원로목사</option>
-                        <option value="담임목사">담임목사</option>
                         <option value="목사">목사</option>
-                        <option value="사모">사모</option>
                         <option value="강도사">강도사</option>
                         <option value="전임전도사">전임전도사</option>
                         <option value="교육전도사">교육전도사</option>
@@ -683,10 +677,7 @@
                   >
                     <option value="none" class="hidden" />
                     <optgroup label="교역자">
-                      <option value="원로목사">원로목사</option>
-                      <option value="담임목사">담임목사</option>
                       <option value="목사">목사</option>
-                      <option value="사모">사모</option>
                       <option value="강도사">강도사</option>
                       <option value="전임전도사">전임전도사</option>
                       <option value="교육전도사">교육전도사</option>
@@ -800,10 +791,7 @@
                         <option value={item}>{item}</option>
                       {/each}
                     {:else if group1 == "교역자"}
-                      <option value="원로목사">원로목사</option>
-                      <option value="담임목사">담임목사</option>
                       <option value="목사">목사</option>
-                      <option value="사모">사모</option>
                       <option value="강도사">강도사</option>
                       <option value="전임전도사">전임전도사</option>
                       <option value="교육전도사">교육전도사</option>
