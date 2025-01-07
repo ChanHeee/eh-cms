@@ -453,6 +453,7 @@
                       {:else if group1 == "교역자"}
                         <option value="담임목사">담임목사</option>
                         <option value="목사">목사</option>
+                        <option value="사모">사모</option>
                         <option value="강도사">강도사</option>
                         <option value="전도사">전도사</option>
                         <option value="교육전도사">교육전도사</option>
@@ -673,9 +674,7 @@
                   <select
                     id="jikbunM"
                     on:change={() => {
-                      jikbun = document.querySelector(
-                        "#jikbunM > option:checked"
-                      ).value
+                      jikbun = document.querySelector("#jikbunM").value
                     }}
                     value={jikbun}
                     class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
@@ -797,6 +796,7 @@
                     {:else if group1 == "교역자"}
                       <option value="담임목사">담임목사</option>
                       <option value="목사">목사</option>
+                      <option value="사모">사모</option>
                       <option value="강도사">강도사</option>
                       <option value="전도사">전도사</option>
                       <option value="교육전도사">교육전도사</option>

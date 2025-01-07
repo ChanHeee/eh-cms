@@ -297,7 +297,10 @@ export const getGroupList = (allowedGroup: string[]) => {
       ],
     }
   }
-  return groupList
+
+  const { 게스트, ...rest } = groupList
+
+  return { ...rest }
 }
 
 export const getFamilyChartFromDb = (charts) => {

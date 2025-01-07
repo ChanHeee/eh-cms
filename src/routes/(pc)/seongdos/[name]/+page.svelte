@@ -47,7 +47,6 @@
   }
 
   $: allowedGroup = data.allowedGroup
-  $: console.log(allowedGroup)
 
   onMount(async () => {
     selectedSimbang = data.simbangs.filter(
@@ -179,6 +178,7 @@
 
   const seongdoUpdate = async () => {
     const { name, originalName, age, group2, address, ...rest } = seongdo
+    console.log(seongdo)
 
     const response = await fetch("/api/seongdos", {
       method: "PUT",
@@ -773,6 +773,7 @@
                       {:else if seongdo.group1 == "교역자"}
                         <option value="담임목사">담임목사</option>
                         <option value="목사">목사</option>
+                        <option value="사모">사모</option>
                         <option value="강도사">강도사</option>
                         <option value="전도사">전도사</option>
                         <option value="교육전도사">교육전도사</option>
@@ -1007,9 +1008,7 @@
                   <select
                     id="jikbunM"
                     on:change={() => {
-                      seongdo.jikbun = document.querySelector(
-                        "#jikbunM > option:checked"
-                      ).value
+                      seongdo.jikbun = document.querySelector("#jikbunM").value
                     }}
                     value={seongdo.jikbun}
                     class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
@@ -1149,6 +1148,7 @@
                     {:else if seongdo.group1 == "교역자"}
                       <option value="담임목사">담임목사</option>
                       <option value="목사">목사</option>
+                      <option value="사모">사모</option>
                       <option value="강도사">강도사</option>
                       <option value="전도사">전도사</option>
                       <option value="교육전도사">교육전도사</option>

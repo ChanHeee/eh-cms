@@ -316,6 +316,11 @@ export const load = async ({ url, locals, fetch }) => {
           child: [],
         },
         {
+          name: "사모",
+          count: await Seongdo.count({ group1: "교역자", group2: "사모" }),
+          child: [],
+        },
+        {
           name: "강도사",
           count: await Seongdo.count({ group1: "교역자", group2: "강도사" }),
           child: [],

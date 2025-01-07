@@ -445,6 +445,11 @@
                     <option value="23구역">23구역</option>
                     <option value="24구역">24구역</option>
                     <option value="25구역">25구역</option>
+                    <option value="26구역">26구역</option>
+                    <option value="27구역">27구역</option>
+                    <option value="28구역">28구역</option>
+                    <option value="29구역">29구역</option>
+                    <option value="30구역">30구역</option>
                   </select>
                 </div>
               </div>
