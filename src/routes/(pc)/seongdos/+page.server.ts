@@ -41,7 +41,7 @@ export const load = async ({ request, fetch, url, locals }) => {
     group2,
     birthStart,
     birthEnd,
-    excludeETC: group1 == "기타" ? false : true,
+    excludeETC: group1 == "기타" ? false : name ? false : true,
     showTeacher,
   })}`
 

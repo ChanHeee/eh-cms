@@ -1378,10 +1378,22 @@
       >
         <h1 class="text-lg font-medium">가족관계</h1>
         <div class="flex ml-auto gap-2">
-          <!-- <button
+          <button
             type="submit"
             class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
             on:click={async () => {
+              if (
+                !confirm(
+                  `[${seongdo.name}${seongdo.jikbun || ""}] 세대에서 분가하시겠습니까?`
+                )
+              ) {
+                return false
+              }
+              memberIds = memberIds.filter((id) => id != seongdo._id)
+              members = members.filter(
+                (member) => member.seongdo?._id != seongdo._id
+              )
+              await familyHandler()
               const response = await fetch(`/api/families`, {
                 method: "POST",
                 body: JSON.stringify({
@@ -1407,7 +1419,7 @@
           >
             <DecisionTree scale={16} />
             <span>세대 분가</span>
-          </button> -->
+          </button>
 
           <button
             type="submit"
@@ -2067,6 +2079,27 @@
                   (classification == "직접입력" && classificationValue == "")
                 ) {
                   return toast.error("구분을 입력해주세요.")
+                }
+
+                const response = await fetch(
+                  `/api/families?seongdoId=${selectedSeongdo?._id}`,
+                  {
+                    method: "GET",
+                    headers: {
+                      "content-type": "application/json",
+                    },
+                  }
+                )
+                let selectedSeongdoFamily
+                if (response.ok) {
+                  selectedSeongdoFamily = (await response.json()).family
+                }
+                if (selectedSeongdoFamily) {
+                  selectedSeongdo = null
+                  isFamilyModalHidden = !isFamilyModalHidden
+                  classification = ""
+                  classificationValue = ""
+                  return toast.error("이미 가족관계에 포함되있습니다.")
                 }
 
                 members = [

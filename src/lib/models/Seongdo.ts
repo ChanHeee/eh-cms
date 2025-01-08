@@ -46,18 +46,27 @@ seongdoSchema.pre("deleteOne", async function (next) {
   }
 
   await Simbang.deleteMany({ seongdoId: _id })
-  const family = await Family.findOne({ memberIds: { $in: [_id] } })
-  const newMemberIds = family?.memberIds?.filter((member) => member._id != _id)
-  const newMemebers = family?.members?.filter((member) => member.seongdo != _id)
+  const families = await Family.find({ memberIds: { $in: [_id] } })
 
-  if (newMemberIds?.length == 0) {
-    await Family.deleteOne({ _id: family?._id })
-  } else {
-    await Family.updateOne(
-      { _id: family?._id },
-      { members: newMemebers, memberIds: newMemberIds }
-    )
-  }
+  await Promise.all(
+    families.map(async (family) => {
+      const newMemberIds = family?.memberIds?.filter(
+        (member) => member._id != _id
+      )
+      const newMemebers = family?.members?.filter(
+        (member) => member.seongdo != _id
+      )
+
+      if (newMemberIds?.length == 0) {
+        await Family.deleteOne({ _id: family?._id })
+      } else {
+        await Family.updateOne(
+          { _id: family?._id },
+          { members: newMemebers, memberIds: newMemberIds }
+        )
+      }
+    })
+  )
 
   await SeongdoEdu.deleteMany({ seongdo: _id })
   await Simbang.deleteMany({ seongdoId: _id })
