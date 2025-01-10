@@ -43,6 +43,7 @@
   }
 
   $: seongdos = data.seongdos
+
   $: page = data.page
   $: requestParams = page.requestParams
 

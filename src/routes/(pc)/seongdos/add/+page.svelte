@@ -80,6 +80,7 @@
       },
     })
     const { seongdo } = await response.json()
+
     if (seongdo) {
       toast.error("이미 등록된 이름은 사용할 수 없습니다.")
     } else {

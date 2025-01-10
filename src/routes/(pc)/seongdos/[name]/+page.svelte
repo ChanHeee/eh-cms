@@ -139,14 +139,29 @@
     group1: string
     group2: string
     classification: string
+    startYear?: number | null
+    endYear?: number | null
   } = {
     group1: "",
     group2: "",
     classification: "",
+    startYear: null,
+    endYear: null,
   }
   $: service = service
+
   $: groupItemForService = getGroupItem(service?.group1, service?.group2)
   $: group2AddForService = ""
+  let IService: {
+    group1: string
+    group2: string
+    classification?: string
+    order?: number
+    startYear: number
+    endYear?: number
+  } | null
+  $: selectedService = IService
+  $: beforeService = IService
 
   // for seongdoEdus
   $: seongdoEdus = data.seongdoEdus
@@ -178,7 +193,6 @@
 
   const seongdoUpdate = async () => {
     const { name, originalName, age, group2, address, ...rest } = seongdo
-    console.log(seongdo)
 
     const response = await fetch("/api/seongdos", {
       method: "PUT",
@@ -303,6 +317,8 @@
   }
 
   const searchHandler = async () => {
+    console.log(searchName)
+
     const response = await fetch(`/api/seongdos?name=${searchName}&take=10`, {
       headers: {
         "content-type": "application/json",
@@ -1321,7 +1337,7 @@
           {/if}
         </div>
         <div
-          class="flex flex-col whitespace-nowrap min-w-[30%] divide-y border-b"
+          class="flex flex-col whitespace-nowrap min-w-[20%] divide-y border-r border-b"
         >
           <div
             class="flex justify-center gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
@@ -1340,6 +1356,32 @@
           {/if}
         </div>
 
+        <div
+          class="flex flex-col whitespace-nowrap min-w-[20%] divide-y border-b"
+        >
+          <div
+            class="flex justify-center gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
+          >
+            년도
+          </div>
+          {#if seongdo.services?.length > 0}
+            <!-- content here -->
+            {#each seongdo.services as service}
+              <button class="flex px-3 items-center justify-center h-10">
+                <div class="flex justify-center px-2 items-center h-10">
+                  {service.endYear
+                    ? service.endYear == service.startYear
+                      ? `${service.startYear}`
+                      : `${service.startYear} ~ ${service.endYear}`
+                    : service.startYear
+                      ? `${service.startYear} ~`
+                      : ""}
+                </div>
+              </button>
+            {/each}
+          {/if}
+        </div>
+
         <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
           <button
             class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
@@ -1348,6 +1390,17 @@
             {#each seongdo.services as service}
               <div class="flex items-center px-3 h-10">
                 {#if !allowedGroup.includes("게스트")}
+                  <button
+                    type="button"
+                    class="flex items-center gap-1 rounded-sm text-white text-xs px-1 py-[0.4rem]"
+                    on:click={() => {
+                      selectedService = service
+                      beforeService = { ...service }
+                      isServiceModalHidden = false
+                    }}
+                  >
+                    <Edit fill="#4a4a4a" size={20} />
+                  </button>
                   <button
                     type="button"
                     class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem]"
@@ -3000,223 +3053,414 @@
       <div
         class="sm:h-2/3 h-3/4 sm:max-md:w-2/3 md:w-1/3 w-full relative transform rounded-md bg-white shadow-xl transition-all"
       >
-        <div
-          class="w-full overflow-scroll h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
-        >
-          <h1 class="text-left text-lg font-medium mb-2">소속 추가</h1>
-
-          <form class="flex flex-col">
-            <div class="flex flex-col text-sm gap-3">
-              <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
-                <div class="flex w-full gap-1">
-                  <label
-                    for="group1ForService"
-                    class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                    >소속</label
-                  >
-                  <div class="flex w-full justify-center gap-1 pr-1">
-                    <select
-                      value={groupItemForService.group1}
-                      id="group1ForService"
-                      on:change={() => {
-                        service.group1 = document.querySelector(
-                          "#group1ForService > option:checked"
-                        ).value
-                        service.group2 = ""
-                      }}
-                      class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                    >
-                      <option value="none" class="hidden" />
-                      <option value="장년부">장년부</option>
-                      <option value="청년부">청년부</option>
-                      <option value="교회학교">교회학교</option>
-                    </select>
-                    <div class="border-l border-gray-300" />
-
-                    <select
-                      id="group2ForService"
-                      value={groupItemForService.group2}
-                      on:change={() => {
-                        service.group2 =
-                          document.querySelector("#group2ForService").value
-                      }}
-                      class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                    >
-                      <option value="none" class="hidden" />
-                      {#if service?.group1 == "장년부"}
-                        <option value="1교구">1교구</option>
-                        <option value="2교구">2교구</option>
-                        <option value="3교구">3교구</option>
-                      {:else if service?.group1 == "청년부"}
-                        <option value="1청년">1청년</option>
-                        <option value="2청년">2청년</option>
-                      {:else if service?.group1 == "교회학교"}
-                        <option value="영아부">영아부</option>
-                        <option value="유치부">유치부</option>
-                        <option value="유년부">유년부</option>
-                        <option value="초등부">초등부</option>
-                        <option value="중등부">중등부</option>
-                        <option value="고등부">고등부</option>
-                        <option value="은혜브릿지">은혜브릿지</option>
-                        <option value="늘푸른부">늘푸른부</option>
-                      {/if}
-                    </select>
-                    <div
-                      class="border-l border-gray-300"
-                      class:hidden={service?.group1 == "장년부" &&
-                      service?.group2 != ""
-                        ? false
-                        : true}
-                    />
-                    <select
-                      id="group2AddForService"
-                      value={group2AddForService}
-                      on:change={() => {
-                        group2AddForService = document.querySelector(
-                          "#group2AddForService"
-                        ).value
-                      }}
-                      class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                      class:hidden={service?.group1 == "장년부" &&
-                      service?.group2 != ""
-                        ? false
-                        : true}
-                    >
-                      <option value="none" class="hidden" />
-                      <option value="1구역">1구역</option>
-                      <option value="2구역">2구역</option>
-                      <option value="3구역">3구역</option>
-                      <option value="4구역">4구역</option>
-                      <option value="5구역">5구역</option>
-                      <option value="6구역">6구역</option>
-                      <option value="7구역">7구역</option>
-                      <option value="8구역">8구역</option>
-                      <option value="9구역">9구역</option>
-                      <option value="10구역">10구역</option>
-                      <option value="11구역">11구역</option>
-                      <option value="12구역">12구역</option>
-                      <option value="13구역">13구역</option>
-                      <option value="14구역">14구역</option>
-                      <option value="15구역">15구역</option>
-                      <option value="16구역">16구역</option>
-                      <option value="17구역">17구역</option>
-                      <option value="18구역">18구역</option>
-                      <option value="19구역">19구역</option>
-                      <option value="20구역">20구역</option>
-                      <option value="21구역">21구역</option>
-                      <option value="22구역">22구역</option>
-                      <option value="23구역">23구역</option>
-                      <option value="24구역">24구역</option>
-                      <option value="25구역">25구역</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
-                <div class="flex w-full gap-1">
-                  <label
-                    for="group1ForService"
-                    class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                    >구분</label
-                  >
-                  <div class="flex flex-auto justify-start bg-gray-50">
-                    <input
-                      id="classificationForService"
-                      type="text"
-                      bind:value={service.classification}
-                      class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
-        <div
-          class="bg-gray-50 h-[55px] px-4 py-3 flex flex-row-reverse px-6 gap-2"
-        >
-          <button
-            type="button"
-            class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
-            on:click={async () => {
-              isServiceModalHidden = !isServiceModalHidden
-              service.group1 = ""
-              service.group2 = ""
-              service.classification = ""
-              group2AddForService = ""
-            }}
+        {#if !selectedService}
+          <div
+            class="w-full overflow-scroll h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
           >
-            <span class="flex items-center">
-              <Close class="text-[#F46055]" />
-              <p>닫기</p>
-            </span>
-          </button>
-          <button
-            type="submit"
-            class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
-            on:click={async () => {
-              if (!service.group1) {
-                toast.error("소속을 입력해주세요.")
-                // } else if (!service.classification) {
-                // toast.error("구분을 입력해주세요.")
-              } else {
-                let order
-                switch (service.classification) {
-                  case "교구장로":
-                    order = 10
-                    break
-                  case "교구장":
-                    order = 9
-                    break
-                  case "부교구장":
-                    order = 8
-                    break
-                  case "구역장":
-                    order = 7
-                    break
-                  case "부구역장":
-                    order = 6
-                    break
-                  case "담당교역자":
-                    order = 6
-                    break
-                  case "부장":
-                    order = 5
-                    break
-                  case "부감":
-                    order = 4
-                    break
-                  case "교사":
-                    order = 3
-                    break
-                  default:
-                    break
-                }
-                seongdo.services = [
-                  ...seongdo.services,
-                  {
-                    group1: service.group1,
-                    group2: group2AddForService
-                      ? service.group2 + "," + group2AddForService
-                      : service.group2,
-                    classification: service.classification,
-                    order,
-                  },
-                ]
+            <h1 class="text-left text-lg font-medium mb-2">소속 추가</h1>
 
-                await submitHandler()
+            <form class="flex flex-col">
+              <div class="flex flex-col text-sm gap-3">
+                <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
+                  <div class="flex w-full gap-1">
+                    <label
+                      for="group1ForService"
+                      class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                      >소속</label
+                    >
+                    <div class="flex w-full justify-center gap-1 pr-1">
+                      <select
+                        value={groupItemForService.group1}
+                        id="group1ForService"
+                        on:change={() => {
+                          service.group1 = document.querySelector(
+                            "#group1ForService > option:checked"
+                          ).value
+                          service.group2 = ""
+                        }}
+                        class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      >
+                        <option value="none" class="hidden" />
+                        <option value="장년부">장년부</option>
+                        <option value="청년부">청년부</option>
+                        <option value="교회학교">교회학교</option>
+                      </select>
+                      <div class="border-l border-gray-300" />
+
+                      <select
+                        id="group2ForService"
+                        value={groupItemForService.group2}
+                        on:change={() => {
+                          service.group2 =
+                            document.querySelector("#group2ForService").value
+                        }}
+                        class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      >
+                        <option value="none" class="hidden" />
+                        {#if service?.group1 == "장년부"}
+                          <option value="1교구">1교구</option>
+                          <option value="2교구">2교구</option>
+                          <option value="3교구">3교구</option>
+                        {:else if service?.group1 == "청년부"}
+                          <option value="1청년">1청년</option>
+                          <option value="2청년">2청년</option>
+                        {:else if service?.group1 == "교회학교"}
+                          <option value="영아부">영아부</option>
+                          <option value="유치부">유치부</option>
+                          <option value="유년부">유년부</option>
+                          <option value="초등부">초등부</option>
+                          <option value="중등부">중등부</option>
+                          <option value="고등부">고등부</option>
+                          <option value="은혜브릿지">은혜브릿지</option>
+                          <option value="늘푸른부">늘푸른부</option>
+                        {/if}
+                      </select>
+                      <div
+                        class="border-l border-gray-300"
+                        class:hidden={service?.group1 == "장년부" &&
+                        service?.group2 != ""
+                          ? false
+                          : true}
+                      />
+                      <select
+                        id="group2AddForService"
+                        value={group2AddForService}
+                        on:change={() => {
+                          group2AddForService = document.querySelector(
+                            "#group2AddForService"
+                          ).value
+                        }}
+                        class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                        class:hidden={service?.group1 == "장년부" &&
+                        service?.group2 != ""
+                          ? false
+                          : true}
+                      >
+                        <option value="none" class="hidden" />
+                        <option value="1구역">1구역</option>
+                        <option value="2구역">2구역</option>
+                        <option value="3구역">3구역</option>
+                        <option value="4구역">4구역</option>
+                        <option value="5구역">5구역</option>
+                        <option value="6구역">6구역</option>
+                        <option value="7구역">7구역</option>
+                        <option value="8구역">8구역</option>
+                        <option value="9구역">9구역</option>
+                        <option value="10구역">10구역</option>
+                        <option value="11구역">11구역</option>
+                        <option value="12구역">12구역</option>
+                        <option value="13구역">13구역</option>
+                        <option value="14구역">14구역</option>
+                        <option value="15구역">15구역</option>
+                        <option value="16구역">16구역</option>
+                        <option value="17구역">17구역</option>
+                        <option value="18구역">18구역</option>
+                        <option value="19구역">19구역</option>
+                        <option value="20구역">20구역</option>
+                        <option value="21구역">21구역</option>
+                        <option value="22구역">22구역</option>
+                        <option value="23구역">23구역</option>
+                        <option value="24구역">24구역</option>
+                        <option value="25구역">25구역</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
+                  <div class="flex w-full gap-1">
+                    <label
+                      for="classificationForService"
+                      class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                      >구분</label
+                    >
+                    <div class="flex flex-auto justify-start bg-gray-50">
+                      <input
+                        id="classificationForService"
+                        type="text"
+                        bind:value={service.classification}
+                        class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
+                  <div class="flex w-full gap-1">
+                    <label
+                      for="startYearForService"
+                      class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                      >시작 년도</label
+                    >
+                    <div class="flex flex-auto justify-start bg-gray-50">
+                      <input
+                        id="startYearForService"
+                        type="number"
+                        min="1900"
+                        max="2099"
+                        step="1"
+                        bind:value={service.startYear}
+                        class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
+                  <div class="flex w-full gap-1">
+                    <label
+                      for="endYearForService"
+                      class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                      >종료 년도</label
+                    >
+                    <div class="flex flex-auto justify-start bg-gray-50">
+                      <input
+                        id="endYearForService"
+                        type="number"
+                        min="1900"
+                        max="2099"
+                        step="1"
+                        bind:value={service.endYear}
+                        class="px-2 flex flex-auto w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div
+            class="bg-gray-50 h-[55px] px-4 py-3 flex flex-row-reverse px-6 gap-2"
+          >
+            <button
+              type="button"
+              class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
+              on:click={async () => {
                 isServiceModalHidden = !isServiceModalHidden
                 service.group1 = ""
                 service.group2 = ""
                 service.classification = ""
+                service.startYear = null
+                service.endYear = null
                 group2AddForService = ""
-              }
-            }}
+              }}
+            >
+              <span class="flex items-center">
+                <Close class="text-[#F46055]" />
+                <p>닫기</p>
+              </span>
+            </button>
+            <button
+              type="submit"
+              class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              on:click={async () => {
+                if (!service.group1) {
+                  toast.error("소속을 입력해주세요.")
+                } else if (!service.startYear) {
+                  toast.error("시작 년도를 입력해주세요.")
+                } else {
+                  let order
+                  switch (service.classification) {
+                    case "교구장로":
+                      order = 10
+                      break
+                    case "교구장":
+                      order = 9
+                      break
+                    case "부교구장":
+                      order = 8
+                      break
+                    case "구역장":
+                      order = 7
+                      break
+                    case "부구역장":
+                      order = 6
+                      break
+                    case "담당교역자":
+                      order = 6
+                      break
+                    case "부장":
+                      order = 5
+                      break
+                    case "부감":
+                      order = 4
+                      break
+                    case "교사":
+                      order = 3
+                      break
+                    default:
+                      break
+                  }
+                  seongdo.services = [
+                    ...seongdo.services,
+                    {
+                      group1: service.group1,
+                      group2: group2AddForService
+                        ? service.group2 + "," + group2AddForService
+                        : service.group2,
+                      classification: service.classification,
+                      order,
+                      startYear: service.startYear,
+                      endYear: service.endYear,
+                    },
+                  ]
+
+                  await submitHandler()
+                  isServiceModalHidden = !isServiceModalHidden
+                  service.group1 = ""
+                  service.group2 = ""
+                  service.classification = ""
+                  service.startYear = null
+                  service.endYear = null
+                  group2AddForService = ""
+
+                  await invalidateAll()
+                }
+              }}
+            >
+              <Checkmark scale={16} />
+              <span>저장</span>
+            </button>
+          </div>
+        {:else}
+          <div
+            class="overflow-scroll h-full min-h-[calc(100%-55px)] bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
           >
-            <Checkmark scale={16} />
-            <span>저장</span>
-          </button>
-        </div>
+            <form class="flex flex-col">
+              <div class="flex flex-col text-sm gap-3">
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="groupServiceModal"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >소속</label
+                  >
+                  <div
+                    class="flex flex-auto justify-start bg-gray-50 pl-1.5 pr-1"
+                  >
+                    <input
+                      id="groupServiceModal"
+                      type="text"
+                      value={getGroupString(
+                        selectedService.group1,
+                        selectedService.group2
+                      )}
+                      disabled
+                      class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    />
+                  </div>
+                </div>
+                <div class="flex w-full h-8 border-gray-300 border">
+                  <div
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                  >
+                    구분
+                  </div>
+                  <div class="flex w-full bg-gray-50 px-1 pl-1.5 pr-1">
+                    <input
+                      class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                      bind:value={selectedService.classification}
+                    />
+                  </div>
+                </div>
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="startYear"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >시작 년도</label
+                  >
+                  <div
+                    class="flex flex-auto justify-start bg-gray-50 pl-1.5 pr-1"
+                  >
+                    <input
+                      id="startYear"
+                      type="number"
+                      min="1900"
+                      max="2099"
+                      step="1"
+                      bind:value={selectedService.startYear}
+                      class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    />
+                  </div>
+                </div>
+                <div class="flex w-full h-8 border-gray-300 border-x border-y">
+                  <label
+                    for="endYear"
+                    class="flex flex-none w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >종료 년도</label
+                  >
+                  <div
+                    class="flex flex-auto justify-start bg-gray-50 pl-1.5 pr-1"
+                  >
+                    <input
+                      id="endYear"
+                      type="number"
+                      min="1900"
+                      max="2099"
+                      step="1"
+                      bind:value={selectedService.endYear}
+                      class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    />
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div
+            class="bg-gray-50 h-[55px] px-4 py-3 flex flex-row-reverse px-6 gap-2"
+          >
+            <button
+              class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
+              on:click={async () => {
+                selectedService = null
+                beforeService = null
+                isServiceModalHidden = !isServiceModalHidden
+              }}
+            >
+              <span class="flex items-center">
+                <Close class="text-[#F46055]" />
+                <p>뒤로</p>
+              </span>
+            </button>
+            <button
+              class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+              on:click={async () => {
+                if (!selectedService?.startYear) {
+                  toast.error("시작 년도를 입력해주세요.")
+                } else {
+                  let response = await fetch(`/api/v2/seongdos/editServices`, {
+                    method: "PATCH",
+                    body: JSON.stringify({
+                      name: seongdo.name,
+                      birth: seongdo.birth,
+                      before: beforeService,
+                      after: selectedService,
+                    }),
+                  })
+
+                  if (response.ok) {
+                    const result = await response.json()
+                    if (result.success) {
+                      toast.success("상세 소속이 수정되었습니다.")
+                      isServiceModalHidden = !isServiceModalHidden
+                      service.group1 = ""
+                      service.group2 = ""
+                      service.classification = ""
+                      service.startYear = null
+                      service.endYear = null
+                      selectedService = null
+                      beforeService = null
+
+                      await invalidateAll()
+                    }
+                  }
+                }
+              }}
+            >
+              <Checkmark scale={16} />
+              <span>저장</span>
+            </button>
+          </div>
+        {/if}
       </div>
     </div>
   </div>

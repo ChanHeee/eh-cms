@@ -22,6 +22,7 @@ export const load = async ({ request, fetch, url, locals }) => {
   if (isNaN(page) || page < 0 || page == "") {
     const url = `/educations/${className ?? "전체"}${getSearchParams({
       name,
+      nameRegex: true,
       jikbun,
       order,
       page: 1,
@@ -39,6 +40,7 @@ export const load = async ({ request, fetch, url, locals }) => {
       class: className,
       semester,
       name,
+      nameRegex: true,
       jikbun,
       order,
       page,
@@ -60,6 +62,7 @@ export const load = async ({ request, fetch, url, locals }) => {
   } else if (seongdoEduPage.totalPage < page) {
     const url = `/educations/${className ?? "전체"}${getSearchParams({
       name,
+      nameRegex: true,
       jikbun,
       order,
       page: seongdoEduPage.totalPage,

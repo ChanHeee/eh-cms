@@ -13,7 +13,8 @@ export const POST: RequestHandler = async ({ request }) => {
 
   const seongdos = await Seongdo.find(
     {
-      birth: { $regex: `${today}$` },
+      // birth: { $regex: `${today}$` },
+      group1: "청년부",
     },
     "name birth"
   )
@@ -30,6 +31,8 @@ export const POST: RequestHandler = async ({ request }) => {
   })
 
   const { modifiedCount } = await Seongdo.bulkWrite(bulkUpdateOps)
+  console.log(modifiedCount)
+
   if (modifiedCount) {
     return json({ success: true })
   } else {

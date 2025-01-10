@@ -218,11 +218,15 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
                   input: {
                     $cond: {
                       if: {
-                        $eq: [
+                        $and: [
                           {
-                            $type: "$services",
+                            $eq: [
+                              {
+                                $type: "$services",
+                              },
+                              "array",
+                            ],
                           },
-                          "array",
                         ],
                       },
                       then: "$services",
@@ -231,14 +235,57 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
                   },
                   as: "data",
                   cond:
-                    group2 && group1 != "장년부"
+                    group2 == "늘푸른부" || group2 == "은혜브릿지"
                       ? {
                           $and: [
                             { $eq: ["$$data.group1", group1] },
                             { $eq: ["$$data.group2", group2] },
                           ],
                         }
-                      : { $eq: ["$$data.group1", group1] },
+                      : group2 && group1 != "장년부"
+                      ? {
+                          $and: [
+                            { $eq: ["$$data.group1", group1] },
+                            { $eq: ["$$data.group2", group2] },
+                            {
+                              $or: [
+                                {
+                                  $eq: [
+                                    "$$data.startYear",
+                                    new Date().getFullYear(),
+                                  ],
+                                },
+                                {
+                                  $and: [
+                                    { $ne: ["$$data.startYear", null] },
+                                    { $eq: ["$$data.endYear", null] },
+                                  ],
+                                },
+                              ],
+                            },
+                          ],
+                        }
+                      : {
+                          $and: [
+                            { $eq: ["$$data.group1", group1] },
+                            {
+                              $or: [
+                                {
+                                  $eq: [
+                                    "$$data.startYear",
+                                    new Date().getFullYear(),
+                                  ],
+                                },
+                                {
+                                  $and: [
+                                    { $ne: ["$$data.startYear", null] },
+                                    { $eq: ["$$data.endYear", null] },
+                                  ],
+                                },
+                              ],
+                            },
+                          ],
+                        },
                 },
               },
             },
@@ -396,7 +443,10 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       jikbun: 1,
       enrolled_at: 1,
       birth: 1,
-      services: 1,
+      // services: 1,
+      services: {
+        $sortArray: { input: "$services", sortBy: { order: -1 } },
+      },
       age: 1,
       phone: 1,
       group1: 1,
@@ -410,7 +460,105 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
   let total: any
 
   if (phone) {
-    total = await Seongdo.aggregate()
+    total = await Seongdo.aggregate(
+      ["장년부", "청년부", "교회학교"].includes(group1 as string)
+        ? [
+            {
+              $project: {
+                name: 1,
+                // avatar: 1,
+                // avatarVercelBlob: 1,
+                gender: 1,
+                singeup: 1,
+                jikbun: 1,
+                enrolled_at: 1,
+                birth: 1,
+                age: 1,
+                phone: 1,
+                group1: 1,
+                group2: 1,
+                address: 1,
+                remarks: 1,
+                services: {
+                  $filter: {
+                    input: {
+                      $cond: {
+                        if: {
+                          $and: [
+                            {
+                              $eq: [
+                                {
+                                  $type: "$services",
+                                },
+                                "array",
+                              ],
+                            },
+                          ],
+                        },
+                        then: "$services",
+                        else: ["$services"],
+                      },
+                    },
+                    as: "data",
+                    cond:
+                      group2 == "늘푸른부" || group2 == "은혜브릿지"
+                        ? {
+                            $and: [
+                              { $eq: ["$$data.group1", group1] },
+                              { $eq: ["$$data.group2", group2] },
+                            ],
+                          }
+                        : group2 && group1 != "장년부"
+                        ? {
+                            $and: [
+                              { $eq: ["$$data.group1", group1] },
+                              { $eq: ["$$data.group2", group2] },
+                              {
+                                $or: [
+                                  {
+                                    $eq: [
+                                      "$$data.startYear",
+                                      new Date().getFullYear(),
+                                    ],
+                                  },
+                                  {
+                                    $and: [
+                                      { $ne: ["$$data.startYear", null] },
+                                      { $eq: ["$$data.endYear", null] },
+                                    ],
+                                  },
+                                ],
+                              },
+                            ],
+                          }
+                        : {
+                            $and: [
+                              { $eq: ["$$data.group1", group1] },
+                              {
+                                $or: [
+                                  {
+                                    $eq: [
+                                      "$$data.startYear",
+                                      new Date().getFullYear(),
+                                    ],
+                                  },
+                                  {
+                                    $and: [
+                                      { $ne: ["$$data.startYear", null] },
+                                      { $eq: ["$$data.endYear", null] },
+                                    ],
+                                  },
+                                ],
+                              },
+                            ],
+                          },
+                  },
+                },
+              },
+            },
+          ]
+        : []
+    )
       .addFields({
         phoneWithoutDash: {
           $replaceAll: { input: "$phone", find: "-", replacement: "" },
@@ -419,10 +567,113 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       .match(seongdoMatch)
       .count("total")
 
-    total = total.length > 0 ? total[0].total : 0
+    // total = total.length > 0 ? total[0].total : 0
   } else {
-    total = await Seongdo.count(seongdoMatch)
+    // total = await Seongdo.count(seongdoMatch)
+    total = await Seongdo.aggregate(
+      ["장년부", "청년부", "교회학교"].includes(group1 as string)
+        ? [
+            {
+              $project: {
+                name: 1,
+                // avatar: 1,
+                // avatarVercelBlob: 1,
+                gender: 1,
+                singeup: 1,
+                jikbun: 1,
+                enrolled_at: 1,
+                birth: 1,
+                age: 1,
+                phone: 1,
+                group1: 1,
+                group2: 1,
+                address: 1,
+                remarks: 1,
+                services: {
+                  $filter: {
+                    input: {
+                      $cond: {
+                        if: {
+                          $and: [
+                            {
+                              $eq: [
+                                {
+                                  $type: "$services",
+                                },
+                                "array",
+                              ],
+                            },
+                          ],
+                        },
+                        then: "$services",
+                        else: ["$services"],
+                      },
+                    },
+                    as: "data",
+                    cond:
+                      group2 == "늘푸른부" || group2 == "은혜브릿지"
+                        ? {
+                            $and: [
+                              { $eq: ["$$data.group1", group1] },
+                              { $eq: ["$$data.group2", group2] },
+                            ],
+                          }
+                        : group2 && group1 != "장년부"
+                        ? {
+                            $and: [
+                              { $eq: ["$$data.group1", group1] },
+                              { $eq: ["$$data.group2", group2] },
+                              {
+                                $or: [
+                                  {
+                                    $eq: [
+                                      "$$data.startYear",
+                                      new Date().getFullYear(),
+                                    ],
+                                  },
+                                  {
+                                    $and: [
+                                      { $ne: ["$$data.startYear", null] },
+                                      { $eq: ["$$data.endYear", null] },
+                                    ],
+                                  },
+                                ],
+                              },
+                            ],
+                          }
+                        : {
+                            $and: [
+                              { $eq: ["$$data.group1", group1] },
+                              {
+                                $or: [
+                                  {
+                                    $eq: [
+                                      "$$data.startYear",
+                                      new Date().getFullYear(),
+                                    ],
+                                  },
+                                  {
+                                    $and: [
+                                      { $ne: ["$$data.startYear", null] },
+                                      { $eq: ["$$data.endYear", null] },
+                                    ],
+                                  },
+                                ],
+                              },
+                            ],
+                          },
+                  },
+                },
+              },
+            },
+          ]
+        : []
+    )
+
+      .match(seongdoMatch)
+      .count("total")
   }
+  total = total.length > 0 ? total[0].total : 0
 
   return json({
     seongdos,

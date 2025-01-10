@@ -26,7 +26,7 @@
         <button
           class="flex flex-auto bg-gray-50 border-y border-r border-gray-300 text-gray-900 text-sm focus:outline-0 p-2 h-[37px]"
         >
-          <p class="text-gray-400">교회학교 교사 추가</p>
+          <p class="text-gray-400">교회학교 교사 관리</p>
         </button>
       </div>
     </a>

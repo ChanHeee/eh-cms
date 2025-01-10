@@ -14,6 +14,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
       ? parseInt(url.searchParams.get("take"))
       : 12
   const name = url.searchParams.get("name")
+  const nameRegex = url.searchParams.get("nameRegex") || false
   const birth = url.searchParams.get("birth")
   const jikbun =
     url.searchParams.get("jikbun") != null
@@ -75,9 +76,12 @@ export const GET: RequestHandler = async ({ request, url }) => {
   if (seongdoId) {
     seongdoMatch._id = new Types.ObjectId(seongdoId)
   }
+
   if (name) {
     seongdoMatch.name = name
-    seongdoMatch.birth = birth
+    if (!nameRegex) {
+      seongdoMatch.birth = birth
+    }
   }
 
   if (jikbun?.length > 0) {
@@ -186,7 +190,6 @@ export const GET: RequestHandler = async ({ request, url }) => {
       seongdo: {
         _id: 1,
         name: 1,
-        avatarVercelBlob: 1,
         jikbun: 1,
         birth: 1,
         phone: 1,

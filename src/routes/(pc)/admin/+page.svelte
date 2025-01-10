@@ -1,17 +1,29 @@
 <script lang="ts">
+  import SearchTable from "./SearchTable.svelte"
   import TableForCSV from "./TableForCSV.svelte"
   import Table from "./Table.svelte"
   import type { IFamily, IPage, ISeongdo } from "$lib/interfaces"
-  import { goto } from "$app/navigation"
+  import { goto, invalidateAll } from "$app/navigation"
   import toast from "svelte-french-toast"
   import { read, utils } from "xlsx"
-  import { Search } from "carbon-icons-svelte"
+  import { Close, Search, TrashCan } from "carbon-icons-svelte"
+  import {
+    AllowedGroupStore,
+    SeongdoPageStore,
+    SeongdosStore,
+  } from "$lib/store"
+  import { getGroupString, isAllowGroup } from "$lib/utils"
 
   export let data: {
     action: String
     seongdos: ISeongdo[]
     page: IPage
   }
+
+  let teachers: ISeongdo[] = []
+
+  $: members = []
+  $: teachers = teachers
 
   $: action = data.action
   $: seongdos = data.seongdos || []
@@ -23,6 +35,8 @@
   $: input = undefined
   $: socheonName = ""
   $: socheonSeongdo = undefined
+
+  $: searchName = ""
 
   var loadFile = async function (event) {
     input = event.target
@@ -70,6 +84,46 @@
     })
 
     seongdos = csv.slice(1)
+  }
+
+  const searchHandler = async () => {
+    const response = await fetch(`/api/seongdos?name=${searchName}&take=10`, {
+      headers: {
+        "content-type": "application/json",
+      },
+    })
+    if (response.ok) {
+      const result = await response.json()
+      $SeongdosStore = result.seongdos
+      $SeongdoPageStore = result.page
+      $SeongdoPageStore.requestParams.take = 10
+    }
+  }
+
+  const addTeacherHandler = async (
+    teacher: ISeongdo,
+    classification: string
+  ) => {
+    let response = await fetch(`/api/v2/seongdos/addTeacher`, {
+      method: "POST",
+      body: JSON.stringify({
+        group: targetName,
+        seongdoId: teacher._id,
+        classification,
+      }),
+      headers: {
+        "content-type": "application/json",
+      },
+    })
+
+    if (response.ok) {
+      const result = await response.json()
+      if (result.success) {
+        toast.success("추가되었습니다.")
+        teachers = [...teachers, teacher]
+      }
+      await invalidateAll()
+    }
   }
 </script>
 
@@ -140,7 +194,7 @@
           </button>
         </div>
       {:else if action == "addTeacher"}
-        <p class="truncate text-lg font-medium mr-1">교회학교 교사 추가</p>
+        <!-- <p class="truncate text-lg font-medium mr-1">교회학교 교사 관리</p>
         <div class="relative hidden lg:flex rounded ml-auto">
           <button
             class="flex h-[2rem] max-h-[2rem] mr-2 border items-center rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#3493eb]"
@@ -230,6 +284,236 @@
           >
             <span class="truncate">추가</span>
           </button>
+        </div> -->
+        <div class="flex flex-col w-full">
+          <div class="flex mb-3 pb-3">
+            <p class="truncate text-lg font-medium mr-1">
+              {targetName
+                ? `${targetName} 교사 관리 (${teachers?.length}명)`
+                : "교회학교 교사 관리"}
+            </p>
+            <div class="relative hidden lg:flex rounded ml-auto">
+              <button
+                class="flex w-fit h-[2rem] max-h-[2rem] items-center rounded-l-sm text-white text-xs px-2 py-[0.4rem] bg-[#3493eb]"
+              >
+                <span class="truncate">부서 선택</span>
+              </button>
+              <select
+                value=""
+                class="mr-2 w-[10rem] h-[2rem] max-h-[2rem] bg-gray-50 text-gray-900 text-sm focus:outline-0 border mr-2 rounded-r-sm pl-1"
+                on:change={async (e) => {
+                  targetName = e.target.value
+
+                  const group1 = ["1청년", "2청년"].includes(targetName)
+                    ? "청년부"
+                    : "교회학교"
+                  const response = await fetch(
+                    `/api/v2/seongdos/getTeachers?group1=${group1}&group2=${targetName}`,
+                    {
+                      headers: {
+                        "content-type": "application/json",
+                      },
+                    }
+                  )
+
+                  if (response.ok) {
+                    teachers = (await response.json()).seongdos
+                  }
+                }}
+              >
+                <option value="영아부">영아부</option>
+                <option value="유치부">유치부</option>
+                <option value="유년부">유년부</option>
+                <option value="초등부">초등부</option>
+                <option value="중등부">중등부</option>
+                <option value="고등부">고등부</option>
+                <option value="1청년">1청년부</option>
+                <option value="2청년">2청년부</option>
+              </select>
+            </div>
+          </div>
+          <div class="flex gap-10">
+            <div
+              class="w-3/5 flex max-h-[60vh] h-fit text-sm border-l overflow-y-scroll"
+            >
+              <div
+                class="flex flex-col h-fit whitespace-nowrap divide-y border-r border-b"
+              >
+                <div
+                  class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
+                >
+                  이름
+                </div>
+                {#if teachers?.length > 0}
+                  {#each teachers as teacher}
+                    <button
+                      class="flex px-3 items-center h-10"
+                      on:click={() => {
+                        if (
+                          !isAllowGroup(
+                            $AllowedGroupStore,
+                            teacher.group1,
+                            teacher.group2
+                          )
+                        ) {
+                          toast.error("접근할 수 없습니다.")
+                        } else {
+                          goto(
+                            teacher.birth
+                              ? `/seongdos/${teacher.name}-${teacher.birth}`
+                              : `/seongdos/${teacher.name}`
+                          )
+                        }
+                      }}
+                    >
+                      <div>
+                        {teacher.name}
+                      </div>
+                    </button>
+                  {/each}
+                {/if}
+              </div>
+
+              <div
+                class="flex flex-col h-fit whitespace-nowrap border-r divide-y border-b"
+              >
+                <button
+                  class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
+                >
+                  구분
+                </button>
+                {#if teachers?.length > 0}
+                  {#each teachers as teacher}
+                    <div class="flex px-3 items-center h-10">
+                      {teacher?.services[0].classification || ""}
+                    </div>
+                  {/each}
+                {/if}
+              </div>
+
+              <div
+                class="flex flex-col h-fit whitespace-nowrap border-r divide-y border-b"
+              >
+                <button
+                  class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
+                >
+                  직분
+                </button>
+                {#if teachers?.length > 0}
+                  {#each teachers as teacher}
+                    <div class="flex px-3 items-center h-10">
+                      {teacher?.jikbun || ""}
+                    </div>
+                  {/each}
+                {/if}
+              </div>
+
+              <div
+                class="flex flex-col h-fit flex-auto sm:flex-none whitespace-nowrap border-r divide-y border-b"
+              >
+                <button class=" px-3 font-bold h-10 bg-[#D9D9D8]">
+                  생년월일
+                </button>
+                {#if teachers?.length > 0}
+                  {#each teachers as teacher}
+                    <div class="flex justify-center px-3 items-center h-10">
+                      {teacher?.birth}
+                    </div>
+                  {/each}
+                {/if}
+              </div>
+
+              <div
+                class="flex flex-col h-fit flex-auto whitespace-nowrap divide-y border-b"
+              >
+                <div
+                  class="flex justify-center px-3 bg-[#D9D9D8] font-bold items-center h-10"
+                >
+                  소속
+                </div>
+                {#if teachers?.length > 0}
+                  {#each teachers as teacher}
+                    <div class="flex justify-center px-3 items-center h-10">
+                      {getGroupString(teacher?.group1, teacher?.group2)}
+                    </div>
+                  {/each}
+                {/if}
+              </div>
+
+              <div
+                class="flex flex-col h-fit whitespace-nowrap border-r divide-y border-b"
+              >
+                <button
+                  class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
+                />
+                {#if teachers?.length > 0}
+                  {#each teachers as teacher}
+                    <div class="flex items-center px-3 h-10">
+                      <button
+                        type="button"
+                        class="flex items-center gap-1 rounded-sm text-white text-xs px-1 py-[0.4rem]"
+                        on:click={async () => {
+                          let response = await fetch(
+                            `/api/v2/seongdos/removeTeacher`,
+                            {
+                              method: "PATCH",
+                              body: JSON.stringify({
+                                seongdoId: teacher._id,
+                                group: targetName,
+                              }),
+                              headers: {
+                                "content-type": "application/json",
+                              },
+                            }
+                          )
+
+                          if (response.ok) {
+                            const result = await response.json()
+
+                            if (result.success) {
+                              teachers = teachers.filter(
+                                (item) => item._id != teacher._id
+                              )
+                            }
+                          }
+                        }}
+                      >
+                        <TrashCan fill="#4a4a4a" size={20} />
+                      </button>
+                    </div>
+                  {/each}
+                {/if}
+              </div>
+            </div>
+            <div class="w-2/5 flex flex-col text-sm overflow-scroll">
+              <form class="flex w-full items-center mx-auto">
+                <input
+                  id="name"
+                  type="text"
+                  on:focus={() => {
+                    searchName = ""
+                  }}
+                  bind:value={searchName}
+                  class="w-full bg-gray-50 border-gray-300 border-y border-l text-gray-900 text-sm focus:outline-0 px-2 h-10"
+                  placeholder="이름"
+                />
+                <button
+                  class="bg-[#B0B1B0] px-2 h-10 border-gray-300 border-y border-r"
+                  on:click|preventDefault={async () => {
+                    if (!targetName) {
+                      return toast.error("부서를 선택해주세요.")
+                    }
+                    await searchHandler()
+                  }}
+                  ><Search size={20} class="text-gray-600" />
+                </button>
+              </form>
+
+              {#if $SeongdosStore.length > 0}
+                <SearchTable addHandler={addTeacherHandler} />
+              {/if}
+            </div>
+          </div>
         </div>
       {:else if action == "addToBridge"}
         <p class="truncate text-lg font-medium mr-1">은혜브릿지 성도 추가</p>

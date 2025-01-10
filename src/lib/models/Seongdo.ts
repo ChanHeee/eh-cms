@@ -30,6 +30,9 @@ const seongdoSchema = new Schema<ISeongdo>({
       group2: String,
       classification: String,
       order: { type: Number, default: 1 },
+      startYear: { type: Number, default: null },
+      endYear: { type: Number, default: null },
+      inProgress: Boolean,
     },
   ],
 })

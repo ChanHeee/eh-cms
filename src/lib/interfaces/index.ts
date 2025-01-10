@@ -35,6 +35,8 @@ export interface ISeongdo {
     group2: string
     classification: string
     order?: number
+    startYear?: number | null
+    endYear?: number | null
   }[]
 }
 
