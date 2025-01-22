@@ -5,6 +5,7 @@ import { redirect } from "@sveltejs/kit"
 export const load = async ({ request, fetch, url, locals }) => {
   const {
     name,
+    phone,
     jikbun,
     singeup,
     page,
@@ -21,6 +22,7 @@ export const load = async ({ request, fetch, url, locals }) => {
   if (isNaN(page) || page < 0 || page == "") {
     const url = `/seongdos${getSeongdosSearchParams({
       name,
+      phone,
       jikbun,
       singeup,
       order,
@@ -36,6 +38,7 @@ export const load = async ({ request, fetch, url, locals }) => {
 
   let requestUrl = `/api/seongdos${getSeongdosSearchParams({
     name,
+    phone,
     jikbun,
     singeup,
     order,
@@ -60,6 +63,7 @@ export const load = async ({ request, fetch, url, locals }) => {
     } else if (seongdoPage.totalPage < page) {
       const url = `/seongdos${getSeongdosSearchParams({
         name,
+        phone,
         jikbun,
         order,
         page: seongdoPage.totalPage,

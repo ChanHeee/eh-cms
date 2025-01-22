@@ -3,6 +3,7 @@ import type { IEducation } from "$lib/interfaces"
 import { Education } from "$lib/models/Education"
 import { Family } from "$lib/models/Family"
 import { Seongdo } from "$lib/models/Seongdo"
+import { Student } from "$lib/models/Students"
 import {
   dataURItoBlob,
   getCroppedImg,
@@ -11,6 +12,21 @@ import {
 import { json } from "@sveltejs/kit"
 
 export const GET = async ({ request, url, fetch }) => {
+  const seongdos = await Seongdo.find({ group1: "교회학교" }, {}, { limit: 2 })
+  console.log(seongdos)
+
+  const students = await Student.bulkWrite([
+    {
+      insertOne: {
+        document: seongdos[0],
+      },
+    },
+  ])
+
+  console.log(students)
+
+  return json({})
+
   // const seongdos = await Seongdo.find({
   //   "services.classification": "학생",
   // }).select(["-avatar", "-avatarVercelBlob"])

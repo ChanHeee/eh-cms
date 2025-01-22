@@ -74,23 +74,33 @@ export const load = async ({ url, locals, fetch }) => {
             group1: "장년부",
             group2: { $regex: "1교구" },
           }),
-          child: await Promise.all(
-            ("" + Array(30)).split(",").map(async (item, idx) => {
-              const count = await Seongdo.count({
-                group1: "장년부",
-                group2: `1교구,${idx + 1}구역`,
-              })
-              if (count) {
-                return getIGroupItem({
-                  name: `${idx + 1}구역`,
-                  count,
-                  child: [],
+          child: [
+            ...(await Promise.all(
+              ("" + Array(30)).split(",").map(async (item, idx) => {
+                const count = await Seongdo.count({
+                  group1: "장년부",
+                  group2: `1교구,${idx + 1}구역`,
                 })
-              } else {
-                return getIGroupItem({})
-              }
-            })
-          ),
+                if (count) {
+                  return getIGroupItem({
+                    name: `${idx + 1}구역`,
+                    count,
+                    child: [],
+                  })
+                } else {
+                  return getIGroupItem({})
+                }
+              })
+            )),
+            getIGroupItem({
+              name: `청년`,
+              count: await Seongdo.count({
+                group1: "장년부",
+                group2: `1교구,청년`,
+              }),
+              child: [],
+            }),
+          ],
         },
         {
           name: "2교구",
@@ -98,23 +108,33 @@ export const load = async ({ url, locals, fetch }) => {
             group1: "장년부",
             group2: { $regex: "2교구" },
           }),
-          child: await Promise.all(
-            ("" + Array(30)).split(",").map(async (item, idx) => {
-              const count = await Seongdo.count({
-                group1: "장년부",
-                group2: `2교구,${idx + 1}구역`,
-              })
-              if (count) {
-                return getIGroupItem({
-                  name: `${idx + 1}구역`,
-                  count,
-                  child: [],
+          child: [
+            ...(await Promise.all(
+              ("" + Array(30)).split(",").map(async (item, idx) => {
+                const count = await Seongdo.count({
+                  group1: "장년부",
+                  group2: `2교구,${idx + 1}구역`,
                 })
-              } else {
-                return getIGroupItem({})
-              }
-            })
-          ),
+                if (count) {
+                  return getIGroupItem({
+                    name: `${idx + 1}구역`,
+                    count,
+                    child: [],
+                  })
+                } else {
+                  return getIGroupItem({})
+                }
+              })
+            )),
+            getIGroupItem({
+              name: `청년`,
+              count: await Seongdo.count({
+                group1: "장년부",
+                group2: `2교구,청년`,
+              }),
+              child: [],
+            }),
+          ],
         },
         {
           name: "3교구",
@@ -122,23 +142,33 @@ export const load = async ({ url, locals, fetch }) => {
             group1: "장년부",
             group2: { $regex: "3교구" },
           }),
-          child: await Promise.all(
-            ("" + Array(30)).split(",").map(async (item, idx) => {
-              const count = await Seongdo.count({
-                group1: "장년부",
-                group2: `3교구,${idx + 1}구역`,
-              })
-              if (count) {
-                return getIGroupItem({
-                  name: `${idx + 1}구역`,
-                  count,
-                  child: [],
+          child: [
+            ...(await Promise.all(
+              ("" + Array(30)).split(",").map(async (item, idx) => {
+                const count = await Seongdo.count({
+                  group1: "장년부",
+                  group2: `3교구,${idx + 1}구역`,
                 })
-              } else {
-                return getIGroupItem({})
-              }
-            })
-          ),
+                if (count) {
+                  return getIGroupItem({
+                    name: `${idx + 1}구역`,
+                    count,
+                    child: [],
+                  })
+                } else {
+                  return getIGroupItem({})
+                }
+              })
+            )),
+            getIGroupItem({
+              name: `청년`,
+              count: await Seongdo.count({
+                group1: "장년부",
+                group2: `3교구,청년`,
+              }),
+              child: [],
+            }),
+          ],
         },
       ],
     }

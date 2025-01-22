@@ -27,6 +27,7 @@
     })
 
     const url = params ? `/seongdos${params}` : "/seongdos"
+
     goto(url)
   }
 </script>

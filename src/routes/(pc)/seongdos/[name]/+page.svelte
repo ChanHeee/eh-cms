@@ -880,6 +880,7 @@
                       <option value="28구역">28구역</option>
                       <option value="29구역">29구역</option>
                       <option value="30구역">30구역</option>
+                      <option value="청년">청년</option>
                     </select>
                   </div>
                 </div>
@@ -1249,6 +1250,7 @@
                     <option value="28구역">28구역</option>
                     <option value="29구역">29구역</option>
                     <option value="30구역">30구역</option>
+                    <option value="청년">청년</option>
                   </select>
                 </div>
               </div>

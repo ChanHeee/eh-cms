@@ -38,7 +38,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
     seongdoMatch = {
       $and: [
         { group1: { $ne: "" } },
-        { group1: { $ne: undefined } },
+        { group1: { $ne: "기타" } },
         { group2: { $nin: ["소천", "제적"] } },
       ],
     }
@@ -207,7 +207,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
     }
   }
 
-  const seongdos = await Seongdo.aggregate(
+  let aggregate = Seongdo.aggregate(
     ["장년부", "청년부", "교회학교"].includes(group1 as string)
       ? [
           {
@@ -306,142 +306,147 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
         ]
       : []
   )
-    .addFields({
+
+  if (phone) {
+    aggregate.addFields({
       phoneWithoutDash: {
         $replaceAll: { input: "$phone", find: "-", replacement: "" },
       },
     })
-    .addFields({
-      temp: { $max: "$services.order" },
-    })
-    .addFields({
-      orderValue: {
-        $cond: {
-          if: {
-            $gt: ["$temp", 7],
+  }
+
+  if (group1 == "장년부" || showTeacher == "true") {
+    aggregate
+      .addFields({
+        temp: { $max: "$services.order" },
+      })
+      .addFields({
+        orderValue: {
+          $cond: {
+            if: {
+              $gt: ["$temp", 7],
+            },
+            then: { $multiply: ["$temp", 10] },
+            else: 0,
           },
-          then: { $multiply: ["$temp", 10] },
-          else: 0,
+        },
+      })
+  }
+
+  if (order?.startsWith("birth") || order?.startsWith("age")) {
+    aggregate.addFields({
+      hasBirth: {
+        $cond: [{ $eq: ["$birth", ""] }, false, true],
+      },
+    })
+  }
+
+  if (order?.startsWith("group") && group1 == "교회학교") {
+    aggregate.addFields({
+      groupWithService: {
+        $cond: {
+          if: { $ne: ["$group1", "교회학교"] },
+
+          then: {
+            $switch: {
+              branches: [
+                {
+                  case: { $eq: [{ $min: "$services.group2" }, "영아부"] },
+                  then: 1,
+                },
+                {
+                  case: { $eq: [{ $min: "$services.group2" }, "유치부"] },
+                  then: 2,
+                },
+                {
+                  case: { $eq: [{ $min: "$services.group2" }, "유년부"] },
+                  then: 3,
+                },
+                {
+                  case: { $eq: [{ $min: "$services.group2" }, "초등부"] },
+                  then: 4,
+                },
+                {
+                  case: { $eq: [{ $min: "$services.group2" }, "중등부"] },
+                  then: 5,
+                },
+                {
+                  case: { $eq: [{ $min: "$services.group2" }, "고등부"] },
+                  then: 6,
+                },
+                {
+                  case: {
+                    $eq: [{ $min: "$services.group2" }, "은혜브릿지"],
+                  },
+                  then: 7,
+                },
+                {
+                  case: {
+                    $eq: [{ $min: "$services.group2" }, "늘푸른부"],
+                  },
+                  then: 8,
+                },
+              ],
+              default: 0,
+            },
+          },
+          else: {
+            $switch: {
+              branches: [
+                {
+                  case: { $eq: ["$group2", "영아부"] },
+                  then: 1,
+                },
+                {
+                  case: { $eq: ["$group2", "유치부"] },
+                  then: 2,
+                },
+                {
+                  case: { $eq: ["$group2", "유년부"] },
+                  then: 3,
+                },
+                {
+                  case: { $eq: ["$group2", "초등부"] },
+                  then: 4,
+                },
+                {
+                  case: { $eq: ["$group2", "중등부"] },
+                  then: 5,
+                },
+                {
+                  case: { $eq: ["$group2", "고등부"] },
+                  then: 6,
+                },
+                {
+                  case: {
+                    $eq: ["$group2", "은혜브릿지"],
+                  },
+                  then: 7,
+                },
+                {
+                  case: {
+                    $eq: ["$group2", "늘푸른부"],
+                  },
+                  then: 8,
+                },
+              ],
+              default: 0,
+            },
+          },
         },
       },
     })
-    .addFields(
-      order?.startsWith("birth") || order?.startsWith("age")
-        ? {
-            hasBirth: {
-              $cond: [{ $eq: ["$birth", ""] }, false, true],
-            },
-          }
-        : { undefined }
-    )
-    .addFields(
-      order?.startsWith("group") && group1 == "교회학교"
-        ? {
-            groupWithService: {
-              $cond: {
-                if: { $ne: ["$group1", "교회학교"] },
+  }
 
-                then: {
-                  $switch: {
-                    branches: [
-                      {
-                        case: { $eq: [{ $min: "$services.group2" }, "영아부"] },
-                        then: 1,
-                      },
-                      {
-                        case: { $eq: [{ $min: "$services.group2" }, "유치부"] },
-                        then: 2,
-                      },
-                      {
-                        case: { $eq: [{ $min: "$services.group2" }, "유년부"] },
-                        then: 3,
-                      },
-                      {
-                        case: { $eq: [{ $min: "$services.group2" }, "초등부"] },
-                        then: 4,
-                      },
-                      {
-                        case: { $eq: [{ $min: "$services.group2" }, "중등부"] },
-                        then: 5,
-                      },
-                      {
-                        case: { $eq: [{ $min: "$services.group2" }, "고등부"] },
-                        then: 6,
-                      },
-                      {
-                        case: {
-                          $eq: [{ $min: "$services.group2" }, "은혜브릿지"],
-                        },
-                        then: 7,
-                      },
-                      {
-                        case: {
-                          $eq: [{ $min: "$services.group2" }, "늘푸른부"],
-                        },
-                        then: 8,
-                      },
-                    ],
-                    default: 0,
-                  },
-                },
-                else: {
-                  $switch: {
-                    branches: [
-                      {
-                        case: { $eq: ["$group2", "영아부"] },
-                        then: 1,
-                      },
-                      {
-                        case: { $eq: ["$group2", "유치부"] },
-                        then: 2,
-                      },
-                      {
-                        case: { $eq: ["$group2", "유년부"] },
-                        then: 3,
-                      },
-                      {
-                        case: { $eq: ["$group2", "초등부"] },
-                        then: 4,
-                      },
-                      {
-                        case: { $eq: ["$group2", "중등부"] },
-                        then: 5,
-                      },
-                      {
-                        case: { $eq: ["$group2", "고등부"] },
-                        then: 6,
-                      },
-                      {
-                        case: {
-                          $eq: ["$group2", "은혜브릿지"],
-                        },
-                        then: 7,
-                      },
-                      {
-                        case: {
-                          $eq: ["$group2", "늘푸른부"],
-                        },
-                        then: 8,
-                      },
-                    ],
-                    default: 0,
-                  },
-                },
-              },
-            },
-          }
-        : { undefined }
-    )
-    .addFields(
-      order?.startsWith("address")
-        ? {
-            hasAddress: {
-              $cond: [{ $eq: ["$address", ""] }, false, true],
-            },
-          }
-        : { undefined }
-    )
+  if (order?.startsWith("address")) {
+    aggregate.addFields({
+      hasAddress: {
+        $cond: [{ $eq: ["$address", ""] }, false, true],
+      },
+    })
+  }
 
+  const seongdos = await aggregate
     .match(seongdoMatch)
     .sort(aggregateSort)
     .skip((page - 1) * take)
@@ -452,9 +457,9 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       name: 1,
       // avatar: 1,
       gender: 1,
-      singeup: 1,
+      // singeup: 1,
       jikbun: 1,
-      enrolled_at: 1,
+      // enrolled_at: 1,
       birth: 1,
       // services: 1,
       services: {
@@ -465,7 +470,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       group1: 1,
       group2: 1,
       address: 1,
-      remarks: 1,
+      // remarks: 1,
     })
 
   // const total = await Seongdo.count(seongdoMatch)
@@ -591,17 +596,17 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
                 name: 1,
                 // avatar: 1,
                 // avatarVercelBlob: 1,
-                gender: 1,
-                singeup: 1,
+                // gender: 1,
+                // singeup: 1,
                 jikbun: 1,
-                enrolled_at: 1,
+                // enrolled_at: 1,
                 birth: 1,
                 age: 1,
                 phone: 1,
                 group1: 1,
                 group2: 1,
                 address: 1,
-                remarks: 1,
+                // remarks: 1,
                 services: {
                   $filter: {
                     input: {
