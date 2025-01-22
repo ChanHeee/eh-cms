@@ -11,54 +11,35 @@ import {
 import { json } from "@sveltejs/kit"
 
 export const GET = async ({ request, url, fetch }) => {
-  const seongdos = await Seongdo.find({
-    // group1: "장년부",
-    // group2: { $regex: "2교구" },
-    "services.group1": "교회학교",
-    "services.startYear": null,
-  }).select("-avatar")
-
-  const bulkWriteOp: any = []
-
-  seongdos.map((seongdo, idx) => {
-    const service = seongdo.services.filter((item) => item.group1 == "교회학교")
-
-    service.map((item, idx) => {
-      const pull = {
-        updateOne: {
-          filter: { _id: seongdo._id },
-          update: {
-            $pull: {
-              services: service[idx],
-            },
-          },
-        },
-      }
-
-      const push = {
-        updateOne: {
-          filter: { _id: seongdo._id },
-          update: {
-            $push: {
-              services: { ...service[idx], startYear: null, endYear: null },
-            },
-          },
-        },
-      }
-
-      bulkWriteOp.push(pull, push)
-    })
-  })
-
-  const { modifiedCount } = await Seongdo.bulkWrite(bulkWriteOp)
-
-  console.log(modifiedCount)
-
-  if (modifiedCount) {
-    return json({ success: true })
-  } else {
-    return json({ success: false })
-  }
+  // const seongdos = await Seongdo.find({
+  //   "services.classification": "학생",
+  // }).select(["-avatar", "-avatarVercelBlob"])
+  // const bulkWriteOp: any = []
+  // seongdos.map((seongdo, idx) => {
+  //   const service = seongdo.services.filter(
+  //     (item) => item.classification == "학생"
+  //   )
+  //   service.map((item, idx) => {
+  //     const pull = {
+  //       updateOne: {
+  //         filter: { _id: seongdo._id },
+  //         update: {
+  //           $pull: {
+  //             services: service[idx],
+  //           },
+  //         },
+  //       },
+  //     }
+  //     bulkWriteOp.push(pull)
+  //   })
+  // })
+  // const { modifiedCount } = await Seongdo.bulkWrite(bulkWriteOp)
+  // console.log(modifiedCount)
+  // if (modifiedCount) {
+  //   return json({ success: true })
+  // } else {
+  //   return json({ success: false })
+  // }
 }
 
 export const POST = async ({ request, url, fetch }) => {

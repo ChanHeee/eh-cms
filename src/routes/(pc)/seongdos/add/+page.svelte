@@ -74,11 +74,14 @@
       toast.error("이름을 입력해주세요.")
       return
     }
-    let response = await fetch(`/api/seongdos/${name.trim()}`, {
-      headers: {
-        "content-type": "application/json",
-      },
-    })
+    let response = await fetch(
+      `/api/v2/seongdos/getSeongdoByName?name=${name.trim()}&excludeStu=true`,
+      {
+        headers: {
+          "content-type": "application/json",
+        },
+      }
+    )
     const { seongdo } = await response.json()
 
     if (seongdo) {

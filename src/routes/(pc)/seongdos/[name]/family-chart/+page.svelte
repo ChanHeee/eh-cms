@@ -340,11 +340,14 @@
   }
 
   const searchSeongdosByName = async () => {
-    let response = await fetch(`/api/seongdos?name=${searchName}`, {
-      headers: {
-        "content-type": "application/json",
-      },
-    })
+    let response = await fetch(
+      `/api/seongdos?name=${searchName}&includeStu=true`,
+      {
+        headers: {
+          "content-type": "application/json",
+        },
+      }
+    )
     const result = await response.json()
 
     return { seongdos: result.seongdos, page: result.page }

@@ -4,11 +4,14 @@ export const getSeongdosSearchParams = ({
   name,
   phone,
   jikbun,
+  singeup,
   order,
   eduName,
   page,
   group1,
   group2,
+  birthStart,
+  birthEnd,
   excludeETC,
   showTeacher,
 }: ISeongdoSearchParams) => {
@@ -20,6 +23,8 @@ export const getSeongdosSearchParams = ({
   }
   if (jikbun && jikbun.length > 0)
     searchParams.push(`jikbun=${JSON.stringify(jikbun)}`)
+  if (singeup && singeup.length > 0)
+    searchParams.push(`singeup=${JSON.stringify(singeup)}`)
   if (order) searchParams.push(`order=${order}`)
   if (eduName) searchParams.push(`eduName=${eduName}`)
   if (group1) {
@@ -28,6 +33,8 @@ export const getSeongdosSearchParams = ({
       searchParams.push(`group2=${group2}`)
     }
   }
+  if (birthStart) searchParams.push(`birthStart=${birthStart}`)
+  if (birthEnd) searchParams.push(`birthEnd=${birthEnd}`)
 
   if (page) searchParams.push(`page=${page}`)
   if (excludeETC) searchParams.push(`excludeETC=${excludeETC}`)

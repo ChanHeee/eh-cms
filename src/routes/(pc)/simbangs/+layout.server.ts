@@ -55,7 +55,7 @@ export const load = async ({ url, locals, fetch }) => {
           name: "1교구",
           count: 0,
           child: await Promise.all(
-            ("" + Array(19)).split(",").map(async (item, idx) => {
+            ("" + Array(30)).split(",").map(async (item, idx) => {
               return {
                 name: `${idx + 1}구역`,
                 count: await Seongdo.count({
@@ -71,7 +71,7 @@ export const load = async ({ url, locals, fetch }) => {
           name: "2교구",
           count: 0,
           child: await Promise.all(
-            ("" + Array(20)).split(",").map(async (item, idx) => {
+            ("" + Array(30)).split(",").map(async (item, idx) => {
               return {
                 name: `${idx + 1}구역`,
                 count: 0,
@@ -84,7 +84,7 @@ export const load = async ({ url, locals, fetch }) => {
           name: "3교구",
           count: 0,
           child: await Promise.all(
-            ("" + Array(18)).split(",").map(async (item, idx) => {
+            ("" + Array(30)).split(",").map(async (item, idx) => {
               return {
                 name: `${idx + 1}구역`,
                 count: 0,

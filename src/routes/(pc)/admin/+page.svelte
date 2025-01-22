@@ -120,7 +120,19 @@
       const result = await response.json()
       if (result.success) {
         toast.success("추가되었습니다.")
-        teachers = [...teachers, teacher]
+        teachers = [
+          ...teachers,
+          {
+            ...teacher,
+            services: [
+              {
+                group1: "",
+                group2: "",
+                classification,
+              },
+            ],
+          },
+        ]
       }
       await invalidateAll()
     }

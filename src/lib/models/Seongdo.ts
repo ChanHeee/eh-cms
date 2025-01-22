@@ -4,7 +4,6 @@ import type { ISeongdo } from "$lib/interfaces"
 import { Simbang } from "./Simbang"
 import { Family } from "./Family"
 import { SeongdoEdu } from "./SeongdoEdu"
-import { getAgeFromBirth } from "$lib/utils"
 import { del } from "@vercel/blob"
 import { BLOB_READ_WRITE_TOKEN } from "$lib/env"
 
@@ -19,8 +18,15 @@ const seongdoSchema = new Schema<ISeongdo>({
   age: { type: Number, required: false },
   jikbun: { type: String, required: false },
   singeup: { type: String, required: false },
+  singeupDate: {
+    study: { type: String, required: false },
+    baptism: { type: String, required: false },
+    infant: { type: String, required: false },
+    confirm: { type: String, required: false },
+  },
   group1: { type: String, required: false },
   group2: { type: String, required: false },
+  addressHistory: [{ type: String, required: false, default: [] }],
   address: { type: String, required: false },
   remarks: { type: String, required: false },
   enrolled_at: { type: String, required: false },

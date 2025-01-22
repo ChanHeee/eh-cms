@@ -11,8 +11,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
     seongdoMatch = {
       $and: [
         { "services.group1": group1 },
-        { "services.group2": { $ne: "늘푸른부" } },
-        { "services.group2": { $ne: "은혜브릿지" } },
+        { "services.classification": { $ne: "" } },
       ],
     }
   } else {

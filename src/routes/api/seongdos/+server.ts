@@ -10,6 +10,10 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
     url.searchParams.get("jikbun") != null
       ? JSON.parse(url.searchParams.get("jikbun"))
       : []
+  const singeup =
+    url.searchParams.get("singeup") != null
+      ? JSON.parse(url.searchParams.get("singeup"))
+      : []
   const order = url.searchParams.get("order")
   const group1 = url.searchParams.get("group1")
   const group2 = url.searchParams.get("group2")
@@ -26,18 +30,20 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       : 12
 
   const excludeETC = url.searchParams.get("excludeETC")
+  const includeStu = url.searchParams.get("includeStu")
   const showTeacher = url.searchParams.get("showTeacher")
 
   let seongdoMatch: any = {}
-  if (excludeETC) {
+  if (excludeETC == "true") {
     seongdoMatch = {
       $and: [
         { group1: { $ne: "" } },
         { group1: { $ne: undefined } },
-        { group2: { $nin: ["소천", "재적"] } },
+        { group2: { $nin: ["소천", "제적"] } },
       ],
     }
   }
+
   if (name) {
     seongdoMatch.name = { $regex: name }
   }
@@ -70,6 +76,10 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       jikbunTemp.push("서리집사", "명예서리집사")
     }
     seongdoMatch.jikbun = { $in: jikbunTemp }
+  }
+
+  if (singeup?.length > 0) {
+    seongdoMatch.singeup = { $in: singeup }
   }
 
   if (birthStart) {
@@ -142,6 +152,10 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       break
   }
 
+  if (includeStu == "true" || group1 == "교회학교") {
+  } else {
+    seongdoMatch.group1 = { $ne: "교회학교" }
+  }
   if (group1 == "기타") {
     if (group2 == "미분류") {
       seongdoMatch["$or"] = [{ group1: "" }, { group1: undefined }]
@@ -151,7 +165,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       seongdoMatch["$or"] = [
         { group1: "" },
         { group1: undefined },
-        { group1, group2: { $in: ["별명부", "재적", "소천"] } },
+        { group1, group2: { $in: ["별명부", "제적", "소천"] } },
       ]
     }
   } else {
@@ -184,8 +198,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
             ? {
                 $and: [
                   { "services.group1": group1 },
-                  { "services.group2": { $ne: "늘푸른부" } },
-                  { "services.group2": { $ne: "은혜브릿지" } },
+                  { "services.classification": { $ne: "" } },
                 ],
               }
             : { group1 },
@@ -686,6 +699,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
         name,
         phone,
         jikbun,
+        singeup,
         order,
         group1,
         group2,
@@ -753,35 +767,35 @@ export async function POST({ request }) {
 }
 
 export async function PUT({ request }) {
-  let { _id, name, avatarVercelBlob, thumb, ...rest } = await request.json()
+  let { _id, address, addressBefore, ...rest } = await request.json()
 
-  // if (thumb) {
-  //   if (avatarVercelBlob) {
-  //     await del(avatarVercelBlob, { token: BLOB_READ_WRITE_TOKEN })
-  //   }
-  //   const blob = dataURItoBlob(thumb)
-  //   const result = await put(`${name}.jpeg`, blob, {
-  //     access: "public",
-  //     token: BLOB_READ_WRITE_TOKEN,
-  //   })
-  //   avatarVercelBlob = result.url
-  // } else {
-  //   if (avatarVercelBlob) {
-  //     await del(avatarVercelBlob, { token: BLOB_READ_WRITE_TOKEN })
-  //   }
-  //   avatarVercelBlob = ""
-  // }
-
-  const { upsertedCount, modifiedCount } = await Seongdo.updateOne(
-    { _id },
+  let bulkWirteOptions = [
     {
-      name,
-      // avatarVercelBlob,
-      ...rest,
-    }
-  )
+      updateOne: {
+        filter: { _id },
+        update: {
+          address,
+          ...rest,
+        },
+      },
+    },
+  ]
+  if (address != addressBefore) {
+    bulkWirteOptions.push({
+      updateOne: {
+        filter: { _id },
+        update: {
+          $push: {
+            addressHistory: { $each: [addressBefore], $position: 0 },
+          },
+        },
+      },
+    })
+  }
 
-  if (upsertedCount == 1) {
+  const { modifiedCount } = await Seongdo.bulkWrite(bulkWirteOptions)
+
+  if (modifiedCount) {
     return json({ success: true })
   } else {
     return json({ success: false })

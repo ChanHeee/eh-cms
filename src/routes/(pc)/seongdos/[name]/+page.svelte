@@ -21,6 +21,8 @@
     Edit,
     PedestrianFamily,
     DecisionTree,
+    ChevronDown,
+    ChevronUp,
   } from "carbon-icons-svelte"
   import {
     AllowedGroupStore,
@@ -49,6 +51,8 @@
   $: allowedGroup = data.allowedGroup
 
   onMount(async () => {
+    addressBefore = fullAddress
+
     selectedSimbang = data.simbangs.filter(
       (simbang) => simbang._id == data.simbangId
     )[0]
@@ -65,6 +69,7 @@
   $: groupList = data.groupList
   // value for senogdo detail
   $: seongdo = data.seongdo
+
   $: isNameChanged = false
   $: ageWithString = seongdo.age ? seongdo.age + " 세" : ""
   $: groupItem = getGroupItem(seongdo.group1, seongdo.group2)
@@ -81,6 +86,11 @@
   $: extraAddress = addressData.split(" (")[1]?.slice(0, -1) || ""
 
   $: fullAddress = getFullAddress()
+  $: addressHistory = seongdo.addressHistory
+  $: showAddressHistory = false
+  let addressBefore: string
+
+  $: showSingeupDate = false
 
   $: getFullAddress = () => {
     if (address == "") {
@@ -112,6 +122,7 @@
   $: selectedSeongdoFamily = selectedSeongdoFamily
 
   $: family = data.family
+
   $: familyId = family?._id
   $: members = family?.members || []
   $: memberIds = family?.memberIds || []
@@ -204,6 +215,7 @@
           ? groupItem.group2 + "," + group2Add
           : groupItem.group2,
         address: fullAddress,
+        addressBefore: addressBefore,
         // thumb: seongdo.avatar ? await getThumbFile(seongdo.avatar) : "",
         ...rest,
       }),
@@ -212,11 +224,13 @@
       },
     })
     if (response.ok) {
-      goto(
-        seongdo.birth
-          ? `/seongdos/${seongdo.name}-${seongdo.birth}`
-          : `/seongdos/${seongdo.name}`
-      )
+      addressBefore = fullAddress
+      await invalidateAll()
+      // goto(
+      //   seongdo.birth
+      //     ? `/seongdos/${seongdo.name}-${seongdo.birth}`
+      //     : `/seongdos/${seongdo.name}`
+      // )
     }
   }
   const submitHandler = async () => {
@@ -317,13 +331,14 @@
   }
 
   const searchHandler = async () => {
-    console.log(searchName)
-
-    const response = await fetch(`/api/seongdos?name=${searchName}&take=10`, {
-      headers: {
-        "content-type": "application/json",
-      },
-    })
+    const response = await fetch(
+      `/api/seongdos?name=${searchName}&take=10&includeStu=true`,
+      {
+        headers: {
+          "content-type": "application/json",
+        },
+      }
+    )
     if (response.ok) {
       const result = await response.json()
       $SeongdosStore = result.seongdos
@@ -614,13 +629,53 @@
                   />
                 </div>
               </div>
+              <div class="flex w-full h-8 border-gray-300 border">
+                <label
+                  for="phone"
+                  class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                  >휴대전화</label
+                >
+                <div class="flex w-full bg-gray-50">
+                  <input
+                    id="phone"
+                    type="text"
+                    value={seongdo.phone}
+                    class="flex w-full px-2 bg-gray-50 text-gray-900 text-sm focus:outline-0"
+                    on:input={(e) => {
+                      seongdo.phone = e.target.value
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-col w-full md:flex-row gap-3">
               <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
                 <div class="flex w-full gap-1">
                   <label
                     for="name"
-                    class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                    >직분 / 신급</label
-                  >
+                    class="flex flex-none justify-between w-[4.8rem] md:w-[6rem] items-center text-white p-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                    >직분 / 신급
+
+                    {#if showSingeupDate}
+                      <button
+                        on:click={() => {
+                          showSingeupDate = false
+                        }}
+                      >
+                        <ChevronUp />
+                      </button>
+                    {:else}
+                      <button
+                        on:click={() => {
+                          showSingeupDate = true
+                        }}
+                      >
+                        <ChevronDown />
+                      </button>
+                    {/if}
+                  </label>
+
                   <div class="flex w-full justify-center gap-1 pr-1">
                     <select
                       id="jikbun"
@@ -696,30 +751,11 @@
                   </div>
                 </div>
               </div>
-            </div>
-            <div class="flex flex-col w-full md:flex-row gap-3">
-              <div class="flex w-full h-8 border-gray-300 border">
-                <label
-                  for="phone"
-                  class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
-                  >휴대전화</label
-                >
-                <div class="flex w-full bg-gray-50">
-                  <input
-                    id="phone"
-                    type="text"
-                    value={seongdo.phone}
-                    class="flex w-full px-2 bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                    on:input={(e) => {
-                      seongdo.phone = e.target.value
-                    }}
-                  />
-                </div>
-              </div>
+
               <div class="flex w-full h-8 bg-gray-50 border-gray-300 border">
                 <div class="flex w-full gap-1">
                   <label
-                    for="name"
+                    for=""
                     class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis hover:opacity-75"
                   >
                     <button
@@ -1220,41 +1256,181 @@
           </div>
         </div>
 
-        <div class="flex flex-auto h-8 border-gray-300 border-x border-y">
-          <div
-            class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0]"
-          >
-            주소
-          </div>
+        <div
+          class="flex flex-col w-full md:flex-row gap-3"
+          class:hidden={!showSingeupDate}
+        >
+          <div class="flex w-full h-8 gap-3 bg-gray-50">
+            <div class="flex w-full gap-1 border-gray-300 border">
+              <label
+                for="name"
+                class="flex flex-none justify-between w-[4.8rem] md:w-[6rem] items-center text-white p-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                >학습 / 세례
+              </label>
 
-          <input
-            id="address"
-            autocomplete="off"
-            value={addressWithExtraAddress}
-            on:input={(e) => {
-              addressWithExtraAddress = e.target.value
-            }}
-            class="flex w-full justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
-            on:click={searchAddress}
-          />
+              <div class="flex w-fit justify-center gap-1 pr-1">
+                <input
+                  type="text"
+                  class="flex w-full bg-gray-50 border-0 text-gray-900 text-xs focus:outline-0 p-2"
+                  bind:value={seongdo.singeupDate.study}
+                  on:change={(e) => {
+                    seongdo.singeupDate.study = e.target.value
+                  }}
+                />
+                <div class="border-l border-gray-300" />
+
+                <input
+                  type="text"
+                  class="flex w-full bg-gray-50 border-0 text-gray-900 text-xs focus:outline-0 p-2"
+                  bind:value={seongdo.singeupDate.baptism}
+                  on:change={(e) => {
+                    seongdo.singeupDate.baptism = e.target.value
+                  }}
+                />
+              </div>
+            </div>
+            <div class="flex w-full gap-1 border-gray-300 border">
+              <label
+                for="name"
+                class="flex flex-none justify-between w-[4.8rem] md:w-[6rem] items-center text-white p-2 bg-[#B0B1B0] whitespace-nowrap text-ellipsis"
+                >유세 / 입교
+              </label>
+
+              <div class="flex w-full justify-center gap-1 pr-1">
+                <input
+                  type="text"
+                  class="flex w-full bg-gray-50 border-0 text-gray-900 text-xs focus:outline-0 p-2"
+                  bind:value={seongdo.singeupDate.infant}
+                  on:change={(e) => {
+                    seongdo.singeupDate.infant = e.target.value
+                  }}
+                />
+                <div class="border-l border-gray-300" />
+
+                <input
+                  type="text"
+                  class="flex w-full bg-gray-50 border-0 text-gray-900 text-xs focus:outline-0 p-2"
+                  bind:value={seongdo.singeupDate.confirm}
+                  on:change={(e) => {
+                    seongdo.singeupDate.confirm = e.target.value
+                  }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="flex h-8 flex-auto border-gray-300 border-x border-y">
-          <div
-            class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0]"
-          >
-            상세주소
-          </div>
+        <div id="addressBox" class="flex flex-col gap-3">
+          <div class="flex flex-auto h-8 border-gray-300 border-x border-y">
+            <div
+              class="flex flex-none w-[4.8rem] md:w-[6rem] justify-between items-center text-white px-2 bg-[#B0B1B0]"
+            >
+              주소
 
-          <input
-            id="detailAddress"
-            autocomplete="off"
-            value={detailAddress}
-            on:input={(e) => {
-              detailAddress = e.target.value
-            }}
-            type="text"
-            class="flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
-          />
+              {#if Array.isArray(addressHistory) && addressHistory.length > 0}
+                {#if showAddressHistory}
+                  <button
+                    on:click={() => {
+                      showAddressHistory = false
+                    }}
+                  >
+                    <ChevronUp />
+                  </button>
+                {:else}
+                  <button
+                    on:click={() => {
+                      showAddressHistory = true
+                    }}
+                  >
+                    <ChevronDown />
+                  </button>
+                {/if}
+              {/if}
+            </div>
+
+            <input
+              id="address"
+              autocomplete="off"
+              value={addressWithExtraAddress}
+              on:input={(e) => {
+                addressWithExtraAddress = e.target.value
+              }}
+              class="flex w-full justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
+              on:click={searchAddress}
+            />
+          </div>
+          <div class="flex h-8 flex-auto border-gray-300 border-x border-y">
+            <div
+              class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0]"
+            >
+              상세주소
+            </div>
+
+            <input
+              id="detailAddress"
+              autocomplete="off"
+              value={detailAddress}
+              on:input={(e) => {
+                detailAddress = e.target.value
+              }}
+              type="text"
+              class="flex justify-between bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0 p-2"
+            />
+          </div>
+          {#if Array.isArray(addressHistory) && addressHistory.length > 0}
+            <div
+              id="addressHistory"
+              class="flex min-h-8 flex-auto border-gray-300 border-x border-y"
+              class:hidden={!showAddressHistory}
+            >
+              <div
+                class="flex flex-none w-[4.8rem] md:w-[6rem] items-center text-white pl-2 bg-[#B0B1B0]"
+              >
+                이전 주소
+              </div>
+
+              <div
+                class="flex flex-col divide-y divide-gray-300 justify-center bg-gray-50 border-0 text-gray-900 w-full text-sm focus:outline-0"
+              >
+                {#if Array.isArray(addressHistory)}
+                  {#each addressHistory as history}
+                    <div class="flex w-full justify-between pl-2 pr-5 py-2">
+                      <p>
+                        {history}
+                      </p>
+
+                      <button
+                        on:click={async () => {
+                          let response = await fetch(
+                            `/api/v2/seongdos/removeAddressHistory`,
+                            {
+                              method: "PATCH",
+                              body: JSON.stringify({
+                                seongdoId: seongdo._id,
+                                address: history,
+                              }),
+                              headers: {
+                                "content-type": "application/json",
+                              },
+                            }
+                          )
+
+                          if (response.ok) {
+                            const result = await response.json()
+                            await invalidateAll()
+                            // if (result.success) {
+
+                            // }
+                          }
+                        }}
+                      >
+                        <TrashCan fill="#4a4a4a" />
+                      </button>
+                    </div>
+                  {/each}
+                {/if}
+              </div>
+            </div>
+          {/if}
         </div>
         {#if !allowedGroup.includes("게스트")}
           <div class="flex flex-auto border-gray-300 border-x border-y">
@@ -1595,21 +1771,7 @@
             {/each}
           {/if}
         </div>
-        <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
-          <button
-            class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
-          >
-            신급
-          </button>
-          {#if members?.length > 0}
-            <!-- content here -->
-            {#each members as member}
-              <div class="flex px-3 justify-center items-center h-10">
-                {member.isSeongdo ? member?.seongdo?.singeup : ""}
-              </div>
-            {/each}
-          {/if}
-        </div>
+
         <div
           class="flex flex-col flex-auto sm:flex-none whitespace-nowrap border-r divide-y border-b"
         >
@@ -1619,20 +1781,6 @@
             {#each members as member}
               <div class="flex justify-center px-3 items-center h-10">
                 {member.isSeongdo ? member?.seongdo?.birth : member?.birth}
-              </div>
-            {/each}
-          {/if}
-        </div>
-
-        <div
-          class="flex flex-col flex-auto sm:flex-none whitespace-nowrap border-r divide-y border-b"
-        >
-          <button class=" px-3 font-bold h-10 bg-[#D9D9D8]"> 핸드폰 </button>
-          {#if members?.length > 0}
-            <!-- content here -->
-            {#each members as member}
-              <div class="flex justify-center px-3 items-center h-10">
-                {member.isSeongdo ? member?.seongdo?.phone : member?.phone}
               </div>
             {/each}
           {/if}

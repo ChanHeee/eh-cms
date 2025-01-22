@@ -40,6 +40,7 @@
     searchParams: ISeongdoSearchParams
     groupTree: IGroup
     listName: string
+    stuWithFamilyCount: number
   }
 
   $: seongdos = data.seongdos
@@ -48,6 +49,7 @@
   $: requestParams = page.requestParams
 
   $: searchParams = data.searchParams
+
   $: name = searchParams.name
   $: phone = searchParams.phone
   $: jikbunArray = searchParams.jikbun ?? []
@@ -69,6 +71,8 @@
 
   $: groupTree = data.groupTree
   $: listName = data.listName
+
+  $: stuWithFamilyCount = data.stuWithFamilyCount
 
   $: isSearchModalHidden = true
   $: isExportModalHidden = true
@@ -108,6 +112,97 @@
       ids = []
       history.back()
     }
+  }
+
+  const exportHandler = async () => {
+    const { take, ...rest } = requestParams
+
+    let seongdos
+    let response = await await fetch(
+      `/api/seongdos${getSearchParams({ ...rest, excludeETC: "true", take: 10000 })}`,
+      {
+        method: "GET",
+        headers: {
+          "content-type": "application/json",
+        },
+      }
+    )
+    if (response.ok) {
+      seongdos = (await response.json()).seongdos
+    }
+
+    let seongdosForSheet
+    seongdosForSheet = await Promise.all(
+      seongdos.map(async (item) => {
+        const result = {}
+
+        if (exportFieldList.includes("이름")) {
+          result["이름"] = item.name
+        }
+        if (exportFieldList.includes("성별")) {
+          result["성별"] = item.gender
+        }
+        if (exportFieldList.includes("등록일자")) {
+          result["등록일자"] = item.enrolled_at
+        }
+        if (exportFieldList.includes("생년월일")) {
+          result["생년월일"] = item.birth
+        }
+        if (exportFieldList.includes("나이")) {
+          result["나이"] = item.age
+        }
+        if (exportFieldList.includes("직분")) {
+          result["직분"] = item.jikbun
+        }
+        if (exportFieldList.includes("신급")) {
+          result["신급"] = item.singeup
+        }
+        if (exportFieldList.includes("휴대전화")) {
+          result["휴대전화"] = item.phone
+        }
+        if (exportFieldList.includes("소속")) {
+          result["소속1"] = item.group1
+          result["소속2"] = item.group2
+        }
+        if (exportFieldList.includes("주소")) {
+          result["주소"] = item.address
+        }
+        if (exportFieldList.includes("가족관계")) {
+          let response = await fetch(`/api/families?seongdoId=${item._id}`, {
+            method: "GET",
+            headers: {
+              "content-type": "application/json",
+            },
+          })
+
+          let family
+          if (response.ok) {
+            family = (await response.json()).family
+          }
+
+          result["가족관계"] = family?.members
+            ?.map((member) => {
+              if (member?.isSeongdo) {
+                return `${member?.classification}:${member?.seongdo?.name}`
+              } else {
+                return `${member?.classification}:${member?.name}`
+              }
+            })
+            .toString(", ")
+        }
+        return result
+      })
+    )
+
+    const worksheet = utils.json_to_sheet(seongdosForSheet)
+    const workbook = utils.book_new()
+    utils.book_append_sheet(workbook, worksheet)
+    writeFile(
+      workbook,
+      `성도목록_${new Date()
+        .toISOString()
+        .substring(0, 10)}${getSearchParams({ ...rest })}.xlsx`
+    )
   }
 </script>
 
@@ -168,6 +263,9 @@
       <div class="flex items-center">
         <p class="text-lg font-medium mr-1">{`${listName} 목록`}</p>
         <p class="text-lg">
+          <!-- {listName == "전체 성도"
+            ? `(${page?.totalSize + stuWithFamilyCount}명)`
+            : `(${page?.totalSize}명)`} -->
           {`(${page?.totalSize}명)`}
         </p>
       </div>
@@ -920,7 +1018,7 @@
                       <input
                         type="checkbox"
                         id="checkAll"
-                        checked={exportFieldList.length == 10}
+                        checked={exportFieldList.length == 11}
                         on:change={() => {
                           if (document.querySelector("#checkAll").checked) {
                             exportFieldList = [
@@ -934,6 +1032,7 @@
                               "휴대전화",
                               "소속",
                               "주소",
+                              "가족관계",
                             ]
                           } else {
                             exportFieldList = ["이름"]
@@ -1142,6 +1241,27 @@
                       />
                       <label for="address">주소</label>
                     </p>
+                    <p class="flex text-gray-600 text-sm gap-2 px-3">
+                      <input
+                        type="checkbox"
+                        id="family"
+                        checked={exportFieldList.find(
+                          (element) => element == "가족관계"
+                        ) != undefined}
+                        on:change={() => {
+                          if (document.querySelector("#family").checked) {
+                            exportFieldList = [...exportFieldList, "가족관계"]
+                          } else {
+                            exportFieldList = [
+                              ...exportFieldList.filter(
+                                (value) => value !== "가족관계"
+                              ),
+                            ]
+                          }
+                        }}
+                      />
+                      <label for="family">가족관계</label>
+                    </p>
                   </div>
                 </div>
               </div>
@@ -1168,68 +1288,11 @@
             type="submit"
             class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#237334]"
             on:click={async () => {
-              const { take, ...rest } = requestParams
-              let seongdos
-              let response = await await fetch(
-                `/api/seongdos${getSearchParams({ ...rest, take: 10000 })}`,
-                {
-                  method: "GET",
-                  headers: {
-                    "content-type": "application/json",
-                  },
-                }
-              )
-              if (response.ok) {
-                seongdos = (await response.json()).seongdos
-              }
-
-              let seongdosForSheet
-              seongdosForSheet = seongdos.map((item) => {
-                const result = {}
-
-                if (exportFieldList.includes("이름")) {
-                  result["이름"] = item.name
-                }
-                if (exportFieldList.includes("성별")) {
-                  result["성별"] = item.gender
-                }
-                if (exportFieldList.includes("등록일자")) {
-                  result["등록일자"] = item.enrolled_at
-                }
-                if (exportFieldList.includes("생년월일")) {
-                  result["생년월일"] = item.birth
-                }
-                if (exportFieldList.includes("나이")) {
-                  result["나이"] = item.age
-                }
-                if (exportFieldList.includes("직분")) {
-                  result["직분"] = item.jikbun
-                }
-                if (exportFieldList.includes("신급")) {
-                  result["신급"] = item.singeup
-                }
-                if (exportFieldList.includes("휴대전화")) {
-                  result["휴대전화"] = item.phone
-                }
-                if (exportFieldList.includes("소속")) {
-                  result["소속1"] = item.group1
-                  result["소속2"] = item.group2
-                }
-                if (exportFieldList.includes("주소")) {
-                  result["주소"] = item.address
-                }
-                return result
+              toast.promise(exportHandler(), {
+                loading: "데이터를 불러오는 중입니다...",
+                success: `저장할 준비가 되었습니다!`,
+                error: "오류가 발생했습니다.",
               })
-
-              const worksheet = utils.json_to_sheet(seongdosForSheet)
-              const workbook = utils.book_new()
-              utils.book_append_sheet(workbook, worksheet)
-              writeFile(
-                workbook,
-                `성도목록_${new Date()
-                  .toISOString()
-                  .substring(0, 10)}${getSearchParams({ ...rest })}.xlsx`
-              )
             }}
           >
             <DocumentExport scale={16} />

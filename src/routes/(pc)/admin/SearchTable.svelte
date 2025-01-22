@@ -120,7 +120,18 @@
             if (!classification || classificationIndex != index) {
               return toast.error("구분을 입력해주세요.")
             }
+
             await addHandler(item, classification)
+            classification = ""
+            classificationIndex = null
+            seongdos = []
+            seongdoPage = {
+              totalPage: 0,
+              totalSize: 0,
+              requestPage: 1,
+              requestSize: 1,
+              requestParams: {},
+            }
           }}
         >
           <AddLarge fill="#4a4a4a" size={20} />

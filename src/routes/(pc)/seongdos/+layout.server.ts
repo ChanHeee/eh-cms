@@ -1,12 +1,19 @@
 import type { IGroup } from "$lib/interfaces"
+import { Family } from "$lib/models/Family"
 import { Seongdo } from "$lib/models/Seongdo"
 import { redirect } from "@sveltejs/kit"
+
+const getIGroupItem = (obj: any) => {
+  let item: IGroup = { ...obj }
+  return item
+}
 
 /** @type {import('@sveltejs/kit').Load} */
 export const load = async ({ url, locals, fetch }) => {
   const name = url.searchParams.get("name")
   const phone = url.searchParams.get("phone")
   const jikbun = JSON.parse(url.searchParams.get("jikbun"))
+  const singeup = JSON.parse(url.searchParams.get("singeup"))
   const order = url.searchParams.get("order")
   const page =
     url.searchParams.get("page") == ""
@@ -44,6 +51,7 @@ export const load = async ({ url, locals, fetch }) => {
     name,
     phone,
     jikbun,
+    singeup,
     order,
     page,
     group1,
@@ -73,13 +81,13 @@ export const load = async ({ url, locals, fetch }) => {
                 group2: `1교구,${idx + 1}구역`,
               })
               if (count) {
-                return {
+                return getIGroupItem({
                   name: `${idx + 1}구역`,
                   count,
                   child: [],
-                }
+                })
               } else {
-                return []
+                return getIGroupItem({})
               }
             })
           ),
@@ -97,13 +105,13 @@ export const load = async ({ url, locals, fetch }) => {
                 group2: `2교구,${idx + 1}구역`,
               })
               if (count) {
-                return {
+                return getIGroupItem({
                   name: `${idx + 1}구역`,
                   count,
                   child: [],
-                }
+                })
               } else {
-                return []
+                return getIGroupItem({})
               }
             })
           ),
@@ -121,13 +129,13 @@ export const load = async ({ url, locals, fetch }) => {
                 group2: `3교구,${idx + 1}구역`,
               })
               if (count) {
-                return {
+                return getIGroupItem({
                   name: `${idx + 1}구역`,
                   count,
                   child: [],
-                }
+                })
               } else {
-                return []
+                return getIGroupItem({})
               }
             })
           ),
@@ -383,12 +391,38 @@ export const load = async ({ url, locals, fetch }) => {
     }
   }
 
+  const stuWithFamily = await Family.aggregate()
+    .lookup({
+      from: "seongdos",
+      localField: "memberIds",
+      foreignField: "_id",
+      as: "memberIds",
+      pipeline: [{ $match: { group1: "교회학교" } }],
+    })
+    .unwind("memberIds")
+    .project({
+      memberIds: {
+        name: 1,
+        group1: 1,
+        group2: 1,
+      },
+    })
+    .count("count")
+
+  // students = await Promise.all(
+  //   students.filter(
+  //     async (stu) => (await Family.findOne({ memberIds: stu._id }).count()) == 1
+  //   )
+  // )
+  // console.log(students)
+
   if (groupTree) {
     return {
       searchParams: {
         name,
         phone,
         jikbun,
+        singeup,
         order,
         page,
         group1,
@@ -398,6 +432,7 @@ export const load = async ({ url, locals, fetch }) => {
         showTeacher,
       },
       groupTree,
+      stuWithFamilyCount: stuWithFamily[0].count,
     }
   } else {
     return {
@@ -405,6 +440,7 @@ export const load = async ({ url, locals, fetch }) => {
         name,
         phone,
         jikbun,
+        singeup,
         order,
         page,
         group1,
@@ -413,6 +449,7 @@ export const load = async ({ url, locals, fetch }) => {
         birthEnd,
         showTeacher,
       },
+      stuWithFamilyCount: stuWithFamily[0].count,
     }
   }
 }

@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken"
 export const load = async ({ cookies, url }) => {
   const token = cookies.get("token")
 
-  if (!url.pathname.includes("/login")) {
+  if (url.pathname != "/login" && url.pathname != "/karis") {
     if (!token) {
       throw redirect(302, "/login")
     }

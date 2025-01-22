@@ -6,6 +6,7 @@ export const load = async ({ request, fetch, url, locals }) => {
   const {
     name,
     jikbun,
+    singeup,
     page,
     order,
     group1,
@@ -21,6 +22,7 @@ export const load = async ({ request, fetch, url, locals }) => {
     const url = `/seongdos${getSeongdosSearchParams({
       name,
       jikbun,
+      singeup,
       order,
       page: 1,
       group1,
@@ -35,6 +37,7 @@ export const load = async ({ request, fetch, url, locals }) => {
   let requestUrl = `/api/seongdos${getSeongdosSearchParams({
     name,
     jikbun,
+    singeup,
     order,
     page,
     group1,

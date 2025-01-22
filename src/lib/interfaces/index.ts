@@ -25,9 +25,16 @@ export interface ISeongdo {
   phone: string
   jikbun: string
   singeup: string
+  singeupDate: {
+    study: string
+    baptism: string
+    infant: string
+    confirm: string
+  }
   group1: string
   group2: string
   address: string
+  addressHistory: string[]
   remarks: string
   enrolled_at: string
   services: {
@@ -208,6 +215,7 @@ export interface ISeongdoSearchParams {
   name?: string
   phone?: string
   jikbun?: string[]
+  singeup?: string[]
   order?: string
   eduName?: string
   page?: number

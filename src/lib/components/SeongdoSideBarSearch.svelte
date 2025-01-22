@@ -8,6 +8,7 @@
   $: name = searchParams.name
   $: phone = searchParams.phone
   $: jikbunArray = searchParams.jikbun ?? []
+  $: singeupArray = searchParams.singeup ?? []
   $: birthStart = searchParams.birthStart
   $: birthEnd = searchParams.birthEnd
 
@@ -20,6 +21,7 @@
       name,
       phone,
       jikbun: jikbunArray,
+      singeup: singeupArray,
       birthStart,
       birthEnd,
     })
@@ -755,6 +757,134 @@
                 }}
               />
               <label for="f">성도</label>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 신급 검색 -->
+  <div class="flex flex-col w-full justify-center items-center">
+    <div class="flex w-full items-center mx-auto">
+      <div
+        class="flex w-full bg-gray-50 border-y border-x border-gray-300 focus:outline-0"
+      >
+        <div class="flex flex-col w-full">
+          <input
+            type="checkbox"
+            id="singeupDropdown"
+            checked
+            class="singeup-input hidden"
+            on:change={(e) => {
+              if (e.target.checked) {
+                document
+                  .getElementById("singeup-dropdown")
+                  ?.classList.remove("hidden")
+
+                document.getElementById("singeup-down")?.classList.add("hidden")
+                document
+                  .getElementById("singeup-up")
+                  ?.classList.remove("hidden")
+              } else {
+                const checkboxes = document.querySelectorAll(
+                  "#singeup-dropdown input"
+                )
+                document
+                  .getElementById("singeup-dropdown")
+                  ?.classList.add("hidden")
+                document
+                  .getElementById("singeup-down")
+                  ?.classList.remove("hidden")
+                document.getElementById("singeup-up")?.classList.add("hidden")
+                checkboxes.forEach((checkbox) => {
+                  checkbox.checked = false
+                })
+              }
+            }}
+          />
+          <label class="flex w-full justify-between p-2" for="singeupDropdown">
+            <p class="text-gray-400 text-sm select-none">신급</p>
+            <ChevronDown id="singeup-down" class="hidden cursor-pointer" />
+            <ChevronUp id="singeup-up" class="cursor-pointer" />
+          </label>
+
+          <div
+            id="singeup-dropdown"
+            class="grid grid-cols-2 gap-[5px] border-t border-gray-300 focus:outline-0 px-3 py-2"
+          >
+            <p class="flex text-gray-600 text-sm gap-2 px-3">
+              <input
+                type="checkbox"
+                id="singeupa"
+                checked={singeupArray.find(
+                  (element) => element == "유아세례"
+                ) != undefined}
+                on:change={() => {
+                  if (document.querySelector("#singeupa").checked) {
+                    singeupArray = [...singeupArray, "유아세례"]
+                  } else {
+                    singeupArray = [
+                      ...singeupArray.filter((value) => value !== "유아세례"),
+                    ]
+                  }
+                }}
+              />
+              <label for="singeupa">유아세례</label>
+            </p>
+            <p class="flex text-gray-600 text-sm gap-2 px-3">
+              <input
+                type="checkbox"
+                id="singeupb"
+                checked={singeupArray.find((element) => element == "학습") !=
+                  undefined}
+                on:change={() => {
+                  if (document.querySelector("#singeupb").checked) {
+                    singeupArray = [...singeupArray, "학습"]
+                  } else {
+                    singeupArray = [
+                      ...singeupArray.filter((value) => value !== "학습"),
+                    ]
+                  }
+                }}
+              />
+              <label for="singeupb">학습</label>
+            </p>
+            <p class="flex text-gray-600 text-sm gap-2 px-3">
+              <input
+                type="checkbox"
+                id="singeupc"
+                checked={singeupArray.find((element) => element == "입교") !=
+                  undefined}
+                on:change={() => {
+                  if (document.querySelector("#singeupc").checked) {
+                    singeupArray = [...singeupArray, "입교"]
+                  } else {
+                    singeupArray = [
+                      ...singeupArray.filter((value) => value !== "입교"),
+                    ]
+                  }
+                }}
+              />
+              <label for="singeupc">입교</label>
+            </p>
+            <p class="flex text-gray-600 text-sm gap-2 px-3">
+              <input
+                type="checkbox"
+                id="singeupd"
+                checked={singeupArray.find((element) => element == "세례") !=
+                  undefined}
+                on:change={() => {
+                  if (document.querySelector("#singeupd").checked) {
+                    singeupArray = [...singeupArray, "세례"]
+                  } else {
+                    singeupArray = [
+                      ...singeupArray.filter((value) => value !== "세례"),
+                    ]
+                  }
+                }}
+              />
+              <label for="singeupd">세례</label>
             </p>
           </div>
         </div>
