@@ -1049,8 +1049,10 @@
                     goto(
                       `/seongdos?group1=${groupTree.name}&group2=${child.name},${secondChild.name}`
                     )
-                  }}>{`${secondChild.name}(${secondChild.count})`}</button
+                  }}
                 >
+                  {`${secondChild.name}(${secondChild.count})`}
+                </button>
               </div>
             {/if}
           {/each}

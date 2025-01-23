@@ -9,10 +9,12 @@
   export let data: {
     educations: IEducation[]
     page: IPage
+    allowedGroup: string[]
   }
 
   $: educations = data.educations
   $: page = data.page
+  $: allowedGroup = data.allowedGroup
 </script>
 
 <div
@@ -25,15 +27,18 @@
     >
       <p class="text-lg font-medium mr-1">강의 내역</p>
       <div class="rounded flex ml-auto gap-2">
-        <button
-          class="flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#FBA244]"
-          on:click={() => {
-            goto("/educations/add")
-          }}
-        >
-          <BookPlusStroke color="#ffffff" width="16px" />
-          <span>강의 생성</span>
-        </button>
+        {#if allowedGroup.includes("교육")}
+          <button
+            class="flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#FBA244]"
+            on:click={() => {
+              goto("/educations/add")
+            }}
+          >
+            <BookPlusStroke color="#ffffff" width="16px" />
+            <span>강의 생성</span>
+          </button>
+        {/if}
+
         <button
           class="flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#FBA244]"
           on:click={() => {

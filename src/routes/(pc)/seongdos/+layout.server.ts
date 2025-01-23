@@ -63,28 +63,27 @@ export const load = async ({ url, locals, fetch }) => {
 
   let groupTree: IGroup | null = null
 
+  const response = await fetch(
+    `/api/v2/seongdos/getGroupTreeWithCount?group1=${group1}`
+  )
+
+  const treeCount = await response.json()
+
   if (group1 == "장년부") {
     groupTree = {
       name: "장년부",
-      count: await Seongdo.count({ group1: "장년부" }),
+      count: treeCount["장년부"] || 0,
       child: [
         {
           name: "1교구",
-          count: await Seongdo.count({
-            group1: "장년부",
-            group2: { $regex: "1교구" },
-          }),
+          count: treeCount["1교구"] || 0,
           child: [
             ...(await Promise.all(
               ("" + Array(30)).split(",").map(async (item, idx) => {
-                const count = await Seongdo.count({
-                  group1: "장년부",
-                  group2: `1교구,${idx + 1}구역`,
-                })
-                if (count) {
+                if (treeCount[`1교구,${idx + 1}구역`]) {
                   return getIGroupItem({
                     name: `${idx + 1}구역`,
-                    count,
+                    count: treeCount[`1교구,${idx + 1}구역`],
                     child: [],
                   })
                 } else {
@@ -94,31 +93,21 @@ export const load = async ({ url, locals, fetch }) => {
             )),
             getIGroupItem({
               name: `청년`,
-              count: await Seongdo.count({
-                group1: "장년부",
-                group2: `1교구,청년`,
-              }),
+              count: treeCount[`1교구,청년`] || 0,
               child: [],
             }),
           ],
         },
         {
           name: "2교구",
-          count: await Seongdo.count({
-            group1: "장년부",
-            group2: { $regex: "2교구" },
-          }),
+          count: treeCount["2교구"] || 0,
           child: [
             ...(await Promise.all(
               ("" + Array(30)).split(",").map(async (item, idx) => {
-                const count = await Seongdo.count({
-                  group1: "장년부",
-                  group2: `2교구,${idx + 1}구역`,
-                })
-                if (count) {
+                if (treeCount[`2교구,${idx + 1}구역`]) {
                   return getIGroupItem({
                     name: `${idx + 1}구역`,
-                    count,
+                    count: treeCount[`2교구,${idx + 1}구역`],
                     child: [],
                   })
                 } else {
@@ -128,31 +117,21 @@ export const load = async ({ url, locals, fetch }) => {
             )),
             getIGroupItem({
               name: `청년`,
-              count: await Seongdo.count({
-                group1: "장년부",
-                group2: `2교구,청년`,
-              }),
+              count: treeCount[`2교구,청년`] || 0,
               child: [],
             }),
           ],
         },
         {
           name: "3교구",
-          count: await Seongdo.count({
-            group1: "장년부",
-            group2: { $regex: "3교구" },
-          }),
+          count: treeCount["3교구"] || 0,
           child: [
             ...(await Promise.all(
               ("" + Array(30)).split(",").map(async (item, idx) => {
-                const count = await Seongdo.count({
-                  group1: "장년부",
-                  group2: `3교구,${idx + 1}구역`,
-                })
-                if (count) {
+                if (treeCount[`3교구,${idx + 1}구역`]) {
                   return getIGroupItem({
                     name: `${idx + 1}구역`,
-                    count,
+                    count: treeCount[`3교구,${idx + 1}구역`],
                     child: [],
                   })
                 } else {
@@ -162,10 +141,7 @@ export const load = async ({ url, locals, fetch }) => {
             )),
             getIGroupItem({
               name: `청년`,
-              count: await Seongdo.count({
-                group1: "장년부",
-                group2: `3교구,청년`,
-              }),
+              count: treeCount[`3교구,청년`] || 0,
               child: [],
             }),
           ],
@@ -175,21 +151,11 @@ export const load = async ({ url, locals, fetch }) => {
   } else if (group1 == "청년부") {
     groupTree = {
       name: "청년부",
-      count: await Seongdo.count().where({
-        // $or: [{ group1: "청년부" }, { "services.group1": "청년부" }],
-        group1: "청년부",
-      }),
+      count: treeCount["청년부"],
       child: [
         {
           name: "1청년",
-          count: await Seongdo.count().where({
-            // $or: [
-            //   { group1: "청년부", group2: "1청년" },
-            //   { "services.group1": "청년부", "services.group2": "1청년" },
-            // ],
-            group1: "청년부",
-            group2: "1청년",
-          }),
+          count: treeCount["1청년"],
           child: [],
           teacherCount: await Seongdo.count({
             $and: [
@@ -212,14 +178,7 @@ export const load = async ({ url, locals, fetch }) => {
         },
         {
           name: "2청년",
-          count: await Seongdo.count().where({
-            // $or: [
-            //   { group1: "청년부", group2: "2청년" },
-            //   { "services.group1": "청년부", "services.group2": "2청년" },
-            // ],
-            group1: "청년부",
-            group2: "2청년",
-          }),
+          count: treeCount["2청년"],
           child: [],
           teacherCount: await Seongdo.count({
             $and: [
@@ -263,62 +222,41 @@ export const load = async ({ url, locals, fetch }) => {
   } else if (group1 == "교회학교") {
     groupTree = {
       name: "교회학교",
-      count: await Seongdo.count().where({
-        // $or: [{ group1: "교회학교" }, { "services.group1": "교회학교" }],
-        group1: "교회학교",
-      }),
+      count: treeCount["교회학교"] || 0,
       child: [
         {
           name: "영아부",
-          count: await Seongdo.count().where({
-            group1: "교회학교",
-            group2: "영아부",
-          }),
+          count: treeCount["영아부"] || 0,
           child: [],
           teacherCount: await getTeacherCount("교회학교", "영아부"),
         },
         {
           name: "유치부",
-          count: await Seongdo.count().where({
-            group1: "교회학교",
-            group2: "유치부",
-          }),
+          count: treeCount["유치부"] || 0,
           child: [],
           teacherCount: await getTeacherCount("교회학교", "유치부"),
         },
         {
           name: "유년부",
-          count: await Seongdo.count().where({
-            group1: "교회학교",
-            group2: "유년부",
-          }),
+          count: treeCount["유년부"] || 0,
           child: [],
           teacherCount: await getTeacherCount("교회학교", "유년부"),
         },
         {
           name: "초등부",
-          count: await Seongdo.count().where({
-            group1: "교회학교",
-            group2: "초등부",
-          }),
+          count: treeCount["초등부"] || 0,
           child: [],
           teacherCount: await getTeacherCount("교회학교", "초등부"),
         },
         {
           name: "중등부",
-          count: await Seongdo.count().where({
-            group1: "교회학교",
-            group2: "중등부",
-          }),
+          count: treeCount["중등부"] || 0,
           child: [],
           teacherCount: await getTeacherCount("교회학교", "중등부"),
         },
         {
           name: "고등부",
-          count: await Seongdo.count().where({
-            group1: "교회학교",
-            group2: "고등부",
-          }),
+          count: treeCount["고등부"] || 0,
           child: [],
           teacherCount: await getTeacherCount("교회학교", "고등부"),
         },
@@ -344,47 +282,41 @@ export const load = async ({ url, locals, fetch }) => {
   } else if (group1 == "교역자") {
     groupTree = {
       name: "교역자",
-      count: await Seongdo.count({ group1: "교역자" }),
+      count: treeCount["교역자"] || 0,
       child: [
         {
           name: "원로목사",
-          count: await Seongdo.count({ group1: "교역자", group2: "원로목사" }),
+          count: treeCount["원로목사"] || 0,
           child: [],
         },
         {
           name: "담임목사",
-          count: await Seongdo.count({ group1: "교역자", group2: "담임목사" }),
+          count: treeCount["담임목사"] || 0,
           child: [],
         },
         {
           name: "목사",
-          count: await Seongdo.count({ group1: "교역자", group2: "목사" }),
+          count: treeCount["목사"] || 0,
           child: [],
         },
         {
           name: "사모",
-          count: await Seongdo.count({ group1: "교역자", group2: "사모" }),
+          count: treeCount["사모"] || 0,
           child: [],
         },
         {
           name: "강도사",
-          count: await Seongdo.count({ group1: "교역자", group2: "강도사" }),
+          count: treeCount["강도사"] || 0,
           child: [],
         },
         {
           name: "전임전도사",
-          count: await Seongdo.count({
-            group1: "교역자",
-            group2: "전임전도사",
-          }),
+          count: treeCount["전임전도사"] || 0,
           child: [],
         },
         {
           name: "교육전도사",
-          count: await Seongdo.count({
-            group1: "교역자",
-            group2: "교육전도사",
-          }),
+          count: treeCount["교육전도사"] || 0,
           child: [],
         },
       ],
@@ -421,30 +353,23 @@ export const load = async ({ url, locals, fetch }) => {
     }
   }
 
-  const stuWithFamily = await Family.aggregate()
-    .lookup({
-      from: "seongdos",
-      localField: "memberIds",
-      foreignField: "_id",
-      as: "memberIds",
-      pipeline: [{ $match: { group1: "교회학교" } }],
-    })
-    .unwind("memberIds")
-    .project({
-      memberIds: {
-        name: 1,
-        group1: 1,
-        group2: 1,
-      },
-    })
-    .count("count")
-
-  // students = await Promise.all(
-  //   students.filter(
-  //     async (stu) => (await Family.findOne({ memberIds: stu._id }).count()) == 1
-  //   )
-  // )
-  // console.log(students)
+  // const stuWithFamily = await Family.aggregate()
+  //   .lookup({
+  //     from: "seongdos",
+  //     localField: "memberIds",
+  //     foreignField: "_id",
+  //     as: "memberIds",
+  //     pipeline: [{ $match: { group1: "교회학교" } }],
+  //   })
+  //   .unwind("memberIds")
+  //   .project({
+  //     memberIds: {
+  //       name: 1,
+  //       group1: 1,
+  //       group2: 1,
+  //     },
+  //   })
+  //   .count("count")
 
   if (groupTree) {
     return {
@@ -462,7 +387,7 @@ export const load = async ({ url, locals, fetch }) => {
         showTeacher,
       },
       groupTree,
-      stuWithFamilyCount: stuWithFamily[0].count,
+      // stuWithFamilyCount: stuWithFamily[0].count,
     }
   } else {
     return {
@@ -479,7 +404,7 @@ export const load = async ({ url, locals, fetch }) => {
         birthEnd,
         showTeacher,
       },
-      stuWithFamilyCount: stuWithFamily[0].count,
+      // stuWithFamilyCount: stuWithFamily[0].count,
     }
   }
 }

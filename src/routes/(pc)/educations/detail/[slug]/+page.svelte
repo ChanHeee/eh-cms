@@ -42,6 +42,7 @@
   $: searchName = ""
   $: education = data.education
   $: teacherList = JSON.parse(data.selectList).teacherList
+  $: allowedGroup = data.allowedGroup
 
   $: isModalHidden = true
 
@@ -161,28 +162,29 @@
       >
         <h1 class="text-lg font-medium">강의 정보</h1>
         <div class="flex ml-auto gap-2">
-          <button
-            type="submit"
-            class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#FBA244]"
-          >
-            <Save size={16} />
-            <span>저장</span>
-          </button>
+          {#if allowedGroup.includes("교육")}
+            <button
+              type="submit"
+              class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#FBA244]"
+            >
+              <Save size={16} />
+              <span>저장</span>
+            </button>
 
-          <button
-            type="button"
-            class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#FBA244]"
-            on:click={() => {
-              if (!confirm("삭제하시겠습니까?")) {
-                return false
-              }
-              deleteHandler()
-            }}
-          >
-            <TrashCan size={16} />
-            <span>삭제</span>
-          </button>
-
+            <button
+              type="button"
+              class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#FBA244]"
+              on:click={() => {
+                if (!confirm("삭제하시겠습니까?")) {
+                  return false
+                }
+                deleteHandler()
+              }}
+            >
+              <TrashCan size={16} />
+              <span>삭제</span>
+            </button>
+          {/if}
           <button
             type="button"
             class="border-gray-300 border flex items-center gap-1 rounded-sm text-xs px-2 py-[0.4rem]"
@@ -409,36 +411,38 @@
       </div>
 
       <div class="flex ml-auto gap-2">
-        <label for="file">
-          <div
-            class="cursor-pointer hidden md:flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#237334]"
+        {#if allowedGroup.includes("교육")}
+          <label for="file">
+            <div
+              class="cursor-pointer hidden md:flex h-fit items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#237334]"
+            >
+              <Document scale={16} />
+              <span>엑셀로 추가</span>
+            </div>
+          </label>
+          <input
+            id="file"
+            type="file"
+            class="hidden"
+            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+            on:change={(e) => {
+              loadFile(e)
+            }}
+          />
+          <button
+            class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#FBA244]"
+            on:click={() => {
+              $SeongdosStore = []
+              isModalHidden = !isModalHidden
+            }}
           >
-            <Document scale={16} />
-            <span>엑셀로 추가</span>
-          </div>
-        </label>
-        <input
-          id="file"
-          type="file"
-          class="hidden"
-          accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-          on:change={(e) => {
-            loadFile(e)
-          }}
-        />
-        <button
-          class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#FBA244]"
-          on:click={() => {
-            $SeongdosStore = []
-            isModalHidden = !isModalHidden
-          }}
-        >
-          <AddLarge scale={16} />
-          <span>추가</span>
-        </button>
+            <AddLarge scale={16} />
+            <span>추가</span>
+          </button>
+        {/if}
       </div>
     </div>
-    <Table />
+    <Table {allowedGroup} />
   </div>
 </div>
 

@@ -40,7 +40,7 @@
     searchParams: ISeongdoSearchParams
     groupTree: IGroup
     listName: string
-    stuWithFamilyCount: number
+    // stuWithFamilyCount: number
   }
 
   $: seongdos = data.seongdos
@@ -72,7 +72,7 @@
   $: groupTree = data.groupTree
   $: listName = data.listName
 
-  $: stuWithFamilyCount = data.stuWithFamilyCount
+  // $: stuWithFamilyCount = data.stuWithFamilyCount
 
   $: isSearchModalHidden = true
   $: isExportModalHidden = true

@@ -10,6 +10,8 @@
   import { TrashCan } from "carbon-icons-svelte"
   import toast from "svelte-french-toast"
 
+  export let allowedGroup: string[]
+
   $: seongdoEdus = $SeongdoEdusStore
   $: page = $SeongdoEduPageStore
 
@@ -172,18 +174,23 @@
     />
     {#each seongdoEdus as item, index}
       <div class="flex items-center px-3 h-10">
-        <button
-          type="button"
-          class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem]"
-          on:click={async () => {
-            const result = await deleteHandler(item.seongdo._id, item.education)
-            if (result) {
-              await invalidateAll()
-            }
-          }}
-        >
-          <TrashCan fill="#4a4a4a" size={20} />
-        </button>
+        {#if allowedGroup.includes("교육")}
+          <button
+            type="button"
+            class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem]"
+            on:click={async () => {
+              const result = await deleteHandler(
+                item.seongdo._id,
+                item.education
+              )
+              if (result) {
+                await invalidateAll()
+              }
+            }}
+          >
+            <TrashCan fill="#4a4a4a" size={20} />
+          </button>
+        {/if}
       </div>
     {/each}
   </div>
