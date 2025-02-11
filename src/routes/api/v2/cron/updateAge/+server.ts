@@ -5,7 +5,7 @@ import { json, RequestHandler } from "@sveltejs/kit"
 //*  @desc    Update seongdo's age
 //*  @route   GET /api/v2/cron/updateAge
 //*  @access  Private/Admin
-export const POST: RequestHandler = async ({ request }) => {
+export const GET: RequestHandler = async ({ request }) => {
   const date = new Date()
   const today = `${date.getMonth() + 1}-${
     date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
