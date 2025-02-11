@@ -12,18 +12,96 @@ import {
 import { json } from "@sveltejs/kit"
 
 export const GET = async ({ request, url, fetch }) => {
-  const seongdos = await Seongdo.find({ group1: "교회학교" }, {}, { limit: 2 })
-  console.log(seongdos)
+  const group1 = url.searchParams.get("group1")
 
-  const students = await Student.bulkWrite([
-    {
-      insertOne: {
-        document: seongdos[0],
+  let result = {}
+  let groupTree
+  if (group1 == "장년부") {
+    let gyogu = ["1교구", "2교구", "3교구"]
+
+    await Promise.all(
+      gyogu.map(async (item) => {
+        groupTree = await Seongdo.aggregate([
+          { $match: { group1: "장년부", group2: { $regex: item } } },
+          {
+            $group: {
+              _id: "$group2",
+              count: { $count: {} },
+            },
+          },
+        ])
+
+        let total = 0
+        groupTree.map((item) => {
+          result[item._id] = item.count
+          total += item.count
+        })
+
+        result[item] = total
+      })
+    )
+
+    groupTree = await Seongdo.aggregate([
+      { $match: { group1: "장년부" } },
+      {
+        $group: {
+          _id: "$group1",
+          count: { $count: {} },
+        },
       },
-    },
-  ])
+    ])
+    result["장년부"] = groupTree[0].count
+  } else if (group1 == "교회학교") {
+    groupTree = await Seongdo.aggregate([
+      { $match: { group1: "교회학교" } },
+      {
+        $group: {
+          _id: "$group2",
+          count: { $count: {} },
+        },
+      },
+    ])
 
-  console.log(students)
+    groupTree.map((item) => {
+      result[item._id] = item.count
+    })
+
+    groupTree = await Seongdo.aggregate([
+      { $match: { group1: "교회학교" } },
+      {
+        $group: {
+          _id: "$group1",
+          count: { $count: {} },
+        },
+      },
+    ])
+    result["교회학교"] = groupTree[0].count
+  } else if (group1 == "교역자") {
+    groupTree = await Seongdo.aggregate([
+      { $match: { group1: "교역자" } },
+      {
+        $group: {
+          _id: "$group2",
+          count: { $count: {} },
+        },
+      },
+    ])
+
+    groupTree.map((item) => {
+      result[item._id] = item.count
+    })
+
+    groupTree = await Seongdo.aggregate([
+      { $match: { group1: "교역자" } },
+      {
+        $group: {
+          _id: "$group1",
+          count: { $count: {} },
+        },
+      },
+    ])
+    result["교역자"] = groupTree[0].count
+  }
 
   return json({})
 

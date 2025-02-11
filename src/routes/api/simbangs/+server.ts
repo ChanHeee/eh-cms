@@ -2,8 +2,20 @@ import { Family } from "$lib/models/Family"
 import { Simbang } from "$lib/models/Simbang"
 import { json, type RequestHandler } from "@sveltejs/kit"
 import { Types } from "mongoose"
+import jwt from "jsonwebtoken"
+import { JWT_SECRET } from "$lib/env"
 
 export const GET: RequestHandler = async ({ request, url }) => {
+  const token = request.headers.get("authorization")
+  if (!token) {
+    return json({ success: false, message: "token is required" })
+  }
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return json({ success: false, message: "token is invalid" })
+    }
+  })
+
   const name = url.searchParams.get("name")
   const jikbun =
     url.searchParams.get("jikbun") != null

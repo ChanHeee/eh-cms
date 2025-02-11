@@ -1,9 +1,21 @@
+import { JWT_SECRET } from "$lib/env"
 import type { ISeongdo } from "$lib/interfaces"
 import { Seongdo } from "$lib/models/Seongdo"
 import { getAgeFromBirth, getGroupItem } from "$lib/utils"
 import { json, type RequestHandler } from "@sveltejs/kit"
+import jwt from "jsonwebtoken"
 
 export const GET: RequestHandler = async ({ request, url, locals }) => {
+  const token = request.headers.get("authorization")
+  if (!token) {
+    return json({ success: false, message: "token is required" })
+  }
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return json({ success: false, message: "token is invalid" })
+    }
+  })
+
   const name = url.searchParams.get("name")
   const phone = url.searchParams.get("phone")
   const jikbun =
@@ -225,7 +237,6 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
               group1: 1,
               group2: 1,
               address: 1,
-              remarks: 1,
               services: {
                 $filter: {
                   input: {
@@ -304,7 +315,8 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
             },
           },
         ]
-      : []
+      : [],
+    { allowDiskUse: true }
   )
 
   if (phone) {

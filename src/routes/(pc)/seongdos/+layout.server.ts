@@ -222,7 +222,16 @@ export const load = async ({ url, locals, fetch }) => {
   } else if (group1 == "교회학교") {
     groupTree = {
       name: "교회학교",
-      count: treeCount["교회학교"] || 0,
+      count:
+        treeCount["교회학교"] +
+          (await Seongdo.count().where({
+            "services.group1": "교회학교",
+            "services.group2": "은혜브릿지",
+          })) +
+          (await Seongdo.count().where({
+            "services.group1": "교회학교",
+            "services.group2": "늘푸른부",
+          })) || 0,
       child: [
         {
           name: "영아부",

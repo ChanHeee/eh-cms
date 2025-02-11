@@ -4,21 +4,7 @@ import type { PageServerLoad } from "./$types"
 import { ENVIRONMENT, JWT_SECRET } from "$lib/env"
 
 /** @type {import('@sveltejs/kit').Load} */
-export const load: PageServerLoad = async ({ url, locals }) => {
-  console.log(ENVIRONMENT)
-
-  // const { token } = locals
-  // if (token) {
-  //   const decoded = await jwt.verify(token, "JWT_SECRET", (err, decoded) => {
-  //     if (err) {
-  //       console.log(err.name)
-  //       return null
-  //     }
-  //     return decoded
-  //   })
-  //   throw redirect(302, "/")
-  // }
-}
+export const load: PageServerLoad = async ({ url, locals }) => {}
 
 export const actions = {
   login: async ({ request, cookies, fetch, locals }) => {
@@ -53,7 +39,7 @@ export const actions = {
   },
 
   logout: async ({ request, cookies, fetch }) => {
-    cookies.delete("token")
+    cookies.delete("token", { path: "/" })
     throw redirect(302, "/login")
   },
 }

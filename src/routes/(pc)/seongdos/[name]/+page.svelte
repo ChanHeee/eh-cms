@@ -1773,7 +1773,21 @@
             {/each}
           {/if}
         </div>
-
+        <div class="flex flex-col whitespace-nowrap border-r divide-y border-b">
+          <button
+            class="flex justify-between gap-2 px-3 bg-[#D9D9D8] font-bold items-center h-10"
+          >
+            신급
+          </button>
+          {#if members?.length > 0}
+            <!-- content here -->
+            {#each members as member}
+              <div class="flex px-3 justify-center items-center h-10">
+                {member.isSeongdo ? member?.seongdo?.singeup : ""}
+              </div>
+            {/each}
+          {/if}
+        </div>
         <div
           class="flex flex-col flex-auto sm:flex-none whitespace-nowrap border-r divide-y border-b"
         >
@@ -1783,6 +1797,20 @@
             {#each members as member}
               <div class="flex justify-center px-3 items-center h-10">
                 {member.isSeongdo ? member?.seongdo?.birth : member?.birth}
+              </div>
+            {/each}
+          {/if}
+        </div>
+
+        <div
+          class="flex flex-col flex-auto sm:flex-none whitespace-nowrap border-r divide-y border-b"
+        >
+          <button class=" px-3 font-bold h-10 bg-[#D9D9D8]"> 핸드폰 </button>
+          {#if members?.length > 0}
+            <!-- content here -->
+            {#each members as member}
+              <div class="flex justify-center px-3 items-center h-10">
+                {member.isSeongdo ? member?.seongdo?.phone : member?.phone}
               </div>
             {/each}
           {/if}

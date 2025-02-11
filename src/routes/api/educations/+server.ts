@@ -1,8 +1,20 @@
+import { JWT_SECRET } from "$lib/env"
 import { Education } from "$lib/models/Education"
 import { SeongdoEdu } from "$lib/models/SeongdoEdu"
 import { json, type RequestHandler } from "@sveltejs/kit"
+import jwt from "jsonwebtoken"
 
 export const GET: RequestHandler = async ({ request, url }) => {
+  const token = request.headers.get("authorization")
+  if (!token) {
+    return json({ success: false, message: "token is required" })
+  }
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return json({ success: false, message: "token is invalid" })
+    }
+  })
+
   const name = url.searchParams.get("name")
   const semester = url.searchParams.get("semester")
   const startDate = url.searchParams.get("startDate")

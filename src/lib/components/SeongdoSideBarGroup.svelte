@@ -994,7 +994,8 @@
     </div>
     {#each groupTree.child as child}
       <div
-        class="flex items-center pb-[10px] ml-3 sticky top-[30px] bg-gray-50"
+        class="flex items-center pb-[10px] ml-3 top-[30px] bg-gray-50"
+        class:sticky={group1 == "장년부"}
       >
         {#if child.name == group2}
           <DotFill width="12px" fill="#636363" />

@@ -3,8 +3,20 @@ import { Seongdo } from "$lib/models/Seongdo"
 import { SeongdoEdu } from "$lib/models/SeongdoEdu"
 import { json, type RequestHandler } from "@sveltejs/kit"
 import { Aggregate, Types } from "mongoose"
+import jwt from "jsonwebtoken"
+import { JWT_SECRET } from "$lib/env"
 
 export const GET: RequestHandler = async ({ request, url }) => {
+  const token = request.headers.get("authorization")
+  if (!token) {
+    return json({ success: false, message: "token is required" })
+  }
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return json({ success: false, message: "token is invalid" })
+    }
+  })
+
   let page =
     url.searchParams.get("page") != null
       ? parseInt(url.searchParams.get("page"))

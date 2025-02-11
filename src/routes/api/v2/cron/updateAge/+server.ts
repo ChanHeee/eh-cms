@@ -13,8 +13,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
   const seongdos = await Seongdo.find(
     {
-      // birth: { $regex: `${today}$` },
-      group1: "청년부",
+      birth: { $regex: `${today}$` },
     },
     "name birth"
   )
