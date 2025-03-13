@@ -13,6 +13,7 @@
     SeongdosStore,
   } from "$lib/store"
   import { getGroupString, isAllowGroup } from "$lib/utils"
+  import TableWithoutPage from "./TableWithoutPage.svelte"
 
   export let data: {
     action: String
@@ -87,11 +88,14 @@
   }
 
   const searchHandler = async () => {
-    const response = await fetch(`/api/seongdos?name=${searchName}&take=10`, {
-      headers: {
-        "content-type": "application/json",
-      },
-    })
+    const response = await fetch(
+      `/api/seongdos?name=${searchName}&excludeETC=true&take=10`,
+      {
+        headers: {
+          "content-type": "application/json",
+        },
+      }
+    )
     if (response.ok) {
       const result = await response.json()
       $SeongdosStore = result.seongdos
@@ -136,6 +140,13 @@
       }
       await invalidateAll()
     }
+  }
+
+  $: socheonId = -1
+  $: console.log(socheonId)
+
+  const socheonCheckHandler = (index) => {
+    socheonId = index
   }
 </script>
 
@@ -750,7 +761,7 @@
               }
 
               const response = await fetch(
-                `/api/seongdos?name=${socheonName}`,
+                `/api/v2/admin/socheon/getSeongdoByName?name=${socheonName}`,
                 {
                   method: "GET",
                   headers: {
@@ -766,7 +777,6 @@
                   return toast.error("일치하는 성도가 없습니다.")
                 }
                 seongdos = result.seongdos
-                page = result.page
               }
             }}
           >
@@ -776,7 +786,7 @@
           <button
             class="flex h-[2rem] max-h-[2rem] items-center rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#3493eb]"
             on:click={async () => {
-              if (seongdos?.length == 0) {
+              if (socheonId < 0) {
                 return toast.error("성도를 선택해주세요.")
               }
 
@@ -784,8 +794,8 @@
               let response = await fetch(`/api/seongdos`, {
                 method: "PUT",
                 body: JSON.stringify({
-                  _id: seongdos[0]._id,
-                  name: `${seongdos[0].name}†`,
+                  _id: seongdos[socheonId]._id,
+                  name: `${seongdos[socheonId].name}†`,
                   group1: "기타",
                   group2: "소천",
                 }),
@@ -796,7 +806,7 @@
 
               //가족관계 있는지 확인
               response = await fetch(
-                `/api/families?seongdoId=${seongdos[0]._id}`,
+                `/api/families?seongdoId=${seongdos[socheonId]._id}`,
                 {
                   method: "GET",
                   headers: {
@@ -811,12 +821,12 @@
 
               if (family) {
                 family.memberIds = family.memberIds?.filter(
-                  (id) => id != seongdos[0]._id
+                  (id) => id != seongdos[socheonId]._id
                 )
                 family.members = family.members?.filter(
                   (member) =>
                     member.isSeongdo == false ||
-                    member.seongdo._id != seongdos[0]._id
+                    member.seongdo._id != seongdos[socheonId]._id
                 )
 
                 //가족관계에서 본인 제외
@@ -844,8 +854,10 @@
       {/if}
     </div>
   </div>
-  {#if (action == "graduate" || action == "editSocheon") && seongdos?.length > 0 && page != undefined}
+  {#if action == "graduate" && seongdos?.length > 0 && page != undefined}
     <Table {seongdos} {page} />
+  {:else if action == "editSocheon" && seongdos?.length > 0}
+    <TableWithoutPage {seongdos} handler={socheonCheckHandler} />
   {:else if (action == "addTeacher" || action == "addToBridge" || action == "addToNpr" || action == "updateGyogu") && seongdos?.length > 0}
     <TableForCSV {seongdos} />
   {:else}
