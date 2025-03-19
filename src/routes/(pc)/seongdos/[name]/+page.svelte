@@ -830,8 +830,9 @@
                     </select>
                     <div
                       class="border-l border-gray-300"
-                      class:hidden={seongdo.group1 == "장년부" &&
-                      seongdo.group2 != ""
+                      class:hidden={(seongdo.group1 == "장년부" &&
+                        seongdo.group2 != "") ||
+                      seongdo.group2.startsWith("초등부")
                         ? false
                         : true}
                     />
@@ -843,44 +844,54 @@
                         group2Add = document.querySelector("#group2Add").value
                       }}
                       class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                      class:hidden={seongdo.group1 == "장년부" &&
-                      seongdo.group2 != ""
+                      class:hidden={(seongdo.group1 == "장년부" &&
+                        seongdo.group2 != "") ||
+                      seongdo.group2.startsWith("초등부")
                         ? false
                         : true}
                     >
                       <option value="none" class="hidden" />
                       <option value=""></option>
-                      <option value="1구역">1구역</option>
-                      <option value="2구역">2구역</option>
-                      <option value="3구역">3구역</option>
-                      <option value="4구역">4구역</option>
-                      <option value="5구역">5구역</option>
-                      <option value="6구역">6구역</option>
-                      <option value="7구역">7구역</option>
-                      <option value="8구역">8구역</option>
-                      <option value="9구역">9구역</option>
-                      <option value="10구역">10구역</option>
-                      <option value="11구역">11구역</option>
-                      <option value="12구역">12구역</option>
-                      <option value="13구역">13구역</option>
-                      <option value="14구역">14구역</option>
-                      <option value="15구역">15구역</option>
-                      <option value="16구역">16구역</option>
-                      <option value="17구역">17구역</option>
-                      <option value="18구역">18구역</option>
-                      <option value="19구역">19구역</option>
-                      <option value="20구역">20구역</option>
-                      <option value="21구역">21구역</option>
-                      <option value="22구역">22구역</option>
-                      <option value="23구역">23구역</option>
-                      <option value="24구역">24구역</option>
-                      <option value="25구역">25구역</option>
-                      <option value="26구역">26구역</option>
-                      <option value="27구역">27구역</option>
-                      <option value="28구역">28구역</option>
-                      <option value="29구역">29구역</option>
-                      <option value="30구역">30구역</option>
-                      <option value="청년">청년</option>
+                      {#if seongdo.group1 == "장년부"}
+                        <option value="1구역">1구역</option>
+                        <option value="2구역">2구역</option>
+                        <option value="3구역">3구역</option>
+                        <option value="4구역">4구역</option>
+                        <option value="5구역">5구역</option>
+                        <option value="6구역">6구역</option>
+                        <option value="7구역">7구역</option>
+                        <option value="8구역">8구역</option>
+                        <option value="9구역">9구역</option>
+                        <option value="10구역">10구역</option>
+                        <option value="11구역">11구역</option>
+                        <option value="12구역">12구역</option>
+                        <option value="13구역">13구역</option>
+                        <option value="14구역">14구역</option>
+                        <option value="15구역">15구역</option>
+                        <option value="16구역">16구역</option>
+                        <option value="17구역">17구역</option>
+                        <option value="18구역">18구역</option>
+                        <option value="19구역">19구역</option>
+                        <option value="20구역">20구역</option>
+                        <option value="21구역">21구역</option>
+                        <option value="22구역">22구역</option>
+                        <option value="23구역">23구역</option>
+                        <option value="24구역">24구역</option>
+                        <option value="25구역">25구역</option>
+                        <option value="26구역">26구역</option>
+                        <option value="27구역">27구역</option>
+                        <option value="28구역">28구역</option>
+                        <option value="29구역">29구역</option>
+                        <option value="30구역">30구역</option>
+                        <option value="청년">청년</option>
+                      {:else}
+                        <option value="느헤미야">느헤미야</option>
+                        <option value="엘리야">엘리야</option>
+                        <option value="바나바">바나바</option>
+                        <option value="에스더">에스더</option>
+                        <option value="여호수아">여호수아</option>
+                        <option value="한나">한나</option>
+                      {/if}
                     </select>
                   </div>
                 </div>
@@ -1201,8 +1212,9 @@
                   </select>
                   <div
                     class="border-l border-gray-300"
-                    class:hidden={seongdo.group1 == "장년부" &&
-                    seongdo.group2 != ""
+                    class:hidden={(seongdo.group1 == "장년부" &&
+                      seongdo.group2 != "") ||
+                    seongdo.group2.startsWith("초등부")
                       ? false
                       : true}
                   />
@@ -1214,43 +1226,53 @@
                       group2Add = document.querySelector("#group2MAdd").value
                     }}
                     class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
-                    class:hidden={seongdo.group1 == "장년부" &&
-                    seongdo.group2 != ""
+                    class:hidden={(seongdo.group1 == "장년부" &&
+                      seongdo.group2 != "") ||
+                    seongdo.group2.startsWith("초등부")
                       ? false
                       : true}
                   >
                     <option value="none" class="hidden" />
-                    <option value="1구역">1구역</option>
-                    <option value="2구역">2구역</option>
-                    <option value="3구역">3구역</option>
-                    <option value="4구역">4구역</option>
-                    <option value="5구역">5구역</option>
-                    <option value="6구역">6구역</option>
-                    <option value="7구역">7구역</option>
-                    <option value="8구역">8구역</option>
-                    <option value="9구역">9구역</option>
-                    <option value="10구역">10구역</option>
-                    <option value="11구역">11구역</option>
-                    <option value="12구역">12구역</option>
-                    <option value="13구역">13구역</option>
-                    <option value="14구역">14구역</option>
-                    <option value="15구역">15구역</option>
-                    <option value="16구역">16구역</option>
-                    <option value="17구역">17구역</option>
-                    <option value="18구역">18구역</option>
-                    <option value="19구역">19구역</option>
-                    <option value="20구역">20구역</option>
-                    <option value="21구역">21구역</option>
-                    <option value="22구역">22구역</option>
-                    <option value="23구역">23구역</option>
-                    <option value="24구역">24구역</option>
-                    <option value="25구역">25구역</option>
-                    <option value="26구역">26구역</option>
-                    <option value="27구역">27구역</option>
-                    <option value="28구역">28구역</option>
-                    <option value="29구역">29구역</option>
-                    <option value="30구역">30구역</option>
-                    <option value="청년">청년</option>
+                    {#if seongdo.group1 == "장년부"}
+                      <option value="1구역">1구역</option>
+                      <option value="2구역">2구역</option>
+                      <option value="3구역">3구역</option>
+                      <option value="4구역">4구역</option>
+                      <option value="5구역">5구역</option>
+                      <option value="6구역">6구역</option>
+                      <option value="7구역">7구역</option>
+                      <option value="8구역">8구역</option>
+                      <option value="9구역">9구역</option>
+                      <option value="10구역">10구역</option>
+                      <option value="11구역">11구역</option>
+                      <option value="12구역">12구역</option>
+                      <option value="13구역">13구역</option>
+                      <option value="14구역">14구역</option>
+                      <option value="15구역">15구역</option>
+                      <option value="16구역">16구역</option>
+                      <option value="17구역">17구역</option>
+                      <option value="18구역">18구역</option>
+                      <option value="19구역">19구역</option>
+                      <option value="20구역">20구역</option>
+                      <option value="21구역">21구역</option>
+                      <option value="22구역">22구역</option>
+                      <option value="23구역">23구역</option>
+                      <option value="24구역">24구역</option>
+                      <option value="25구역">25구역</option>
+                      <option value="26구역">26구역</option>
+                      <option value="27구역">27구역</option>
+                      <option value="28구역">28구역</option>
+                      <option value="29구역">29구역</option>
+                      <option value="30구역">30구역</option>
+                      <option value="청년">청년</option>
+                    {:else}
+                      <option value="느헤미야">느헤미야</option>
+                      <option value="엘리야">엘리야</option>
+                      <option value="바나바">바나바</option>
+                      <option value="에스더">에스더</option>
+                      <option value="여호수아">여호수아</option>
+                      <option value="한나">한나</option>
+                    {/if}
                   </select>
                 </div>
               </div>

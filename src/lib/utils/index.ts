@@ -72,7 +72,7 @@ export const getGroupItem = (
 ): { group1: string; group2: string; group2Add?: string } => {
   if (!group2) {
     return { group1, group2: "" }
-  } else if (group1 == "장년부") {
+  } else if (group1 == "장년부" || group2.startsWith("초등부")) {
     const first = group2.split(",")[0]
     const second = group2.split(",")[1]
     if (second) {
@@ -103,7 +103,7 @@ export const getGroupString = (
       }
     }
   } else {
-    if (group1 == "장년부") {
+    if (group1 == "장년부" || group2.startsWith("초등부")) {
       const first = group2.split(",")[0]
       const second = group2.split(",")[1]
       if (second) {

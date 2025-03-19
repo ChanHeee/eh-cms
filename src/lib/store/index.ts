@@ -30,6 +30,8 @@ export const AllowedGroupStore = writable<string[]>()
 
 export const SeongdoDeleteIdsStore = writable<string[]>()
 
+export const target = writable<string>("")
+
 // export function customStore(url) {
 //   const name = writable("")
 //   const jikbun = writable([])

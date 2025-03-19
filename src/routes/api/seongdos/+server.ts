@@ -192,13 +192,22 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
             "services.group2": group2,
           }
         } else {
-          seongdoMatch["$or"] = [
-            showTeacher
-              ? { "services.group1": group1, "services.group2": group2 }
-              : { group1, group2 },
-            // { group1, group2 },
-            // { "services.group1": group1, "services.group2": group2 },
-          ]
+          if (showTeacher) {
+            seongdoMatch["$or"] = [
+              { "services.group1": group1, "services.group2": group2 },
+            ]
+          } else {
+            seongdoMatch.group1 = group1
+            seongdoMatch.group2 = { $regex: group2 }
+          }
+
+          // seongdoMatch["$or"] = [
+          //   showTeacher
+          //     ? { "services.group1": group1, "services.group2": group2 }
+          //     : { group1, group2 },
+          //   // { group1, group2 },
+          //   // { "services.group1": group1, "services.group2": group2 },
+          // ]
         }
       }
     } else if (group1) {
@@ -469,9 +478,9 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       name: 1,
       // avatar: 1,
       gender: 1,
-      // singeup: 1,
+      singeup: 1,
       jikbun: 1,
-      // enrolled_at: 1,
+      enrolled_at: 1,
       birth: 1,
       // services: 1,
       services: {
@@ -482,7 +491,6 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       group1: 1,
       group2: 1,
       address: 1,
-      // remarks: 1,
     })
 
   // const total = await Seongdo.count(seongdoMatch)
@@ -608,17 +616,16 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
                 name: 1,
                 // avatar: 1,
                 // avatarVercelBlob: 1,
-                // gender: 1,
-                // singeup: 1,
+                gender: 1,
+                singeup: 1,
                 jikbun: 1,
-                // enrolled_at: 1,
+                enrolled_at: 1,
                 birth: 1,
                 age: 1,
                 phone: 1,
                 group1: 1,
                 group2: 1,
                 address: 1,
-                // remarks: 1,
                 services: {
                   $filter: {
                     input: {

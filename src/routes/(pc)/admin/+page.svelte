@@ -11,6 +11,7 @@
     AllowedGroupStore,
     SeongdoPageStore,
     SeongdosStore,
+    target,
   } from "$lib/store"
   import { getGroupString, isAllowGroup } from "$lib/utils"
   import TableWithoutPage from "./TableWithoutPage.svelte"
@@ -32,7 +33,6 @@
   let familyType: IFamily
   $: family = familyType
 
-  $: targetName = ""
   $: input = undefined
   $: socheonName = ""
   $: socheonSeongdo = undefined
@@ -111,7 +111,7 @@
     let response = await fetch(`/api/v2/seongdos/addTeacher`, {
       method: "POST",
       body: JSON.stringify({
-        group: targetName,
+        group: $target,
         seongdoId: teacher._id,
         classification,
       }),
@@ -143,7 +143,6 @@
   }
 
   $: socheonId = -1
-  $: console.log(socheonId)
 
   const socheonCheckHandler = (index) => {
     socheonId = index
@@ -176,7 +175,7 @@
             <span>부서 선택</span>
           </button>
           <select
-            bind:value={targetName}
+            bind:value={$target}
             class="w-[10rem] h-[2rem] max-h-[2rem] bg-gray-50 text-gray-900 text-sm focus:outline-0 border mr-2 rounded-r-sm pl-1"
             on:change={async (e) => {
               goto(`/admin?action=${action}&name=${e.target.value}`)
@@ -193,7 +192,7 @@
           <button
             class="flex h-[2rem] max-h-[2rem] items-center rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#3493eb]"
             on:click={async () => {
-              if (!targetName) {
+              if (!$target) {
                 return toast.error("부서를 선택해주세요.")
               } else if (!confirm("부서를 이동하시겠습니까?")) {
                 return false
@@ -264,7 +263,7 @@
             value=""
             class="mr-2 w-[10rem] h-[2rem] max-h-[2rem] bg-gray-50 text-gray-900 text-sm focus:outline-0 border mr-2 rounded-r-sm pl-1"
             on:change={async (e) => {
-              targetName = e.target.value
+              $target = e.target.value
             }}
           >
             <option value="영아부">영아부</option>
@@ -283,7 +282,7 @@
             on:click={async () => {
               if (!input) {
                 return toast.error("파일을 선택해주세요.")
-              } else if (!targetName) {
+              } else if (!$target) {
                 return toast.error("부서를 선택해주세요.")
               } else if (!confirm("추가하시겠습니까?")) {
                 return false
@@ -292,7 +291,7 @@
               const response = await fetch(`/api/v2/admin/addTeacher`, {
                 method: "POST",
                 body: JSON.stringify({
-                  name: targetName,
+                  name: $target,
                   seongdoNames: seongdos.map((item) => item.name),
                 }),
                 headers: {
@@ -311,8 +310,8 @@
         <div class="flex flex-col w-full">
           <div class="flex mb-3 pb-3">
             <p class="truncate text-lg font-medium mr-1">
-              {targetName
-                ? `${targetName} 교사 관리 (${teachers?.length}명)`
+              {$target
+                ? `${$target} 교사 관리 (${teachers?.length}명)`
                 : "교회학교 교사 관리"}
             </p>
             <div class="relative hidden lg:flex rounded ml-auto">
@@ -325,13 +324,13 @@
                 value=""
                 class="mr-2 w-[10rem] h-[2rem] max-h-[2rem] bg-gray-50 text-gray-900 text-sm focus:outline-0 border mr-2 rounded-r-sm pl-1"
                 on:change={async (e) => {
-                  targetName = e.target.value
+                  $target = e.target.value
 
-                  const group1 = ["1청년", "2청년"].includes(targetName)
+                  const group1 = ["1청년", "2청년"].includes($target)
                     ? "청년부"
                     : "교회학교"
                   const response = await fetch(
-                    `/api/v2/seongdos/getTeachers?group1=${group1}&group2=${targetName}`,
+                    `/api/v2/seongdos/getTeachers?group1=${group1}&group2=${$target}`,
                     {
                       headers: {
                         "content-type": "application/json",
@@ -482,7 +481,7 @@
                               method: "PATCH",
                               body: JSON.stringify({
                                 seongdoId: teacher._id,
-                                group: targetName,
+                                group: $target,
                               }),
                               headers: {
                                 "content-type": "application/json",
@@ -523,7 +522,7 @@
                 <button
                   class="bg-[#B0B1B0] px-2 h-10 border-gray-300 border-y border-r"
                   on:click|preventDefault={async () => {
-                    if (!targetName) {
+                    if (!$target) {
                       return toast.error("부서를 선택해주세요.")
                     }
                     await searchHandler()
