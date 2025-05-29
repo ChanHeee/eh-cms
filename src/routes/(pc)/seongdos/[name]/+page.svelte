@@ -3732,6 +3732,24 @@
             </span>
           </button>
           <button
+            type="button"
+            class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
+            on:click={() => {
+              const preview = document.getElementById("preview")
+              const previewM = document.getElementById("previewM")
+              seongdo.avatar = null
+              preview.src = null
+              previewM.src = null
+              reset()
+              isAvatarModalHidden = true
+            }}
+          >
+            <span class="flex items-center">
+              <TrashCan scale={16} class="mr-1" />
+              <p>삭제</p>
+            </span>
+          </button>
+          <button
             type="submit"
             class="flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
             on:click={async () => {
