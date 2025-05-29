@@ -153,6 +153,7 @@
               {:else if name == "성숙반"}
                 <option value="큐티학교">큐티학교</option>
                 <option value="기독교교양">기독교교양</option>
+                <option value="구약개관">구약개관</option>
               {:else if name == "사명자반"}
                 <option value="기도학교">기도학교</option>
                 <option value="선교학교">선교학교</option>

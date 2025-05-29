@@ -49,19 +49,19 @@ export const GET: RequestHandler = async ({ request, url }) => {
   }
   switch (order) {
     case "nameAsc":
-      query.sort({ name: 1, startDate: -1, _id: 1 })
+      query.sort({ name: 1, endDate: -1, _id: 1 })
       break
     case "nameDesc":
-      query.sort({ name: -1, startDate: -1, _id: 1 })
+      query.sort({ name: -1, endDate: -1, _id: 1 })
       break
-    case "startDateAsc":
-      query.sort({ startDate: 1, _id: 1 })
+    case "endDateAsc":
+      query.sort({ endDate: 1, _id: 1 })
       break
-    case "startDateDesc":
-      query.sort({ startDate: -1, _id: 1 })
+    case "endDateDesc":
+      query.sort({ endDate: -1, _id: 1 })
       break
     default:
-      query.sort({ startDate: -1, _id: 1 })
+      query.sort({ endDate: -1, _id: 1 })
       break
   }
 
