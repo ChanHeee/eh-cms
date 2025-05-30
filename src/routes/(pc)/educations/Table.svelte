@@ -171,34 +171,36 @@
     <button
       id="eduDateField"
       class=" flex px-3 font-bold items-center h-10 hover:bg-[#B0B1B0]"
-      class:bg-[#B0B1B0]={order == "endDateAsc" || order == "endDateDesc"
+      class:bg-[#B0B1B0]={order == "startDateAsc" || order == "startDateDesc"
         ? true
         : false}
-      class:bg-[#D9D9D8]={order == "endDateAsc" || order == "endDateDesc"
+      class:bg-[#D9D9D8]={order == "startDateAsc" || order == "startDateDesc"
         ? false
         : true}
       on:mouseover={(e) => {
-        if (order != "endDateAsc" && order != "endDateDesc") {
+        if (order != "startDateAsc" && order != "startDateDesc") {
           document
-            .getElementById("endDateDefault")
+            .getElementById("startDateDefault")
             ?.classList.remove("invisible")
         }
       }}
       on:mouseleave={(e) => {
-        if (order != "endDateAsc" && order != "endDateDesc") {
-          document.getElementById("endDateDefault")?.classList.add("invisible")
+        if (order != "startDateAsc" && order != "startDateDesc") {
+          document
+            .getElementById("startDateDefault")
+            ?.classList.add("invisible")
         }
       }}
       on:focus={null}
       on:click={() => {
         const { order } = searchParams
         let newOrder
-        if (order == "endDateAsc") {
-          newOrder = "endDateDesc"
-        } else if (order == "endDateDesc") {
+        if (order == "startDateAsc") {
+          newOrder = "startDateDesc"
+        } else if (order == "startDateDesc") {
           newOrder = ""
         } else {
-          newOrder = "endDateAsc"
+          newOrder = "startDateAsc"
         }
 
         goto(
@@ -210,24 +212,25 @@
       }}
     >
       교육 기간
-      {#if order == "endDateAsc"}
-        <ArrowsVertical id="endDateDefault" class="ml-3 hidden" />
-        <ArrowUp id="endDateAsc" class="ml-3 " />
-        <ArrowDown id="endDateDesc" class="ml-3 hidden " />
-      {:else if order == "endDateDesc"}
-        <ArrowsVertical id="endDateDefault" class="ml-3 hidden" />
-        <ArrowUp id="endDateAsc" class="ml-3 hidden" />
-        <ArrowDown id="endDateDesc" class="ml-3  " />
+      {#if order == "startDateAsc"}
+        <ArrowsVertical id="startDateDefault" class="ml-3 hidden" />
+        <ArrowUp id="startDateAsc" class="ml-3 " />
+        <ArrowDown id="startDateDesc" class="ml-3 hidden " />
+      {:else if order == "startDateDesc"}
+        <ArrowsVertical id="startDateDefault" class="ml-3 hidden" />
+        <ArrowUp id="startDateAsc" class="ml-3 hidden" />
+        <ArrowDown id="startDateDesc" class="ml-3  " />
       {:else}
-        <ArrowsVertical id="endDateDefault" class="ml-3 invisible" />
-        <ArrowUp id="endDateAsc" class="ml-3 hidden" />
-        <ArrowDown id="endDateDesc" class="ml-3 hidden " />{/if}
+        <ArrowsVertical id="startDateDefault" class="ml-3 invisible" />
+        <ArrowUp id="startDateAsc" class="ml-3 hidden" />
+        <ArrowDown id="startDateDesc" class="ml-3 hidden " />{/if}
     </button>
 
     {#each educations as item, index}
       <div class="flex px-3 items-center h-10">
         <p class="whitespace-nowrap truncate">
-          {item.endDate}
+          <!-- {{item.startDate} - {{item.endDate}}} -->
+          {`${item.startDate} ~ ${item.endDate}`}
         </p>
       </div>
     {/each}
