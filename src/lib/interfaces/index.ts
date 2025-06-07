@@ -216,6 +216,7 @@ export interface ISeongdoSearchParams {
   phone?: string
   jikbun?: string[]
   singeup?: string[]
+  gender?: string
   order?: string
   eduName?: string
   page?: number

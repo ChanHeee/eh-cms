@@ -14,6 +14,7 @@ export const load = async ({ url, locals, fetch }) => {
   const phone = url.searchParams.get("phone")
   const jikbun = JSON.parse(url.searchParams.get("jikbun"))
   const singeup = JSON.parse(url.searchParams.get("singeup"))
+  const gender = url.searchParams.get("gender")
   const order = url.searchParams.get("order")
   const page =
     url.searchParams.get("page") == ""
@@ -52,6 +53,7 @@ export const load = async ({ url, locals, fetch }) => {
     phone,
     jikbun,
     singeup,
+    gender,
     order,
     page,
     group1,
@@ -387,6 +389,7 @@ export const load = async ({ url, locals, fetch }) => {
         phone,
         jikbun,
         singeup,
+        gender,
         order,
         page,
         group1,
@@ -405,6 +408,7 @@ export const load = async ({ url, locals, fetch }) => {
         phone,
         jikbun,
         singeup,
+        gender,
         order,
         page,
         group1,

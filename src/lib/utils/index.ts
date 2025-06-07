@@ -5,6 +5,7 @@ export const getSeongdosSearchParams = ({
   phone,
   jikbun,
   singeup,
+  gender,
   order,
   eduName,
   page,
@@ -25,6 +26,7 @@ export const getSeongdosSearchParams = ({
     searchParams.push(`jikbun=${JSON.stringify(jikbun)}`)
   if (singeup && singeup.length > 0)
     searchParams.push(`singeup=${JSON.stringify(singeup)}`)
+  if (gender) searchParams.push(`gender=${gender}`)
   if (order) searchParams.push(`order=${order}`)
   if (eduName) searchParams.push(`eduName=${eduName}`)
   if (group1) {

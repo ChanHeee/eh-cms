@@ -26,6 +26,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
     url.searchParams.get("singeup") != null
       ? JSON.parse(url.searchParams.get("singeup"))
       : []
+  const gender = url.searchParams.get("gender")
   const order = url.searchParams.get("order")
   const group1 = url.searchParams.get("group1")
   const group2 = url.searchParams.get("group2")
@@ -92,6 +93,9 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
 
   if (singeup?.length > 0) {
     seongdoMatch.singeup = { $in: singeup }
+  }
+  if (gender) {
+    seongdoMatch.gender = gender
   }
 
   if (birthStart) {
