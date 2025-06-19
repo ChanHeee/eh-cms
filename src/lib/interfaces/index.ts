@@ -102,6 +102,7 @@ export interface IPage {
     phone?: string
     jikbun?: string[]
     order?: string
+    gender?: string
     className?: string
     group1?: string
     group2?: string

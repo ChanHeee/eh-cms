@@ -729,6 +729,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
         jikbun,
         singeup,
         order,
+        gender,
         group1,
         group2,
         birthStart,
