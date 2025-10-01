@@ -373,7 +373,7 @@
                       class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                     >
                       <option value="none" class="hidden" />
-                      <option value="성도">성도</option>
+                      <option value=""></option>
                       <option value="세례">세례</option>
                       <option value="입교">입교</option>
                       <option value="학습">학습</option>
@@ -735,7 +735,7 @@
                     class="flex w-full bg-gray-50 text-gray-900 text-sm focus:outline-0"
                   >
                     <option value="none" class="hidden" />
-                    <option value="성도">성도</option>
+                    <option value=""></option>
                     <option value="세례">세례</option>
                     <option value="입교">입교</option>
                     <option value="학습">학습</option>
