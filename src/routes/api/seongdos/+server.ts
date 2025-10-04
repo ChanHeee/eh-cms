@@ -181,7 +181,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       seongdoMatch["$or"] = [
         { group1: "" },
         { group1: undefined },
-        { group1, group2: { $in: ["별명부", "제적", "소천"] } },
+        { group1, group2: { $in: ["타교회", "제적", "소천"] } },
       ]
     }
   } else {

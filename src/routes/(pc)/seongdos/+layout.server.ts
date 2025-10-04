@@ -339,7 +339,7 @@ export const load = async ({ url, locals, fetch }) => {
         $or: [
           { group1: "" },
           { group1: undefined },
-          { group1, group2: { $in: ["소천", "제적"] } },
+          { group1, group2: { $in: ["소천", "제적", "타교회"] } },
         ],
       }),
       child: [
@@ -351,6 +351,11 @@ export const load = async ({ url, locals, fetch }) => {
         {
           name: "제적",
           count: await Seongdo.count({ group1: "기타", group2: "제적" }),
+          child: [],
+        },
+        {
+          name: "타교회",
+          count: await Seongdo.count({ group1: "기타", group2: "타교회" }),
           child: [],
         },
         {
