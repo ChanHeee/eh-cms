@@ -5,6 +5,7 @@ export const PUT: RequestHandler = async ({ request, url }) => {
   const _id = decodeURI(url.pathname).split("/")[3]
 
   const { members, memberIds, detail } = await request.json()
+  console.log(memberIds, members)
 
   if (memberIds.length == 0) {
     await Family.deleteOne({ _id })

@@ -24,6 +24,7 @@ const seongdoSchema = new Schema<ISeongdo>({
     infant: { type: String, required: false },
     confirm: { type: String, required: false },
   },
+  hasFamily: { type: Boolean, required: false },
   group1: { type: String, required: false },
   group2: { type: String, required: false },
   addressHistory: [{ type: String, required: false, default: [] }],

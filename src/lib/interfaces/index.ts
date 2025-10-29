@@ -45,6 +45,7 @@ export interface ISeongdo {
     startYear?: number | null
     endYear?: number | null
   }[]
+  hasFamily?: boolean
 }
 
 export interface IEducation {

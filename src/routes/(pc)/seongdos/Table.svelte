@@ -12,11 +12,11 @@
   const showTeacher = page.requestParams.showTeacher
 
   const getAddressString = (fullAddress: string) => {
-    let address = fullAddress.split(",")[0] || ""
-    let extraAddress = fullAddress.split(" (")[1]?.slice(0, -1) || ""
+    let address = fullAddress?.split(",")[0] || ""
+    let extraAddress = fullAddress?.split(" (")[1]?.slice(0, -1) || ""
     let detailAddress = extraAddress
-      ? fullAddress.split(",")[1]?.split("(")[0]?.slice(1, -1)
-      : fullAddress.split(",")[1]?.split("(")[0]?.slice(1) || ""
+      ? fullAddress?.split(",")[1]?.split("(")[0]?.slice(1, -1)
+      : fullAddress?.split(",")[1]?.split("(")[0]?.slice(1) || ""
 
     if (!address) {
       return detailAddress

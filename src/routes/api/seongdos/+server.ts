@@ -170,7 +170,8 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
 
   if (includeStu == "true" || group1 == "교회학교") {
   } else {
-    seongdoMatch.group1 = { $ne: "교회학교" }
+    seongdoMatch["$or"] = [{ group1: { $ne: "교회학교" } }, { hasFamily: true }]
+    // seongdoMatch.group1 = { $ne: "교회학교" }
   }
   if (group1 == "기타") {
     if (group2 == "미분류") {

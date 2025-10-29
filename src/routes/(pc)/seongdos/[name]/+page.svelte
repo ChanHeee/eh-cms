@@ -384,6 +384,24 @@
     }
   }
 
+  const hasFamilyHandler = async (id: string) => {
+    const response = await fetch(`/api/v2/seongdos/editHasFamily`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        id,
+        value: false,
+      }),
+      headers: {
+        "content-type": "application/json",
+      },
+    })
+
+    if (response.ok) {
+      await invalidateAll()
+    }
+    return response.ok
+  }
+
   const simbangHandler = async () => {
     if (!date || !simbangja) {
       toast.error("심방날짜와 심방자를 입력해주세요.")
@@ -1964,7 +1982,12 @@
                           (seongdo) => seongdo.name != member.name
                         )
                       }
+
                       await familyHandler()
+
+                      if (member.isSeongdo) {
+                        await hasFamilyHandler(member.seongdo?._id)
+                      }
                     }}
                   >
                     <TrashCan fill="#4a4a4a" size={20} />
