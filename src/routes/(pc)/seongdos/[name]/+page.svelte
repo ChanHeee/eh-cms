@@ -497,7 +497,7 @@
               <span>저장</span>
             </button>
 
-            <!-- <button
+            <button
               type="button"
               class="h-[2rem] max-h-[2rem] flex items-center gap-1 rounded-sm text-white text-xs px-2 py-[0.4rem] bg-[#F46055]"
               on:click={async () => {
@@ -517,13 +517,14 @@
                 if (result?.charts?.charts?.length > 0) {
                   toast.error("가족관계도에서 먼저 삭제해주세요.")
                   return goto(`/seongdos/${seongdo.name}/family-chart`)
+                } else {
+                  deleteHandler()
                 }
-                deleteHandler()
               }}
             >
               <TrashCan scale={16} />
               <span>삭제</span>
-            </button> -->
+            </button>
           {/if}
           <button
             type="button"
