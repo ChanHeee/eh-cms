@@ -46,6 +46,7 @@
     groupList: string[]
     seongdoEdus: ISeongdoEduPopulate[]
     allowedGroup: string[]
+    nameWithBirth: string
   }
 
   $: allowedGroup = data.allowedGroup
@@ -64,11 +65,25 @@
       companion = selectedSimbang?.companion
       detail = selectedSimbang?.detail
     }
+
+    const imageExist = await checkIfFileExists()
+
+    if (imageExist) {
+      seongdo.avatar = `/images/${nameWithBirth}.jpeg`
+    }
   })
+
+  async function checkIfFileExists() {
+    const response = await fetch(`/images/${nameWithBirth}.jpeg`, {
+      method: "HEAD",
+    }) // HEAD request is efficient
+    return response.ok
+  }
 
   $: groupList = data.groupList
   // value for senogdo detail
   $: seongdo = data.seongdo
+  $: nameWithBirth = data.nameWithBirth
 
   $: isNameChanged = false
   $: ageWithString = seongdo.age ? seongdo.age + " 세" : ""
@@ -205,7 +220,7 @@
   const seongdoUpdate = async () => {
     const { name, originalName, age, group2, address, ...rest } = seongdo
 
-    const response = await fetch("/api/seongdos", {
+    let response = await fetch("/api/seongdos", {
       method: "PUT",
       body: JSON.stringify({
         name: name.trim(),
@@ -223,8 +238,46 @@
         "content-type": "application/json",
       },
     })
+
+    if (seongdo.avatar) {
+      const formData = new FormData()
+      formData.append("image", croppedImage)
+      formData.append("name", nameWithBirth)
+
+      response = await fetch("/api/admin/upload-image", {
+        method: "POST",
+        body: formData,
+      })
+    } else {
+      console.log("seongdo.avatar null")
+
+      const formData = new FormData()
+      formData.append("name", nameWithBirth)
+
+      response = await fetch("/api/admin/delete-image", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (response.ok) {
+        alert("Image deleted successfully!")
+        // Handle success (e.g., display the uploaded image, clear the input)
+      } else {
+        alert("Image delete failed.")
+        // Handle error
+      }
+    }
+
+    // if (response.ok) {
+    //   alert("Image uploaded successfully!")
+    //   // Handle success (e.g., display the uploaded image, clear the input)
+    // } else {
+    //   alert("Image upload failed.")
+    //   // Handle error
+    // }
     if (response.ok) {
       addressBefore = fullAddress
+      reset()
       await invalidateAll()
       // goto(
       //   seongdo.birth
@@ -3789,7 +3842,6 @@
                 preview.src = croppedImage
                 previewM.src = croppedImage
               }
-              reset()
               isAvatarModalHidden = true
             }}
           >

@@ -138,5 +138,6 @@ export const load = loadFlash(async ({ url, fetch, locals, cookies }) => {
     groupList,
     simbangId,
     seongdoEdus,
+    nameWithBirth: value,
   }
 })
