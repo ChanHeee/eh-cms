@@ -66,11 +66,11 @@
       detail = selectedSimbang?.detail
     }
 
-    const imageExist = await checkIfFileExists()
+    // const imageExist = await checkIfFileExists()
 
-    if (imageExist) {
-      seongdo.avatar = `/images/${nameWithBirth}.jpeg`
-    }
+    // if (imageExist) {
+    //   seongdo.avatar = `/images/${nameWithBirth}.jpeg`
+    // }
   })
 
   async function checkIfFileExists() {
@@ -99,9 +99,9 @@
     : addressData.split(",")[1]?.split("(")[0]?.slice(1) || ""
 
   $: extraAddress = addressData.split(" (")[1]?.slice(0, -1) || ""
-
   $: fullAddress = getFullAddress()
   $: addressHistory = seongdo.addressHistory
+
   $: showAddressHistory = false
   let addressBefore: string
 
@@ -239,33 +239,15 @@
       },
     })
 
-    if (seongdo.avatar) {
-      const formData = new FormData()
-      formData.append("image", croppedImage)
-      formData.append("name", nameWithBirth)
-
-      response = await fetch("/api/admin/upload-image", {
-        method: "POST",
-        body: formData,
-      })
+    if (croppedImage) {
+      // const formData = new FormData()
+      // formData.append("image", croppedImage)
+      // formData.append("name", nameWithBirth)
+      // response = await fetch("/api/admin/upload-image", {
+      //   method: "POST",
+      //   body: formData,
+      // })
     } else {
-      console.log("seongdo.avatar null")
-
-      const formData = new FormData()
-      formData.append("name", nameWithBirth)
-
-      response = await fetch("/api/admin/delete-image", {
-        method: "POST",
-        body: formData,
-      })
-
-      if (response.ok) {
-        alert("Image deleted successfully!")
-        // Handle success (e.g., display the uploaded image, clear the input)
-      } else {
-        alert("Image delete failed.")
-        // Handle error
-      }
     }
 
     // if (response.ok) {
@@ -338,7 +320,7 @@
 
   const searchAddress = () => {
     new daum.Postcode({
-      oncomplete: function (data) {
+      oncomplete: async function (data) {
         var addr = "" // 주소 변수
         var extraAddr = "" // 참고항목 변수
 
@@ -357,15 +339,21 @@
           // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
           if (data.bname !== "" && /[동|로|가]$/g.test(data.bname)) {
             extraAddr += data.bname
+          } else {
+            extraAddr = ""
           }
           // 건물명이 있고, 공동주택일 경우 추가한다.
           if (data.buildingName !== "" && data.apartment === "Y") {
             extraAddr +=
               extraAddr !== "" ? ", " + data.buildingName : data.buildingName
+          } else {
+            extraAddr = ""
           }
           // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
           if (extraAddr !== "") {
             extraAddress = extraAddr
+          } else {
+            extraAddress = ""
           }
         } else {
         }
@@ -377,7 +365,7 @@
         // 커서를 상세주소 필드로 이동한다.
         // document.getElementById("detailAddress")?.removeAttribute("disabled")
         // document.getElementById("detailAddress").value = ""
-        detailAddress = ""
+
         document.getElementById("detailAddress").focus()
       },
     }).open()
@@ -607,10 +595,11 @@
                 isAvatarModalHidden = false
               }}
             >
+              <!-- src="https://drive.google.com/uc?export=view&id=1XJ-cf2RAyP6bJOVMDXcvlwtpDeREi2U3" -->
               <img
+                src={seongdo.avatar || "/avatar.png"}
                 alt=""
                 id="preview"
-                src={seongdo.avatar || "/avatar.png"}
                 class="border-gray-300 border w-[7.5rem] min-w-[7.5rem] h-[7.5rem] object-cover"
               />
             </button>
@@ -666,7 +655,7 @@
                     }}
                     class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 pl-1 pr-2 border-gray-300"
                     min="1900-01-01"
-                    max="2025-12-31"
+                    max="2026-12-31"
                     value={seongdo.enrolled_at}
                   />
                 </div>
@@ -689,7 +678,7 @@
                     }}
                     class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 pl-1 pr-2 border-gray-300 border-r"
                     min="1900-01-01"
-                    max="2025-12-31"
+                    max="2026-12-31"
                     value={seongdo.birth}
                   />
                   <input
@@ -1082,7 +1071,7 @@
                   }}
                   class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 border-gray-300 px-1"
                   min="1900-01-01"
-                  max="2025-12-31"
+                  max="2026-12-31"
                   value={seongdo.birth}
                 />
               </div>
@@ -1104,7 +1093,7 @@
                   }}
                   class="flex flex-auto bg-gray-50 border-0 text-gray-900 text-sm focus:outline-0 border-gray-300 px-1"
                   min="1900-01-01"
-                  max="2025-12-31"
+                  max="2026-12-31"
                   value={seongdo.enrolled_at}
                 />
               </div>
@@ -1468,7 +1457,7 @@
             <input
               id="detailAddress"
               autocomplete="off"
-              value={detailAddress}
+              value={detailAddress || ""}
               on:input={(e) => {
                 detailAddress = e.target.value
               }}
