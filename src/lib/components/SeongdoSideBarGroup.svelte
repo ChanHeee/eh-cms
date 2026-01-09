@@ -8,6 +8,8 @@
   import { getGroupItem, getSearchParams } from "$lib/utils"
 
   export let groupTree: IGroup
+  console.log(groupTree)
+
   export let searchParams: ISeongdoSearchParams
   $: groupItem = getGroupItem(searchParams.group1, searchParams.group2)
   $: group1 = searchParams.group1

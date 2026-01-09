@@ -7,7 +7,7 @@ export const GET = async ({ request, url, fetch }) => {
   let result = {}
   let groupTree
   if (group1 == "장년부") {
-    let gyogu = ["1교구", "2교구", "3교구"]
+    let gyogu = ["1교구", "2교구", "3교구", "4교구"]
 
     await Promise.all(
       gyogu.map(async (item) => {

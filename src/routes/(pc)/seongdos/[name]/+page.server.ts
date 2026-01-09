@@ -24,7 +24,7 @@ export const load = loadFlash(async ({ url, fetch, locals, cookies }) => {
     const child = item.split("_")[1]
     if (!child) {
       if (item.split("_")[0] == "장년부") {
-        groupList[item.split("_")[0]] = ["1교구", "2교구", "3교구"]
+        groupList[item.split("_")[0]] = ["1교구", "2교구", "3교구", "4교구"]
       } else if (item.split("_")[0] == "청년부") {
         groupList[item.split("_")[0]] = ["1청년", "2청년"]
       } else if (item.split("_")[0] == "교회학교") {
@@ -52,7 +52,7 @@ export const load = loadFlash(async ({ url, fetch, locals, cookies }) => {
   })
   if (allowedGroup.includes("전체")) {
     groupList = {
-      장년부: ["1교구", "2교구", "3교구"],
+      장년부: ["1교구", "2교구", "3교구", "4교구"],
       청년부: ["1청년", "2청년"],
       교회학교: [
         "영아부",

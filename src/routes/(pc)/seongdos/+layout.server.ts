@@ -148,6 +148,30 @@ export const load = async ({ url, locals, fetch }) => {
             }),
           ],
         },
+        {
+          name: "4교구",
+          count: treeCount["4교구"] || 0,
+          child: [
+            ...(await Promise.all(
+              ("" + Array(40)).split(",").map(async (item, idx) => {
+                if (treeCount[`4교구,${idx + 1}구역`]) {
+                  return getIGroupItem({
+                    name: `${idx + 1}구역`,
+                    count: treeCount[`4교구,${idx + 1}구역`],
+                    child: [],
+                  })
+                } else {
+                  return getIGroupItem({})
+                }
+              })
+            )),
+            getIGroupItem({
+              name: `청년`,
+              count: treeCount[`4교구,청년`] || 0,
+              child: [],
+            }),
+          ],
+        },
       ],
     }
   } else if (group1 == "청년부") {
