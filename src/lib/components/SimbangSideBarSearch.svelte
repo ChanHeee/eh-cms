@@ -139,21 +139,21 @@
                 type="checkbox"
                 id="simbangb"
                 checked={simbangjaArray.find(
-                  (element) => element == "김성태 목사"
+                  (element) => element == "윤현석 목사"
                 ) != undefined}
                 on:change={() => {
                   if (document.querySelector("#simbangb").checked) {
-                    simbangjaArray = [...simbangjaArray, "김성태 목사"]
+                    simbangjaArray = [...simbangjaArray, "윤현석 목사"]
                   } else {
                     simbangjaArray = [
                       ...simbangjaArray.filter(
-                        (value) => value !== "김성태 목사"
+                        (value) => value !== "윤현석 목사"
                       ),
                     ]
                   }
                 }}
               />
-              <label for="simbangb">김성태 목사</label>
+              <label for="simbangb">윤현석 목사</label>
             </p>
             <p class="flex text-gray-600 text-sm gap-2 px-3">
               <input
