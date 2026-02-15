@@ -94,7 +94,7 @@
                 document.getElementById("jikbun-up")?.classList.remove("hidden")
               } else {
                 const checkboxes = document.querySelectorAll(
-                  "#jikbun-dropdown input"
+                  "#jikbun-dropdown input",
                 )
                 document
                   .getElementById("jikbun-dropdown")
@@ -172,7 +172,7 @@
                     id="a1"
                     class="text-xs mr-2"
                     checked={jikbunArray.find(
-                      (element) => element == "시무장로"
+                      (element) => element == "시무장로",
                     ) != undefined}
                     on:change={() => {
                       if (document.querySelector("#a1").checked) {
@@ -184,7 +184,7 @@
                       } else {
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (value) => value !== "시무장로"
+                            (value) => value !== "시무장로",
                           ),
                         ]
                       }
@@ -198,7 +198,7 @@
                     id="a2"
                     class="text-xs mr-2"
                     checked={jikbunArray.find(
-                      (element) => element == "무임장로"
+                      (element) => element == "무임장로",
                     ) != undefined}
                     on:change={() => {
                       if (document.querySelector("#a2").checked) {
@@ -210,7 +210,7 @@
                       } else {
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (value) => value !== "무임장로"
+                            (value) => value !== "무임장로",
                           ),
                         ]
                       }
@@ -224,7 +224,7 @@
                     id="a3"
                     class="text-xs mr-2"
                     checked={jikbunArray.find(
-                      (element) => element == "협동장로"
+                      (element) => element == "협동장로",
                     ) != undefined}
                     on:change={() => {
                       if (document.querySelector("#a3").checked) {
@@ -236,7 +236,7 @@
                       } else {
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (value) => value !== "협동장로"
+                            (value) => value !== "협동장로",
                           ),
                         ]
                       }
@@ -250,7 +250,7 @@
                     id="a4"
                     class="text-xs mr-2"
                     checked={jikbunArray.find(
-                      (element) => element == "은퇴장로"
+                      (element) => element == "은퇴장로",
                     ) != undefined}
                     on:change={() => {
                       if (document.querySelector("#a4").checked) {
@@ -262,7 +262,7 @@
                       } else {
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (value) => value !== "은퇴장로"
+                            (value) => value !== "은퇴장로",
                           ),
                         ]
                       }
@@ -276,7 +276,7 @@
                     id="a5"
                     class="text-xs mr-2"
                     checked={jikbunArray.find(
-                      (element) => element == "무임은퇴장로"
+                      (element) => element == "무임은퇴장로",
                     ) != undefined}
                     on:change={() => {
                       if (document.querySelector("#a5").checked) {
@@ -288,7 +288,7 @@
                       } else {
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (value) => value !== "무임은퇴장로"
+                            (value) => value !== "무임은퇴장로",
                           ),
                         ]
                       }
@@ -351,7 +351,7 @@
                     id="b1"
                     class="text-xs mr-2"
                     checked={jikbunArray.find(
-                      (element) => element == "시무권사"
+                      (element) => element == "시무권사",
                     ) != undefined}
                     on:change={() => {
                       if (document.querySelector("#b1").checked) {
@@ -363,7 +363,7 @@
                       } else {
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (value) => value !== "시무권사"
+                            (value) => value !== "시무권사",
                           ),
                         ]
                       }
@@ -377,7 +377,7 @@
                     id="b2"
                     class="text-xs mr-2"
                     checked={jikbunArray.find(
-                      (element) => element == "무임권사"
+                      (element) => element == "무임권사",
                     ) != undefined}
                     on:change={() => {
                       if (document.querySelector("#b2").checked) {
@@ -389,7 +389,7 @@
                       } else {
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (value) => value !== "무임권사"
+                            (value) => value !== "무임권사",
                           ),
                         ]
                       }
@@ -403,7 +403,7 @@
                     id="b3"
                     class="text-xs mr-2"
                     checked={jikbunArray.find(
-                      (element) => element == "은퇴권사"
+                      (element) => element == "은퇴권사",
                     ) != undefined}
                     on:change={() => {
                       if (document.querySelector("#b3").checked) {
@@ -415,7 +415,7 @@
                       } else {
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (value) => value !== "은퇴권사"
+                            (value) => value !== "은퇴권사",
                           ),
                         ]
                       }
@@ -429,7 +429,7 @@
                     id="b4"
                     class="text-xs mr-2"
                     checked={jikbunArray.find(
-                      (element) => element == "무임은퇴권사"
+                      (element) => element == "무임은퇴권사",
                     ) != undefined}
                     on:change={() => {
                       if (document.querySelector("#b4").checked) {
@@ -441,7 +441,7 @@
                       } else {
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (value) => value !== "무임은퇴권사"
+                            (value) => value !== "무임은퇴권사",
                           ),
                         ]
                       }
@@ -471,7 +471,7 @@
                 type="checkbox"
                 id="c"
                 checked={jikbunArray.find(
-                  (element) => element == "장립집사all"
+                  (element) => element == "장립집사all",
                 ) != undefined}
                 on:change={() => {
                   if (document.querySelector("#c").checked) {
@@ -482,7 +482,7 @@
 
                     jikbunArray = [
                       ...jikbunArray.filter(
-                        (value) => !value.includes("장립집사")
+                        (value) => !value.includes("장립집사"),
                       ),
                       "장립집사all",
                     ]
@@ -508,21 +508,21 @@
                     id="c1"
                     class="text-xs mr-2"
                     checked={jikbunArray.find(
-                      (element) => element == "장립집사"
+                      (element) => element == "장립집사",
                     ) != undefined}
                     on:change={() => {
                       if (document.querySelector("#c1").checked) {
                         document.querySelector("#c").checked = false
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (item) => item != "장립집사all"
+                            (item) => item != "장립집사all",
                           ),
                           "장립집사",
                         ]
                       } else {
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (value) => value !== "장립집사"
+                            (value) => value !== "장립집사",
                           ),
                         ]
                       }
@@ -536,21 +536,21 @@
                     id="c2"
                     class="text-xs mr-2"
                     checked={jikbunArray.find(
-                      (element) => element == "무임장립집사"
+                      (element) => element == "무임장립집사",
                     ) != undefined}
                     on:change={() => {
                       if (document.querySelector("#c2").checked) {
                         document.querySelector("#c").checked = false
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (item) => item != "장립집사all"
+                            (item) => item != "장립집사all",
                           ),
                           "무임장립집사",
                         ]
                       } else {
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (value) => value !== "무임장립집사"
+                            (value) => value !== "무임장립집사",
                           ),
                         ]
                       }
@@ -565,21 +565,21 @@
                     id="c3"
                     class="text-xs mr-2"
                     checked={jikbunArray.find(
-                      (element) => element == "은퇴장립집사"
+                      (element) => element == "은퇴장립집사",
                     ) != undefined}
                     on:change={() => {
                       if (document.querySelector("#c3").checked) {
                         document.querySelector("#c").checked = false
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (item) => item != "장립집사all"
+                            (item) => item != "장립집사all",
                           ),
                           "은퇴장립집사",
                         ]
                       } else {
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (value) => value !== "은퇴장립집사"
+                            (value) => value !== "은퇴장립집사",
                           ),
                         ]
                       }
@@ -594,21 +594,21 @@
                     id="c4"
                     class="text-xs mr-2"
                     checked={jikbunArray.find(
-                      (element) => element == "무임은퇴장립집사"
+                      (element) => element == "무임은퇴장립집사",
                     ) != undefined}
                     on:change={() => {
                       if (document.querySelector("#c4").checked) {
                         document.querySelector("#c").checked = false
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (item) => item != "장립집사all"
+                            (item) => item != "장립집사all",
                           ),
                           "무임은퇴장립집사",
                         ]
                       } else {
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (value) => value !== "무임은퇴장립집사"
+                            (value) => value !== "무임은퇴장립집사",
                           ),
                         ]
                       }
@@ -638,7 +638,7 @@
                 type="checkbox"
                 id="d"
                 checked={jikbunArray.find(
-                  (element) => element == "서리집사all"
+                  (element) => element == "서리집사all",
                 ) != undefined}
                 on:change={() => {
                   if (document.querySelector("#d").checked) {
@@ -646,7 +646,7 @@
 
                     jikbunArray = [
                       ...jikbunArray.filter(
-                        (value) => !value.includes("서리집사")
+                        (value) => !value.includes("서리집사"),
                       ),
                       "서리집사all",
                     ]
@@ -672,21 +672,21 @@
                     id="d1"
                     class="text-xs mr-2"
                     checked={jikbunArray.find(
-                      (element) => element == "서리집사"
+                      (element) => element == "서리집사",
                     ) != undefined}
                     on:change={() => {
                       if (document.querySelector("#d1").checked) {
                         document.querySelector("#d").checked = false
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (item) => item != "서리집사all"
+                            (item) => item != "서리집사all",
                           ),
                           "서리집사",
                         ]
                       } else {
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (value) => value !== "서리집사all"
+                            (value) => value !== "서리집사all",
                           ),
                         ]
                       }
@@ -700,21 +700,21 @@
                     id="d2"
                     class="text-xs mr-2"
                     checked={jikbunArray.find(
-                      (element) => element == "명예서리집사"
+                      (element) => element == "명예서리집사",
                     ) != undefined}
                     on:change={() => {
                       if (document.querySelector("#d2").checked) {
                         document.querySelector("#d").checked = false
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (item) => item != "서리집사all"
+                            (item) => item != "서리집사all",
                           ),
                           "명예서리집사",
                         ]
                       } else {
                         jikbunArray = [
                           ...jikbunArray.filter(
-                            (value) => value !== "명예서리집사"
+                            (value) => value !== "명예서리집사",
                           ),
                         ]
                       }
@@ -724,25 +724,7 @@
                 </div>
               </div>
             </button>
-            <!-- 권찰 checkbox -->
-            <p class="flex text-gray-600 text-sm gap-2 px-3">
-              <input
-                type="checkbox"
-                id="e"
-                checked={jikbunArray.find((element) => element == "권찰") !=
-                  undefined}
-                on:change={() => {
-                  if (document.querySelector("#e").checked) {
-                    jikbunArray = [...jikbunArray, "권찰"]
-                  } else {
-                    jikbunArray = [
-                      ...jikbunArray.filter((value) => value !== "권찰"),
-                    ]
-                  }
-                }}
-              />
-              <label for="e">권찰</label>
-            </p>
+
             <p class="flex text-gray-600 text-sm gap-2 px-3">
               <input
                 type="checkbox"
@@ -791,7 +773,7 @@
                   ?.classList.remove("hidden")
               } else {
                 const checkboxes = document.querySelectorAll(
-                  "#singeup-dropdown input"
+                  "#singeup-dropdown input",
                 )
                 document
                   .getElementById("singeup-dropdown")
@@ -821,7 +803,7 @@
                 type="checkbox"
                 id="singeupa"
                 checked={singeupArray.find(
-                  (element) => element == "유아세례"
+                  (element) => element == "유아세례",
                 ) != undefined}
                 on:change={() => {
                   if (document.querySelector("#singeupa").checked) {
@@ -917,7 +899,7 @@
                 document.getElementById("gender-up")?.classList.remove("hidden")
               } else {
                 const checkboxes = document.querySelectorAll(
-                  "#gender-dropdown input"
+                  "#gender-dropdown input",
                 )
                 document
                   .getElementById("gender-dropdown")
