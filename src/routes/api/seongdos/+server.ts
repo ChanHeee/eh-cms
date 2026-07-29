@@ -71,7 +71,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
         "무임장로",
         "협동장로",
         "은퇴장로",
-        "무임은퇴장로"
+        "무임은퇴장로",
       )
     }
     if (jikbun.includes("권사")) {
@@ -82,7 +82,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
         "장립집사",
         "무임장립집사",
         "은퇴장립집사",
-        "무임은퇴장립집사"
+        "무임은퇴장립집사",
       )
     }
     if (jikbun.includes("서리집사all")) {
@@ -281,56 +281,56 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
                           ],
                         }
                       : group2 && group1 != "장년부"
-                      ? {
-                          $and: [
-                            { $eq: ["$$data.group1", group1] },
-                            { $eq: ["$$data.group2", group2] },
-                            {
-                              $or: [
-                                {
-                                  $eq: [
-                                    "$$data.startYear",
-                                    new Date().getFullYear(),
-                                  ],
-                                },
-                                {
-                                  $and: [
-                                    { $ne: ["$$data.startYear", null] },
-                                    { $eq: ["$$data.endYear", null] },
-                                  ],
-                                },
-                              ],
-                            },
-                          ],
-                        }
-                      : {
-                          $and: [
-                            { $eq: ["$$data.group1", group1] },
-                            {
-                              $or: [
-                                {
-                                  $eq: [
-                                    "$$data.startYear",
-                                    new Date().getFullYear(),
-                                  ],
-                                },
-                                {
-                                  $and: [
-                                    { $ne: ["$$data.startYear", null] },
-                                    { $eq: ["$$data.endYear", null] },
-                                  ],
-                                },
-                              ],
-                            },
-                          ],
-                        },
+                        ? {
+                            $and: [
+                              { $eq: ["$$data.group1", group1] },
+                              { $eq: ["$$data.group2", group2] },
+                              {
+                                $or: [
+                                  {
+                                    $eq: [
+                                      "$$data.startYear",
+                                      new Date().getFullYear(),
+                                    ],
+                                  },
+                                  {
+                                    $and: [
+                                      { $ne: ["$$data.startYear", null] },
+                                      { $eq: ["$$data.endYear", null] },
+                                    ],
+                                  },
+                                ],
+                              },
+                            ],
+                          }
+                        : {
+                            $and: [
+                              { $eq: ["$$data.group1", group1] },
+                              {
+                                $or: [
+                                  {
+                                    $eq: [
+                                      "$$data.startYear",
+                                      new Date().getFullYear(),
+                                    ],
+                                  },
+                                  {
+                                    $and: [
+                                      { $ne: ["$$data.startYear", null] },
+                                      { $eq: ["$$data.endYear", null] },
+                                    ],
+                                  },
+                                ],
+                              },
+                            ],
+                          },
                 },
               },
             },
           },
         ]
       : [],
-    { allowDiskUse: true }
+    { allowDiskUse: true },
   )
 
   if (phone) {
@@ -474,7 +474,6 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
 
   const seongdos = await aggregate
     .match(seongdoMatch)
-    .sort(aggregateSort)
     .skip((page - 1) * take)
     .limit(take)
     .collation({ locale: "en_US", numericOrdering: true })
@@ -497,6 +496,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       group2: 1,
       address: 1,
     })
+    .sort(aggregateSort)
 
   // const total = await Seongdo.count(seongdoMatch)
 
@@ -552,55 +552,55 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
                             ],
                           }
                         : group2 && group1 != "장년부"
-                        ? {
-                            $and: [
-                              { $eq: ["$$data.group1", group1] },
-                              { $eq: ["$$data.group2", group2] },
-                              {
-                                $or: [
-                                  {
-                                    $eq: [
-                                      "$$data.startYear",
-                                      new Date().getFullYear(),
-                                    ],
-                                  },
-                                  {
-                                    $and: [
-                                      { $ne: ["$$data.startYear", null] },
-                                      { $eq: ["$$data.endYear", null] },
-                                    ],
-                                  },
-                                ],
-                              },
-                            ],
-                          }
-                        : {
-                            $and: [
-                              { $eq: ["$$data.group1", group1] },
-                              {
-                                $or: [
-                                  {
-                                    $eq: [
-                                      "$$data.startYear",
-                                      new Date().getFullYear(),
-                                    ],
-                                  },
-                                  {
-                                    $and: [
-                                      { $ne: ["$$data.startYear", null] },
-                                      { $eq: ["$$data.endYear", null] },
-                                    ],
-                                  },
-                                ],
-                              },
-                            ],
-                          },
+                          ? {
+                              $and: [
+                                { $eq: ["$$data.group1", group1] },
+                                { $eq: ["$$data.group2", group2] },
+                                {
+                                  $or: [
+                                    {
+                                      $eq: [
+                                        "$$data.startYear",
+                                        new Date().getFullYear(),
+                                      ],
+                                    },
+                                    {
+                                      $and: [
+                                        { $ne: ["$$data.startYear", null] },
+                                        { $eq: ["$$data.endYear", null] },
+                                      ],
+                                    },
+                                  ],
+                                },
+                              ],
+                            }
+                          : {
+                              $and: [
+                                { $eq: ["$$data.group1", group1] },
+                                {
+                                  $or: [
+                                    {
+                                      $eq: [
+                                        "$$data.startYear",
+                                        new Date().getFullYear(),
+                                      ],
+                                    },
+                                    {
+                                      $and: [
+                                        { $ne: ["$$data.startYear", null] },
+                                        { $eq: ["$$data.endYear", null] },
+                                      ],
+                                    },
+                                  ],
+                                },
+                              ],
+                            },
                   },
                 },
               },
             },
           ]
-        : []
+        : [],
     )
       .addFields({
         phoneWithoutDash: {
@@ -661,55 +661,55 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
                             ],
                           }
                         : group2 && group1 != "장년부"
-                        ? {
-                            $and: [
-                              { $eq: ["$$data.group1", group1] },
-                              { $eq: ["$$data.group2", group2] },
-                              {
-                                $or: [
-                                  {
-                                    $eq: [
-                                      "$$data.startYear",
-                                      new Date().getFullYear(),
-                                    ],
-                                  },
-                                  {
-                                    $and: [
-                                      { $ne: ["$$data.startYear", null] },
-                                      { $eq: ["$$data.endYear", null] },
-                                    ],
-                                  },
-                                ],
-                              },
-                            ],
-                          }
-                        : {
-                            $and: [
-                              { $eq: ["$$data.group1", group1] },
-                              {
-                                $or: [
-                                  {
-                                    $eq: [
-                                      "$$data.startYear",
-                                      new Date().getFullYear(),
-                                    ],
-                                  },
-                                  {
-                                    $and: [
-                                      { $ne: ["$$data.startYear", null] },
-                                      { $eq: ["$$data.endYear", null] },
-                                    ],
-                                  },
-                                ],
-                              },
-                            ],
-                          },
+                          ? {
+                              $and: [
+                                { $eq: ["$$data.group1", group1] },
+                                { $eq: ["$$data.group2", group2] },
+                                {
+                                  $or: [
+                                    {
+                                      $eq: [
+                                        "$$data.startYear",
+                                        new Date().getFullYear(),
+                                      ],
+                                    },
+                                    {
+                                      $and: [
+                                        { $ne: ["$$data.startYear", null] },
+                                        { $eq: ["$$data.endYear", null] },
+                                      ],
+                                    },
+                                  ],
+                                },
+                              ],
+                            }
+                          : {
+                              $and: [
+                                { $eq: ["$$data.group1", group1] },
+                                {
+                                  $or: [
+                                    {
+                                      $eq: [
+                                        "$$data.startYear",
+                                        new Date().getFullYear(),
+                                      ],
+                                    },
+                                    {
+                                      $and: [
+                                        { $ne: ["$$data.startYear", null] },
+                                        { $eq: ["$$data.endYear", null] },
+                                      ],
+                                    },
+                                  ],
+                                },
+                              ],
+                            },
                   },
                 },
               },
             },
           ]
-        : []
+        : [],
     )
 
       .match(seongdoMatch)
@@ -762,9 +762,9 @@ export async function POST({ request }) {
 
           await Seongdo.updateOne(
             { name: seongdo.name },
-            { $set: updateObject }
+            { $set: updateObject },
           )
-        })
+        }),
       )
       return json({ success: true })
     } else {
@@ -810,7 +810,7 @@ export async function PUT({ request }) {
       },
     },
   ]
-  if (address != addressBefore) {
+  if (address != addressBefore && addressBefore != "") {
     bulkWirteOptions.push({
       updateOne: {
         filter: { _id },
