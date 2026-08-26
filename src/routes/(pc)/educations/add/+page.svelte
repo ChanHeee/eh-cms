@@ -35,7 +35,7 @@
     if (response.ok) {
       toast.success("저장되었습니다.")
       goto(
-        `/educations/detail/${getSlug(name, semester, startDate)}?create=true`
+        `/educations/detail/${getSlug(name, semester, startDate)}?create=true`,
       )
     }
   }
@@ -113,7 +113,7 @@
               id="teacher"
               on:change={() => {
                 teacher = document.querySelector(
-                  "#teacher > option:checked"
+                  "#teacher > option:checked",
                 ).value
               }}
               class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
@@ -141,7 +141,7 @@
               id="semester"
               on:change={() => {
                 semester = document.querySelector(
-                  "#semester > option:checked"
+                  "#semester > option:checked",
                 ).value
               }}
               class="flex flex-auto bg-gray-50 text-gray-900 text-sm focus:outline-0"
@@ -154,6 +154,7 @@
                 <option value="큐티학교">큐티학교</option>
                 <option value="기독교교양">기독교교양</option>
                 <option value="구약개관">구약개관</option>
+                <option value="신약개관">신약개관</option>
               {:else if name == "사명자반"}
                 <option value="기도학교">기도학교</option>
                 <option value="선교학교">선교학교</option>
