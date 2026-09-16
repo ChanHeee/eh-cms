@@ -8,14 +8,13 @@
   import { getGroupItem, getSearchParams } from "$lib/utils"
 
   export let groupTree: IGroup
-  console.log(groupTree)
-
   export let searchParams: ISeongdoSearchParams
   $: groupItem = getGroupItem(searchParams.group1, searchParams.group2)
   $: group1 = searchParams.group1
   $: group2 = searchParams.group2
   $: name = searchParams.name
   $: phone = searchParams.phone
+  $: gender = searchParams.gender
   $: jikbunArray = searchParams.jikbun ?? []
   $: singeupArray = searchParams.singeup ?? []
   $: birthStart = searchParams.birthStart
@@ -29,6 +28,7 @@
       page: 1,
       name,
       phone,
+      gender,
       jikbun: jikbunArray,
       singeup: singeupArray,
       birthStart,
@@ -878,6 +878,86 @@
                 }}
               />
               <label for="singeupd">세례</label>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 성별 검색 -->
+  <div class="flex flex-col w-full justify-center items-center">
+    <div class="flex w-full items-center mx-auto">
+      <div
+        class="flex w-full bg-gray-50 border-y border-x border-gray-300 focus:outline-0"
+      >
+        <div class="flex flex-col w-full">
+          <input
+            type="checkbox"
+            id="genderDropdown"
+            class="gender-input hidden"
+            on:change={(e) => {
+              if (e.target.checked) {
+                document
+                  .getElementById("gender-dropdown")
+                  ?.classList.remove("hidden")
+
+                document.getElementById("gender-down")?.classList.add("hidden")
+                document.getElementById("gender-up")?.classList.remove("hidden")
+              } else {
+                const checkboxes = document.querySelectorAll(
+                  "#gender-dropdown input",
+                )
+                document
+                  .getElementById("gender-dropdown")
+                  ?.classList.add("hidden")
+                document
+                  .getElementById("gender-down")
+                  ?.classList.remove("hidden")
+                document.getElementById("gender-up")?.classList.add("hidden")
+                checkboxes.forEach((checkbox) => {
+                  checkbox.checked = false
+                })
+              }
+            }}
+          />
+          <label class="flex w-full justify-between p-2" for="genderDropdown">
+            <p class="text-gray-400 text-sm select-none">성별</p>
+            <ChevronDown id="gender-down" class="cursor-pointer" />
+            <ChevronUp id="gender-up" class="hidden cursor-pointer" />
+          </label>
+
+          <div
+            id="gender-dropdown"
+            class="hidden grid grid-cols-2 gap-[5px] border-t border-gray-300 focus:outline-0 px-3 py-2"
+          >
+            <p class="flex text-gray-600 text-sm gap-2 px-3">
+              <input
+                type="radio"
+                name="gender"
+                id="gendera"
+                checked={gender == "남자"}
+                on:change={(e) => {
+                  if (e.target.checked) {
+                    gender = "남자"
+                  }
+                }}
+              />
+              <label for="gendera">남자</label>
+            </p>
+            <p class="flex text-gray-600 text-sm gap-2 px-3">
+              <input
+                type="radio"
+                name="gender"
+                id="genderb"
+                checked={gender == "여자"}
+                on:change={(e) => {
+                  if (e.target.checked) {
+                    gender = "여자"
+                  }
+                }}
+              />
+              <label for="genderb">여자</label>
             </p>
           </div>
         </div>

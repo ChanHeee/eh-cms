@@ -915,7 +915,7 @@
             }}
           />
           <label class="flex w-full justify-between p-2" for="genderDropdown">
-            <p class="text-gray-400 text-sm select-none">신급</p>
+            <p class="text-gray-400 text-sm select-none">성별</p>
             <ChevronDown id="gender-down" class="hidden cursor-pointer" />
             <ChevronUp id="gender-up" class="cursor-pointer" />
           </label>

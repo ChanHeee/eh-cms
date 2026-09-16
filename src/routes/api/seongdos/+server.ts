@@ -474,8 +474,7 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
 
   const seongdos = await aggregate
     .match(seongdoMatch)
-    .skip((page - 1) * take)
-    .limit(take)
+
     .collation({ locale: "en_US", numericOrdering: true })
     .project({
       _id: 1,
@@ -497,6 +496,8 @@ export const GET: RequestHandler = async ({ request, url, locals }) => {
       address: 1,
     })
     .sort(aggregateSort)
+    .skip((page - 1) * take)
+    .limit(take)
 
   // const total = await Seongdo.count(seongdoMatch)
 
