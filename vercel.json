@@ -2,7 +2,8 @@
   "git": {
     "deploymentEnabled": {
       "codex/add-new-testament-overview": false,
-      "codex/add-bible-college": false
+      "codex/add-bible-college": false,
+      "codex/fix-vercel-node-runtime": false
     }
   },
   "crons": [
