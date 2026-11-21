@@ -1,7 +1,8 @@
 {
   "git": {
     "deploymentEnabled": {
-      "codex/add-new-testament-overview": false
+      "codex/add-new-testament-overview": false,
+      "codex/add-bible-college": false
     }
   },
   "crons": [
