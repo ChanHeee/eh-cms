@@ -114,6 +114,11 @@ export const load = async ({ url, locals, fetch }) => {
           count: await getEduCount("성숙반", "구약개관"),
           child: [],
         },
+        {
+          name: "신약개관",
+          count: await getEduCount("성숙반", "신약개관"),
+          child: [],
+        },
       ],
     }
   } else if (className == "사명자반") {
@@ -129,6 +134,23 @@ export const load = async ({ url, locals, fetch }) => {
         {
           name: "선교학교",
           count: await getEduCount("사명자반", "선교학교"),
+          child: [],
+        },
+      ],
+    }
+  } else if (className == "바이블 칼리지반") {
+    groupTree = {
+      name: className,
+      count: await getEduCount(className),
+      child: [
+        {
+          name: "갈라디아서",
+          count: await getEduCount(className, "갈라디아서"),
+          child: [],
+        },
+        {
+          name: "빌립보서",
+          count: await getEduCount(className, "빌립보서"),
           child: [],
         },
       ],
@@ -173,6 +195,11 @@ export const load = async ({ url, locals, fetch }) => {
         {
           name: "사명자반",
           count: await getEduCount("사명자반"),
+          child: [],
+        },
+        {
+          name: "바이블 칼리지반",
+          count: await getEduCount("바이블 칼리지반"),
           child: [],
         },
         {

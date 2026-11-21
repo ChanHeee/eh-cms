@@ -126,6 +126,27 @@
     </li>
     <li
       class="hover:bg-[#D9D9D8] cursor-pointer"
+      class:bg-[#D9D9D8]={className == "바이블 칼리지반" ? true : false}
+    >
+      <button
+        class="py-4 flex w-full flex-col items-center text-white hover:text-[#FBA244] font-medium"
+        class:text-[#FBA244]={className == "바이블 칼리지반" ? true : false}
+        class:text-white={className != "바이블 칼리지반" ? true : false}
+        on:click={() => {
+          name = ""
+          goto("/educations/바이블%20칼리지반")
+        }}
+      >
+        <BookStroke
+          color={className == "바이블 칼리지반" ? "#FBA244" : "#FFFFFF"}
+          width="20px"
+          classString="mb-1"
+        />
+        <p class="leading-tight text-center">바이블<br />칼리지반</p>
+      </button>
+    </li>
+    <li
+      class="hover:bg-[#D9D9D8] cursor-pointer"
       class:bg-[#D9D9D8]={className == "통합" ? true : false}
     >
       <button

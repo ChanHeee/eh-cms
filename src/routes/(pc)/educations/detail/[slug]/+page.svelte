@@ -141,7 +141,7 @@
     <form
       id="temp"
       class="flex flex-col bg-white"
-      on:submit={async () => {
+      on:submit|preventDefault={async () => {
         const isSuccess = await submitHandler()
         if (isSuccess) {
           toast.success("저장 되었습니다.")
@@ -230,6 +230,7 @@
                 <option value="기초반">기초반</option>
                 <option value="성숙반">성숙반</option>
                 <option value="사명자반">사명자반</option>
+                <option value="바이블 칼리지반">바이블 칼리지반</option>
               </select>
             </div>
           </div>
@@ -286,9 +287,13 @@
                   <option value="큐티학교">큐티학교</option>
                   <option value="기독교교양">기독교교양</option>
                   <option value="구약개관">구약개관</option>
+                  <option value="신약개관">신약개관</option>
                 {:else if education.name == "사명자반"}
                   <option value="기도학교">기도학교</option>
                   <option value="선교학교">선교학교</option>
+                {:else if education.name == "바이블 칼리지반"}
+                  <option value="갈라디아서">갈라디아서</option>
+                  <option value="빌립보서">빌립보서</option>
                 {/if}
               </select>
             </div>

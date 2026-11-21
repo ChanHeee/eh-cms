@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation"
+  import { getEduSlug } from "$lib/utils"
   import { Checkmark } from "carbon-icons-svelte"
   import toast from "svelte-french-toast"
 
@@ -35,18 +36,15 @@
     if (response.ok) {
       toast.success("저장되었습니다.")
       goto(
-        `/educations/detail/${getSlug(name, semester, startDate)}?create=true`,
+        `/educations/detail/${getEduSlug(name.trim(), semester, startDate, day, time)}?create=true`,
       )
     }
   }
 
-  const getSlug = (name: string, semester: string, startDate: string) => {
-    return `${name}-${semester}-${startDate}`
-  }
 </script>
 
 <div id="content" class="sm:px-16 px-6 pt-8 flex w-full bg-white">
-  <form class="flex flex-col w-full-if-mobile" on:submit={submitHandler}>
+  <form class="flex flex-col w-full-if-mobile" on:submit|preventDefault={submitHandler}>
     <!-- 새강의생성 -->
     <div class="flex justify-between items-start mb-2">
       <h1 class="text-lg font-medium">새 강의 생성</h1>
@@ -96,6 +94,7 @@
               <option value="기초반">기초반</option>
               <option value="성숙반">성숙반</option>
               <option value="사명자반">사명자반</option>
+              <option value="바이블 칼리지반">바이블 칼리지반</option>
             </select>
           </div>
         </div>
@@ -158,6 +157,9 @@
               {:else if name == "사명자반"}
                 <option value="기도학교">기도학교</option>
                 <option value="선교학교">선교학교</option>
+              {:else if name == "바이블 칼리지반"}
+                <option value="갈라디아서">갈라디아서</option>
+                <option value="빌립보서">빌립보서</option>
               {/if}
             </select>
           </div>

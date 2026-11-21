@@ -34,7 +34,7 @@
       semester,
     })
 
-    if (!["기초반", "성숙반", "사명자반", "전체", ""].includes(className)) {
+    if (!["기초반", "성숙반", "사명자반", "바이블 칼리지반", "전체", ""].includes(className)) {
       className = "전체"
     }
 
