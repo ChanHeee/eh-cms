@@ -1,4 +1,9 @@
 {
+  "git": {
+    "deploymentEnabled": {
+      "codex/add-new-testament-overview": false
+    }
+  },
   "crons": [
     {
       "path": "/api/v2/cron/updateAge",
