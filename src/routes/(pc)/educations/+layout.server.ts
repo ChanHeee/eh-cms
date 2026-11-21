@@ -114,6 +114,11 @@ export const load = async ({ url, locals, fetch }) => {
           count: await getEduCount("성숙반", "구약개관"),
           child: [],
         },
+        {
+          name: "신약개관",
+          count: await getEduCount("성숙반", "신약개관"),
+          child: [],
+        },
       ],
     }
   } else if (className == "사명자반") {
