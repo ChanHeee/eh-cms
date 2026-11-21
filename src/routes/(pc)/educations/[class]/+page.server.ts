@@ -15,7 +15,7 @@ export const load = async ({ request, fetch, url, locals }) => {
   } = locals.searchParams
   const className = decodeURI(url.pathname).split("/")[2]
 
-  if (!["기초반", "성숙반", "사명자반", "전체", "통합"].includes(className)) {
+  if (!["기초반", "성숙반", "사명자반", "바이블 칼리지반", "전체", "통합"].includes(className)) {
     throw redirect(302, encodeURI(`/educations`))
   }
 
